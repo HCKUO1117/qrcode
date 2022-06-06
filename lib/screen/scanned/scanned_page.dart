@@ -1,13 +1,15 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
+import 'package:qrcode/model/qrcode_data_type.dart';
 
 class ScannedPage extends StatefulWidget {
   final Barcode? result;
+  final QRCodeDataType type;
 
   const ScannedPage({
     Key? key,
-    required this.result,
+    required this.result, required this.type,
   }) : super(key: key);
 
   @override

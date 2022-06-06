@@ -1,11 +1,16 @@
 import 'dart:io';
 
-import 'package:flutter/foundation.dart';
+import 'package:barcode/barcode.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_vibrate/flutter_vibrate.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
+import 'package:qrcode/model/qrcode_data_type.dart';
 import 'package:qrcode/screen/scanned/scanned_page.dart';
+import 'package:qrcode/utils/judge_qrcode_data_type.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
   runApp(const MyApp());
 }
 
@@ -16,7 +21,6 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
       theme: ThemeData(
         primarySwatch: Colors.blue,
         pageTransitionsTheme: const PageTransitionsTheme(builders: {
@@ -38,11 +42,17 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
   bool haveResult = false;
+
   QRViewController? controller;
 
   bool flashOn = false;
 
   int selectIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   void reassemble() {
@@ -68,10 +78,13 @@ class _MyHomePageState extends State<MyHomePage> {
               flex: 5,
               child: Stack(
                 children: [
-                  QRView(
-                    key: qrKey,
-                    onQRViewCreated: _onQRViewCreated,
-                    overlay: QrScannerOverlayShape(),
+                  GestureDetector(
+                    onTap: () {},
+                    child: QRView(
+                      key: qrKey,
+                      onQRViewCreated: _onQRViewCreated,
+                      overlay: QrScannerOverlayShape(),
+                    ),
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
@@ -123,12 +136,20 @@ class _MyHomePageState extends State<MyHomePage> {
     this.controller = controller;
     controller.scannedDataStream.listen((scanData) async {
       if (haveResult) return;
+
+      Vibrate.vibrate();
+
+      final QRCodeDataType type =
+          JudgeQrcodeDataType().judgeType(scanData.code ?? '');
+
+
       setState(() {
         haveResult = true;
       });
       await Navigator.of(context).push(
         MaterialPageRoute(
           builder: (context) => ScannedPage(
+            type: type,
             result: scanData,
           ),
         ),
