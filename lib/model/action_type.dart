@@ -12,3 +12,6 @@ enum ActionType {
   saveContact,
   saveCalendar
 }
+
+extension ActionTypeEx on ActionType{
+}

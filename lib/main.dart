@@ -2,9 +2,13 @@ import 'dart:io';
 
 import 'package:barcode/barcode.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_vibrate/flutter_vibrate.dart';
+import 'package:provider/provider.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
+import 'package:qrcode/generated/l10n.dart';
 import 'package:qrcode/model/qrcode_data_type.dart';
+import 'package:qrcode/provider/qrcode_provider.dart';
 import 'package:qrcode/screen/scanned/scanned_page.dart';
 import 'package:qrcode/utils/judge_qrcode_data_type.dart';
 
@@ -14,20 +18,43 @@ Future<void> main() async {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({Key? key}) : super(key: key);
+
+  @override
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  QRCodeProvider qrCodeProvider = QRCodeProvider();
 
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        pageTransitionsTheme: const PageTransitionsTheme(builders: {
-          TargetPlatform.android: CupertinoPageTransitionsBuilder(),
-        }),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider.value(value: qrCodeProvider),
+      ],
+      child: MaterialApp(
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+          pageTransitionsTheme: const PageTransitionsTheme(builders: {
+            TargetPlatform.android: CupertinoPageTransitionsBuilder(),
+          }),
+        ),
+        localizationsDelegates: const [
+          S.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: const [
+          Locale('en', ''), // English, no country code
+          Locale('zh', ''), // Spanish, no country code
+        ],
+        locale: const Locale('zh', ''),
+        home: const MyHomePage(),
       ),
-      home: const MyHomePage(),
     );
   }
 }
@@ -141,7 +168,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
       final QRCodeDataType type =
           JudgeQrcodeDataType().judgeType(scanData.code ?? '');
-
 
       setState(() {
         haveResult = true;
