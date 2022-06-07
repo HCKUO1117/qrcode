@@ -1,3 +1,14 @@
 {
-  "copy": "copy"
+  "copy": "Copy",
+  "launch": "Execute",
+  "search": "Search",
+  "launchUrl": "Open Link",
+  "saveBookmark": "Save Bookmark",
+  "sendEmail": "Send Email",
+  "sendSMS": "Send SMS",
+  "call": "Call",
+  "openMap": "Open Map",
+  "connectWifi": "Connect Wifi",
+  "saveContact": "Save Contact",
+  "saveCalendar": "Save Calendar"
 }

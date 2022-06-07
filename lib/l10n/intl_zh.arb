@@ -1,3 +1,14 @@
 {
-  "copy": "複製"
+  "copy": "複製",
+  "launch": "執行",
+  "search": "搜尋",
+  "launchUrl": "開啟連結",
+  "saveBookmark": "儲存書籤",
+  "sendEmail": "寄送Email",
+  "sendSMS": "寄送簡訊",
+  "call": "通話",
+  "openMap": "開啟地圖",
+  "connectWifi": "連接Wifi",
+  "saveContact": "儲存聯絡人",
+  "saveCalendar": "儲存日曆"
 }

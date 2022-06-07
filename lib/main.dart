@@ -20,9 +20,12 @@ Future<void> main() async {
 
 class MyApp extends StatefulWidget {
   const MyApp({Key? key}) : super(key: key);
-
+  static final GlobalKey<NavigatorState> navigatorKey = GlobalKey();
   @override
   _MyAppState createState() => _MyAppState();
+
+  static _MyAppState? of(BuildContext context) =>
+      context.findAncestorStateOfType<_MyAppState>();
 }
 
 class _MyAppState extends State<MyApp> {
@@ -36,6 +39,7 @@ class _MyAppState extends State<MyApp> {
         ChangeNotifierProvider.value(value: qrCodeProvider),
       ],
       child: MaterialApp(
+        navigatorKey: MyApp.navigatorKey,
         theme: ThemeData(
           primarySwatch: Colors.blue,
           pageTransitionsTheme: const PageTransitionsTheme(builders: {

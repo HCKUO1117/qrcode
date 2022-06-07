@@ -1,3 +1,5 @@
+import 'package:qrcode/generated/l10n.dart';
+
 enum ActionType {
   launchApp,
   copy,
@@ -11,7 +13,4 @@ enum ActionType {
   connectWifi,
   saveContact,
   saveCalendar
-}
-
-extension ActionTypeEx on ActionType{
 }

@@ -1,16 +1,20 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:qrcode/generated/l10n.dart';
+import 'package:qrcode/main.dart';
 import 'package:qrcode/model/qrcode_data_type.dart';
+import 'package:qrcode/provider/qrcode_provider.dart';
 
 class ScannedPage extends StatefulWidget {
-  final Barcode? result;
+  final Barcode result;
   final QRCodeDataType type;
 
   const ScannedPage({
     Key? key,
-    required this.result, required this.type,
+    required this.result,
+    required this.type,
   }) : super(key: key);
 
   @override
@@ -23,7 +27,16 @@ class _ScannedPageState extends State<ScannedPage> {
   PageController pageController = PageController();
 
   @override
+  void initState() {
+    super.initState();
+    final qrcodeProvider = Provider.of<QRCodeProvider>(context, listen: false);
+    qrcodeProvider.setActionList(MyApp.navigatorKey.currentContext!,
+        type: widget.type);
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final qrcodeProvider = Provider.of<QRCodeProvider>(context);
     return Scaffold(
       appBar: AppBar(),
       body: Column(
@@ -85,23 +98,29 @@ class _ScannedPageState extends State<ScannedPage> {
           Expanded(
             child: PageView(
               controller: pageController,
-              onPageChanged: (index){
+              onPageChanged: (index) {
                 setState(() {
                   selectIndex = index;
                 });
               },
               children: [
                 Center(
-                  child: (widget.result != null)
-                      ? Text(
-                      'Barcode Type: ${describeEnum(widget.result!.format)}   Data: ${widget.result!.code}')
-                      : Text('Scan a code'),
+                  child: Column(
+                    children: [
+                      Expanded(
+                        child: Text(
+                            'Barcode Type: ${describeEnum(widget.result.format)}   Data: ${widget.result.code}'),
+                      ),
+                      ListView(
+                        shrinkWrap: true,
+                        children: qrcodeProvider.actionList,
+                      ),
+                    ],
+                  ),
                 ),
                 Center(
-                  child: (widget.result != null)
-                      ? Text(
-                      'Barcode Type: ${describeEnum(widget.result!.format)}   Data: ${widget.result!.code}')
-                      : Text('Scan a code'),
+                  child: Text(
+                      'Barcode Type: ${describeEnum(widget.result.format)}   Data: ${widget.result.code}'),
                 )
               ],
             ),
@@ -114,7 +133,8 @@ class _ScannedPageState extends State<ScannedPage> {
   void setSelectIndex(int index) {
     setState(() {
       selectIndex = index;
-      pageController.animateToPage(index, duration: Duration(milliseconds: 200), curve: Curves.ease);
+      pageController.animateToPage(index,
+          duration: Duration(milliseconds: 200), curve: Curves.ease);
     });
   }
 }
