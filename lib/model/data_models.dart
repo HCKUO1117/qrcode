@@ -61,3 +61,19 @@ class WifiModel {
     required this.password,
   });
 }
+
+class CalendarModel {
+  String title;
+  String startTime;
+  String endTime;
+  String location;
+  String description;
+
+  CalendarModel({
+    required this.title,
+    required this.startTime,
+    required this.endTime,
+    required this.location,
+    required this.description,
+  });
+}

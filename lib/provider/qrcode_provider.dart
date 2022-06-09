@@ -1,11 +1,16 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:qrcode/generated/l10n.dart';
 import 'package:qrcode/model/action_type.dart';
 import 'package:qrcode/model/qrcode_data_type.dart';
 
 class QRCodeProvider extends ChangeNotifier {
+
+  Widget mainAction = const SizedBox();
   List<Widget> actionList = [];
+
+  List<Widget> infoList = [];
 
   void setActionList(
     BuildContext context, {
@@ -76,8 +81,96 @@ class QRCodeProvider extends ChangeNotifier {
         break;
     }
 
-    for (final element in actions) {
-      actionList.add(actionButton(context, type: element));
+    mainAction = actionButton(context, type: actions[0]);
+    for (int i = 1;i < actions.length;i ++) {
+      actionList.add(actionButton(context, type: actions[i]));
+    }
+    notifyListeners();
+  }
+
+  void setInfoList(
+    BuildContext context, {
+    required QRCodeDataType type,
+        required Barcode result,
+  }) {
+    switch(type){
+      case QRCodeDataType.text:
+        infoList = [
+          const SizedBox(height: 16),
+          Row(children: const [
+            Icon(Icons.abc,size: 60,),
+            SizedBox(width: 8),
+            Text('TEXT',style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold),),
+          ],),
+          const SizedBox(height: 16),
+
+          Text(result.code ?? ''),
+
+        ];
+        break;
+      case QRCodeDataType.url:
+        infoList = [
+          const Icon(Icons.link),
+          Text(result.code ?? ''),
+
+        ];
+        break;
+      case QRCodeDataType.mail:
+        infoList = [
+          const Icon(Icons.email_outlined),
+          Text(result.code ?? ''),
+
+        ];
+        break;
+      case QRCodeDataType.phone:
+        infoList = [
+          const Icon(Icons.phone_outlined),
+          Text(result.code ?? ''),
+
+        ];
+        break;
+      case QRCodeDataType.sms:
+        infoList = [
+          const Icon(Icons.sms_outlined),
+          Text(result.code ?? ''),
+
+        ];
+        break;
+      case QRCodeDataType.geo:
+        infoList = [
+          const Icon(Icons.location_on_outlined),
+          Text(result.code ?? ''),
+
+        ];
+        break;
+      case QRCodeDataType.wifi:
+        infoList = [
+          const Icon(Icons.wifi),
+          Text(result.code ?? ''),
+
+        ];
+        break;
+      case QRCodeDataType.contract:
+        infoList = [
+          const Icon(Icons.contact_mail_outlined),
+          Text(result.code ?? ''),
+
+        ];
+        break;
+      case QRCodeDataType.bookmark:
+        infoList = [
+          const Icon(Icons.bookmark_border_outlined),
+          Text(result.code ?? ''),
+
+        ];
+        break;
+      case QRCodeDataType.calendar:
+        infoList = [
+          const Icon(Icons.calendar_month_outlined),
+          Text(result.code ?? ''),
+
+        ];
+        break;
     }
     notifyListeners();
   }
@@ -139,8 +232,17 @@ class QRCodeProvider extends ChangeNotifier {
         break;
     }
     return ElevatedButton(
+      style: ElevatedButton.styleFrom(
+        primary: Colors.white,
+        padding: const EdgeInsets.all(8),
+        shape: RoundedRectangleBorder(
+          side: const BorderSide(color: Colors.blueAccent),
+          borderRadius: BorderRadius.circular(0.0),
+
+        ),
+      ),
       onPressed: onTap,
-      child: Text(title),
+      child: Text(title,style: const TextStyle(color: Colors.black),),
     );
   }
 }
