@@ -115,34 +115,11 @@ class _ScannedPageState extends State<ScannedPage> {
                       Expanded(
                         child: ListView(
                           padding: const EdgeInsets.symmetric(horizontal: 16),
-                          children: [
-                            const SizedBox(height: 16),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: const [
-                                Text(
-                                  'TEXT',
-                                  style: TextStyle(
-                                      fontSize: 24,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 16),
-                            Text(widget.result.code ?? ''),
-                          ],
+                          children: qrcodeProvider.infoList,
                         ),
                       ),
-                      Container(padding:EdgeInsets.symmetric(horizontal: 16),width: double.maxFinite,child: qrcodeProvider.mainAction,),
-                      const SizedBox(height: 8),
-                      GridView.count(
-                        padding: EdgeInsets.symmetric(horizontal: 16),
+                      ListView(
                         shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        crossAxisCount: 2,
-                        crossAxisSpacing: 16,
-                        childAspectRatio: 4,
-                        mainAxisSpacing: 8,
                         children: qrcodeProvider.actionList,
                       ),
                       const SizedBox(height: 8),
