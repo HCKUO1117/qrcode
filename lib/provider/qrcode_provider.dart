@@ -94,73 +94,93 @@ class QRCodeProvider extends ChangeNotifier {
   }) {
     switch (type) {
       case QRCodeDataType.text:
+        //TODO 動作
         infoList = [
           const SizedBox(height: 16),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: const [
-              Text(
-                'TEXT',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
-          ),
+          _typeText('TEXT'),
           const SizedBox(height: 16),
           Text(result.code ?? ''),
         ];
         break;
       case QRCodeDataType.url:
         UrlModel urlModel = UrlModel.transfer(result.code ?? '');
+        //TODO 動作
         infoList = [
-          const Text(
-            'URL',
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-            ),
+          const SizedBox(height: 16),
+          _typeText('URL'),
+          const SizedBox(height: 16),
+          _contentTitle(
+            icon: Icons.link,
+            title: null,
+            content: urlModel.url,
           ),
-          Row(
-            children: [
-              const Icon(Icons.link),
-              Text(urlModel.url),
-            ],
-          )
         ];
         break;
       case QRCodeDataType.mail:
+        MailModel mailModel = MailModel.transfer(result.code ?? '');
+        //TODO 動作
         infoList = [
-          const Icon(Icons.email_outlined),
-          Text(result.code ?? ''),
+          const SizedBox(height: 16),
+          _typeText('EMAIL'),
+          const SizedBox(height: 16),
+          _contentTitle(
+            icon: Icons.mail_outline,
+            title: null,
+            content: mailModel.target,
+            showAnyway: true,
+          ),
+          _contentTitle(
+            icon: Icons.title,
+            title: null,
+            content: mailModel.title,
+          ),
+          _contentTitle(
+            icon: null,
+            title: 'CC',
+            content: listToString(mailModel.cc),
+          ),
+          _contentTitle(
+            icon: null,
+            title: 'Bcc',
+            content: listToString(mailModel.bcc),
+          ),
+          _contentTitle(
+            icon: Icons.subject,
+            title: null,
+            content: mailModel.content,
+          ),
         ];
         break;
       case QRCodeDataType.phone:
+        //TODO
         infoList = [
           const Icon(Icons.phone_outlined),
           Text(result.code ?? ''),
         ];
         break;
       case QRCodeDataType.sms:
+        //TODO
         infoList = [
           const Icon(Icons.sms_outlined),
           Text(result.code ?? ''),
         ];
         break;
       case QRCodeDataType.geo:
+        //TODO
         infoList = [
           const Icon(Icons.location_on_outlined),
           Text(result.code ?? ''),
         ];
         break;
       case QRCodeDataType.wifi:
+        //TODO
         infoList = [
           const Icon(Icons.wifi),
           Text(result.code ?? ''),
         ];
         break;
       case QRCodeDataType.contract:
+        //TODO
         infoList = [
           const Icon(Icons.contact_mail_outlined),
           Text(result.code ?? ''),
@@ -168,29 +188,25 @@ class QRCodeProvider extends ChangeNotifier {
         break;
       case QRCodeDataType.bookmark:
         UrlModel urlModel = UrlModel.transfer(result.code ?? '');
+        //TODO 動作
         infoList = [
-          const Text(
-            'BOOKMARK',
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-            ),
+          const SizedBox(height: 16),
+          _typeText('BOOKMARK'),
+          const SizedBox(height: 16),
+          _contentTitle(
+            icon: Icons.bookmark_border_outlined,
+            title: null,
+            content: urlModel.title,
           ),
-          Row(
-            children: [
-              const Icon(Icons.bookmark_border_outlined),
-              Text(urlModel.title),
-            ],
-          ),
-          Row(
-            children: [
-              const Icon(Icons.link),
-              Text(urlModel.url),
-            ],
+          _contentTitle(
+            icon: Icons.link,
+            title: null,
+            content: urlModel.url,
           ),
         ];
         break;
       case QRCodeDataType.calendar:
+        //TODO
         infoList = [
           const Icon(Icons.calendar_month_outlined),
           Text(result.code ?? ''),
@@ -283,6 +299,73 @@ class QRCodeProvider extends ChangeNotifier {
           Icon(iconData),
           const SizedBox(width: 16),
           Text(title),
+        ],
+      ),
+    );
+  }
+
+  String listToString(List<String> list) {
+    String text = '';
+    for (int i = 0; i < list.length; i++) {
+      text += list[i];
+      if (i != list.length - 1) {
+        text += ',';
+      }
+    }
+    return text;
+  }
+
+  Widget _typeText(String title) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text(
+          title,
+          style: const TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _contentTitle({
+    required IconData? icon,
+    required String? title,
+    required String content,
+    IconData? actionIcon,
+    Function()? action,
+    bool showAnyway = false,
+  }) {
+    if (content.isEmpty && !showAnyway) {
+      return const SizedBox();
+    }
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        vertical: 4,
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          if (icon != null) Icon(icon),
+          if (title != null)
+            Text(
+              title,
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              ),
+            ),
+          const SizedBox(width: 8),
+          SelectableText(content,strutStyle: const StrutStyle(
+              forceStrutHeight: true, leading: 0.5),),
+          const Spacer(),
+          if (actionIcon != null)
+            IconButton(
+              onPressed: action,
+              icon: Icon(actionIcon),
+            ),
         ],
       ),
     );

@@ -49,19 +49,84 @@ class UrlModel {
 class MailModel {
   String target;
   String title;
-  String subtitle;
   List<String> cc;
-  List<String> bc;
+  List<String> bcc;
   String content;
 
   MailModel({
     required this.target,
     required this.title,
-    required this.subtitle,
     required this.cc,
-    required this.bc,
+    required this.bcc,
     required this.content,
   });
+
+  factory MailModel.transfer(String rawString) {
+    if (rawString.toUpperCase().startsWith('MATMSG:')) {
+      final to = GetContent().getContent(
+        name: 'TO:',
+        split: ';',
+        rawString: rawString,
+      );
+      final sub = GetContent().getContent(
+        name: 'SUB:',
+        split: ';',
+        rawString: rawString,
+      );
+      final body = GetContent().getContent(
+        name: 'BODY:',
+        split: ';',
+        rawString: rawString,
+      );
+
+      return MailModel(
+        target: to,
+        title: sub,
+        cc: [],
+        bcc: [],
+        content: body,
+      );
+    }
+    final to = GetContent().getContent(
+      name: 'MAILTO:',
+      split: '?',
+      rawString: rawString,
+    );
+    final sub = GetContent().getContent(
+      name: 'SUBJECT=',
+      split: '&',
+      rawString: rawString,
+    );
+
+    final ccRaw = GetContent().getContent(
+      name: 'CC=',
+      split: '&',
+      rawString: rawString,
+      useStartWith: true,
+    );
+    final cc = ccRaw.split(',');
+
+    final bccRaw = GetContent().getContent(
+      name: 'BCC=',
+      split: '&',
+      rawString: rawString,
+    );
+    final bcc = bccRaw.split(',');
+
+    final body = GetContent().getContent(
+      name: 'BODY=',
+      split: '&',
+      rawString: rawString,
+    );
+
+    return MailModel(
+      target: to,
+      title: sub,
+      cc: cc,
+      bcc: bcc,
+      content: body,
+    );
+  }
 }
 
 class SMSModel {

@@ -7,6 +7,8 @@ import 'package:qrcode/main.dart';
 import 'package:qrcode/model/qrcode_data_type.dart';
 import 'package:qrcode/provider/qrcode_provider.dart';
 
+import '../../model/data_models.dart';
+
 class ScannedPage extends StatefulWidget {
   final Barcode result;
   final QRCodeDataType type;
@@ -42,98 +44,103 @@ class _ScannedPageState extends State<ScannedPage> {
   @override
   Widget build(BuildContext context) {
     final qrcodeProvider = Provider.of<QRCodeProvider>(context);
-    return Scaffold(
-      appBar: AppBar(),
-      body: Column(
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: GestureDetector(
-                  onTap: () {
-                    setSelectIndex(0);
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 10),
-                    decoration: selectIndex == 0
-                        ? null
-                        : const BoxDecoration(
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.grey,
-                              ),
-                              BoxShadow(
-                                color: Colors.white54,
-                                spreadRadius: -3.0,
-                                blurRadius: 3.0,
-                              ),
-                            ],
-                          ),
-                    child: Icon(Icons.format_list_bulleted),
-                  ),
-                ),
-              ),
-              Expanded(
-                child: GestureDetector(
-                  onTap: () {
-                    setSelectIndex(1);
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 10),
-                    decoration: selectIndex == 1
-                        ? null
-                        : const BoxDecoration(
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.grey,
-                              ),
-                              BoxShadow(
-                                color: Colors.white54,
-                                spreadRadius: -3.0,
-                                blurRadius: 3.0,
-                              ),
-                            ],
-                          ),
-                    child: Icon(Icons.raw_on),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          Expanded(
-            child: PageView(
-              controller: pageController,
-              onPageChanged: (index) {
-                setState(() {
-                  selectIndex = index;
-                });
-              },
+    return GestureDetector(
+      onTap: () {
+        FocusScope.of(context).unfocus();
+      },
+      child: Scaffold(
+        appBar: AppBar(),
+        body: Column(
+          children: [
+            Row(
               children: [
-                Center(
-                  child: Column(
-                    children: [
-                      Expanded(
-                        child: ListView(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          children: qrcodeProvider.infoList,
-                        ),
-                      ),
-                      ListView(
-                        shrinkWrap: true,
-                        children: qrcodeProvider.actionList,
-                      ),
-                      const SizedBox(height: 8),
-                    ],
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () {
+                      setSelectIndex(0);
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      decoration: selectIndex == 0
+                          ? null
+                          : const BoxDecoration(
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey,
+                                ),
+                                BoxShadow(
+                                  color: Colors.white54,
+                                  spreadRadius: -3.0,
+                                  blurRadius: 3.0,
+                                ),
+                              ],
+                            ),
+                      child: const Icon(Icons.format_list_bulleted),
+                    ),
                   ),
                 ),
-                Center(
-                  child: Text(
-                      'Barcode Type: ${describeEnum(widget.result.format)}   Data: ${widget.result.code}'),
-                )
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () {
+                      setSelectIndex(1);
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      decoration: selectIndex == 1
+                          ? null
+                          : const BoxDecoration(
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey,
+                                ),
+                                BoxShadow(
+                                  color: Colors.white54,
+                                  spreadRadius: -3.0,
+                                  blurRadius: 3.0,
+                                ),
+                              ],
+                            ),
+                      child: const Icon(Icons.raw_on),
+                    ),
+                  ),
+                ),
               ],
             ),
-          ),
-        ],
+            Expanded(
+              child: PageView(
+                controller: pageController,
+                onPageChanged: (index) {
+                  setState(() {
+                    selectIndex = index;
+                  });
+                },
+                children: [
+                  Center(
+                    child: Column(
+                      children: [
+                        Expanded(
+                          child: ListView(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            children: qrcodeProvider.infoList,
+                          ),
+                        ),
+                        ListView(
+                          shrinkWrap: true,
+                          children: qrcodeProvider.actionList,
+                        ),
+                        const SizedBox(height: 8),
+                      ],
+                    ),
+                  ),
+                  Center(
+                    child: SelectableText(
+                        'Barcode Type: ${describeEnum(widget.result.format)}   Data: ${widget.result.code}'),
+                  )
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -142,7 +149,7 @@ class _ScannedPageState extends State<ScannedPage> {
     setState(() {
       selectIndex = index;
       pageController.animateToPage(index,
-          duration: Duration(milliseconds: 200), curve: Curves.ease);
+          duration: const Duration(milliseconds: 200), curve: Curves.ease);
     });
   }
 }

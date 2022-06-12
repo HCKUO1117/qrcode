@@ -54,9 +54,9 @@ class _MyAppState extends State<MyApp> {
         ],
         supportedLocales: const [
           Locale('en', ''), // English, no country code
-          Locale('zh', ''), // Spanish, no country code
+          Locale('zh', 'TW'), // Spanish, no country code
         ],
-        locale: const Locale('zh', ''),
+        locale: const Locale('zh', 'TW'),
         home: const MyHomePage(),
       ),
     );
