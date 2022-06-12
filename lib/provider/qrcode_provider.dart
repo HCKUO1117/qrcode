@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:qrcode/generated/l10n.dart';
 import 'package:qrcode/model/action_type.dart';
+import 'package:qrcode/model/data_models.dart';
 import 'package:qrcode/model/qrcode_data_type.dart';
 
 class QRCodeProvider extends ChangeNotifier {
@@ -101,8 +102,9 @@ class QRCodeProvider extends ChangeNotifier {
               Text(
                 'TEXT',
                 style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold),
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ],
           ),
@@ -111,9 +113,21 @@ class QRCodeProvider extends ChangeNotifier {
         ];
         break;
       case QRCodeDataType.url:
+        UrlModel urlModel = UrlModel.transfer(result.code ?? '');
         infoList = [
-          const Icon(Icons.link),
-          Text(result.code ?? ''),
+          const Text(
+            'URL',
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          Row(
+            children: [
+              const Icon(Icons.link),
+              Text(urlModel.url),
+            ],
+          )
         ];
         break;
       case QRCodeDataType.mail:
@@ -153,9 +167,27 @@ class QRCodeProvider extends ChangeNotifier {
         ];
         break;
       case QRCodeDataType.bookmark:
+        UrlModel urlModel = UrlModel.transfer(result.code ?? '');
         infoList = [
-          const Icon(Icons.bookmark_border_outlined),
-          Text(result.code ?? ''),
+          const Text(
+            'BOOKMARK',
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          Row(
+            children: [
+              const Icon(Icons.bookmark_border_outlined),
+              Text(urlModel.title),
+            ],
+          ),
+          Row(
+            children: [
+              const Icon(Icons.link),
+              Text(urlModel.url),
+            ],
+          ),
         ];
         break;
       case QRCodeDataType.calendar:

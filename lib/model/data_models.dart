@@ -1,3 +1,5 @@
+import 'package:qrcode/utils/get_content.dart';
+
 class UrlModel {
   String title;
   String url;
@@ -6,6 +8,42 @@ class UrlModel {
     required this.url,
     required this.title,
   });
+
+  factory UrlModel.transfer(String rawString) {
+    if (rawString.toUpperCase().startsWith('MEBKM:')) {
+      final title = GetContent().getContent(
+        name: 'TITLE:',
+        split: ';',
+        rawString: rawString,
+      );
+      final url = GetContent().getContent(
+        name: 'URL:',
+        split: ';',
+        rawString: rawString,
+      );
+      return UrlModel(url: url, title: title);
+    }
+    if (rawString.toUpperCase().startsWith('URL:')) {
+      return UrlModel(
+          url: GetContent().getContent(
+            name: 'URL:',
+            split: ';',
+            rawString: rawString,
+          ),
+          title: '');
+    }
+    if (rawString.toUpperCase().startsWith('URLTO:')) {
+      return UrlModel(
+          url: GetContent().getContent(
+            name: 'URLTO:',
+            split: ';',
+            rawString: rawString,
+          ),
+          title: '');
+    }
+
+    return UrlModel(url: rawString, title: '');
+  }
 }
 
 class MailModel {
