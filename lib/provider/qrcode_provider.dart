@@ -5,6 +5,9 @@ import 'package:qrcode/generated/l10n.dart';
 import 'package:qrcode/model/action_type.dart';
 import 'package:qrcode/model/data_models.dart';
 import 'package:qrcode/model/qrcode_data_type.dart';
+import 'package:qrcode/utils/dialog.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 class QRCodeProvider extends ChangeNotifier {
   Widget mainAction = const SizedBox();
@@ -110,6 +113,7 @@ class QRCodeProvider extends ChangeNotifier {
           _typeText('URL'),
           const SizedBox(height: 16),
           _contentTitle(
+            context,
             icon: Icons.link,
             title: null,
             content: urlModel.url,
@@ -124,27 +128,32 @@ class QRCodeProvider extends ChangeNotifier {
           _typeText('EMAIL'),
           const SizedBox(height: 16),
           _contentTitle(
+            context,
             icon: Icons.mail_outline,
             title: null,
             content: mailModel.target,
             showAnyway: true,
           ),
           _contentTitle(
+            context,
             icon: Icons.title,
             title: null,
             content: mailModel.title,
           ),
           _contentTitle(
+            context,
             icon: null,
             title: 'CC',
             content: listToString(mailModel.cc),
           ),
           _contentTitle(
+            context,
             icon: null,
             title: 'Bcc',
             content: listToString(mailModel.bcc),
           ),
           _contentTitle(
+            context,
             icon: Icons.subject,
             title: null,
             content: mailModel.content,
@@ -152,24 +161,60 @@ class QRCodeProvider extends ChangeNotifier {
         ];
         break;
       case QRCodeDataType.phone:
-        //TODO
+        PhoneModel phoneModel = PhoneModel.transfer(result.code ?? '');
+        //TODO 動作
         infoList = [
-          const Icon(Icons.phone_outlined),
-          Text(result.code ?? ''),
+          const SizedBox(height: 16),
+          _typeText('TEL'),
+          const SizedBox(height: 16),
+          _contentTitle(
+            context,
+            icon: Icons.phone_outlined,
+            title: null,
+            content: phoneModel.phoneNumber,
+          ),
         ];
         break;
       case QRCodeDataType.sms:
-        //TODO
+        SMSModel smsModel = SMSModel.transfer(result.code ?? '');
+        //TODO 動作
         infoList = [
-          const Icon(Icons.sms_outlined),
-          Text(result.code ?? ''),
+          const SizedBox(height: 16),
+          _typeText('SMS'),
+          const SizedBox(height: 16),
+          _contentTitle(
+            context,
+            icon: Icons.phone_outlined,
+            title: null,
+            content: smsModel.phoneNumber,
+          ),
+          _contentTitle(
+            context,
+            icon: Icons.sms_outlined,
+            title: null,
+            content: smsModel.content,
+          ),
         ];
         break;
       case QRCodeDataType.geo:
-        //TODO
+        GEOModel geoModel = GEOModel.transfer(result.code ?? '');
+        //TODO 動作
         infoList = [
-          const Icon(Icons.location_on_outlined),
-          Text(result.code ?? ''),
+          const SizedBox(height: 16),
+          _typeText('GEO'),
+          const SizedBox(height: 16),
+          _contentTitle(
+            context,
+            icon: Icons.my_location_outlined,
+            title: null,
+            content: '${geoModel.lon},${geoModel.lat}',
+          ),
+          _contentTitle(
+            context,
+            icon: Icons.location_on_outlined,
+            title: null,
+            content: geoModel.name,
+          ),
         ];
         break;
       case QRCodeDataType.wifi:
@@ -194,11 +239,13 @@ class QRCodeProvider extends ChangeNotifier {
           _typeText('BOOKMARK'),
           const SizedBox(height: 16),
           _contentTitle(
+            context,
             icon: Icons.bookmark_border_outlined,
             title: null,
             content: urlModel.title,
           ),
           _contentTitle(
+            context,
             icon: Icons.link,
             title: null,
             content: urlModel.url,
@@ -330,7 +377,8 @@ class QRCodeProvider extends ChangeNotifier {
     );
   }
 
-  Widget _contentTitle({
+  Widget _contentTitle(
+    BuildContext context, {
     required IconData? icon,
     required String? title,
     required String content,
@@ -341,6 +389,7 @@ class QRCodeProvider extends ChangeNotifier {
     if (content.isEmpty && !showAnyway) {
       return const SizedBox();
     }
+    bool canTap = content.contains(':');
     return Padding(
       padding: const EdgeInsets.symmetric(
         vertical: 4,
@@ -358,8 +407,31 @@ class QRCodeProvider extends ChangeNotifier {
               ),
             ),
           const SizedBox(width: 8),
-          SelectableText(content,strutStyle: const StrutStyle(
-              forceStrutHeight: true, leading: 0.5),),
+          Expanded(
+            child: SelectableText(
+              content,
+              style: TextStyle(
+                color: canTap ? Colors.blue : null,
+                decoration: canTap ? TextDecoration.underline : null,
+              ),
+              strutStyle: const StrutStyle(
+                forceStrutHeight: true,
+                leading: 0.5,
+              ),
+              onTap: canTap
+                  ? () async {
+                      launchUrlString(content)
+                          .onError((error, stackTrace) {
+                        ShowDialog.show(
+                          context,
+                          content: '${S.of(context).canNotOpen} $content',
+                        );
+                        return true;
+                      });
+                    }
+                  : null,
+            ),
+          ),
           const Spacer(),
           if (actionIcon != null)
             IconButton(

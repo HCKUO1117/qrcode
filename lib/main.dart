@@ -11,6 +11,7 @@ import 'package:qrcode/model/qrcode_data_type.dart';
 import 'package:qrcode/provider/qrcode_provider.dart';
 import 'package:qrcode/screen/scanned/scanned_page.dart';
 import 'package:qrcode/utils/judge_qrcode_data_type.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();

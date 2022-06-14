@@ -10,5 +10,7 @@
   "openMap": "Open Map",
   "connectWifi": "Connect Wifi",
   "saveContact": "Save Contact",
-  "saveCalendar": "Save Calendar"
+  "saveCalendar": "Save Calendar",
+  "confirm": "Confirm",
+  "canNotOpen": "Cannot open"
 }

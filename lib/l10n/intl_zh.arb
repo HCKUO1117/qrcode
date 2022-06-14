@@ -10,5 +10,7 @@
   "openMap": "開啟地圖",
   "connectWifi": "連接Wifi",
   "saveContact": "儲存聯絡人",
-  "saveCalendar": "儲存日曆"
+  "saveCalendar": "儲存日曆",
+  "confirm": "確認",
+  "canNotOpen": "無法開啟"
 }

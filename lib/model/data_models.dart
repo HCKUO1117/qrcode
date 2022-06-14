@@ -129,14 +129,48 @@ class MailModel {
   }
 }
 
+class PhoneModel {
+  String phoneNumber;
+
+  PhoneModel({
+    required this.phoneNumber,
+  });
+
+  factory PhoneModel.transfer(String rawString) {
+    final phone = rawString.substring('TEL:'.length,rawString.length);
+    return PhoneModel(
+      phoneNumber: phone,
+    );
+  }
+}
+
 class SMSModel {
-  String target;
+  String phoneNumber;
   String content;
 
   SMSModel({
-    required this.target,
+    required this.phoneNumber,
     required this.content,
   });
+
+  factory SMSModel.transfer(String rawString) {
+    List<String> list = rawString.split(':');
+    String phone = '';
+    String content = '';
+    if (list.length > 1) {
+      phone = list[1];
+    }
+    if (list.length > 2) {
+      content = list[2];
+    }
+    if(list.length > 3){
+      content = list[3];
+    }
+    return SMSModel(
+      phoneNumber: phone,
+      content: content,
+    );
+  }
 }
 
 class GEOModel {
@@ -151,6 +185,35 @@ class GEOModel {
     required this.name,
     required this.zoom,
   });
+
+  factory GEOModel.transfer(String rawString) {
+    final location = GetContent().getContent(
+      name: 'GEO:',
+      split: '?',
+      rawString: rawString,
+    );
+    final locationSplit = location.split(',');
+    final lon = locationSplit[0];
+    final lat = locationSplit[1];
+
+    final name = GetContent().getContent(
+      name: 'Q=',
+      split: '&',
+      rawString: rawString,
+    );
+    final zoom = GetContent().getContent(
+      name: 'Z=',
+      split: '&',
+      rawString: rawString,
+    );
+
+    return GEOModel(
+      lon: double.parse(lon),
+      lat: double.parse(lat),
+      name: name,
+      zoom: double.parse(zoom),
+    );
+  }
 }
 
 class WifiModel {

@@ -44,11 +44,7 @@ class _ScannedPageState extends State<ScannedPage> {
   @override
   Widget build(BuildContext context) {
     final qrcodeProvider = Provider.of<QRCodeProvider>(context);
-    return GestureDetector(
-      onTap: () {
-        FocusScope.of(context).unfocus();
-      },
-      child: Scaffold(
+    return Scaffold(
         appBar: AppBar(),
         body: Column(
           children: [
@@ -141,7 +137,6 @@ class _ScannedPageState extends State<ScannedPage> {
             ),
           ],
         ),
-      ),
     );
   }
 
