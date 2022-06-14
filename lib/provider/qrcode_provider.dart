@@ -1,13 +1,20 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_contacts/contact.dart';
+import 'package:flutter_contacts/properties/address.dart';
+import 'package:flutter_contacts/properties/email.dart';
+import 'package:flutter_contacts/properties/phone.dart';
+import 'package:flutter_contacts/properties/website.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:qrcode/generated/l10n.dart';
 import 'package:qrcode/model/action_type.dart';
 import 'package:qrcode/model/data_models.dart';
 import 'package:qrcode/model/qrcode_data_type.dart';
 import 'package:qrcode/utils/dialog.dart';
+import 'package:qrcode/utils/get_content.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:url_launcher/url_launcher_string.dart';
+import 'package:vcard_maintained/vcard_maintained.dart';
 
 class QRCodeProvider extends ChangeNotifier {
   Widget mainAction = const SizedBox();
@@ -218,17 +225,229 @@ class QRCodeProvider extends ChangeNotifier {
         ];
         break;
       case QRCodeDataType.wifi:
-        //TODO
+        WifiModel wifiModel = WifiModel.transfer(result.code ?? '');
+        //TODO 動作
         infoList = [
-          const Icon(Icons.wifi),
-          Text(result.code ?? ''),
+          const SizedBox(height: 16),
+          _typeText('WIFI'),
+          const SizedBox(height: 16),
+          _contentTitle(
+            context,
+            icon: Icons.wifi,
+            title: null,
+            content: wifiModel.name,
+          ),
+          _contentTitle(
+            context,
+            icon: Icons.vpn_key_outlined,
+            title: null,
+            content: wifiModel.password,
+          ),
+          _contentTitle(
+            context,
+            icon: Icons.settings_ethernet,
+            title: null,
+            content: wifiModel.type,
+          ),
         ];
         break;
       case QRCodeDataType.contract:
+        Contact contact = Contact();
+
+        // Import contact from vCard
+        contact = Contact.fromVCard(result.code ?? '');
+        print(contact.emails);
         //TODO
         infoList = [
-          const Icon(Icons.contact_mail_outlined),
-          Text(result.code ?? ''),
+          const SizedBox(height: 16),
+          _typeText('CONTACT'),
+          const SizedBox(height: 16),
+          if (contact.photo != null) Image.memory(contact.photo!),
+          if (contact.thumbnail != null) Image.memory(contact.thumbnail!),
+          _contentTitle(
+            context,
+            icon: Icons.person_outline,
+            title: null,
+            content: contact.displayName,
+          ),
+          const Divider(),
+          _contentTitleWithChild(
+            icon: Icons.settings_phone_outlined,
+            child: ListView.separated(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: contact.phones.length,
+              separatorBuilder: (context, index) {
+                return const Divider();
+              },
+              itemBuilder: (context, index) {
+                return Column(
+                  children: [
+                    _contentTitle(
+                      context,
+                      icon: Icons.label_outline,
+                      title: null,
+                      content:
+                          '${_phoneLabelToString[contact.phones[index].label]}',
+                      havePadding: false,
+                    ),
+                    _contentTitle(
+                      context,
+                      icon: Icons.phone_outlined,
+                      title: null,
+                      content: contact.phones[index].number,
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
+          const Divider(),
+          _contentTitleWithChild(
+            icon: Icons.mail_outline,
+            child: ListView.separated(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: contact.emails.length,
+              separatorBuilder: (context, index) {
+                return const Divider();
+              },
+              itemBuilder: (context, index) {
+                return Column(
+                  children: [
+                    _contentTitle(
+                      context,
+                      icon: Icons.label_outline,
+                      title: null,
+                      content:
+                          '${_emailLabelToString[contact.emails[index].label]}',
+                      havePadding: false,
+                    ),
+                    _contentTitle(
+                      context,
+                      icon: Icons.email_outlined,
+                      title: null,
+                      content: contact.emails[index].address,
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
+          const Divider(),
+          _contentTitleWithChild(
+            icon: Icons.location_on_outlined,
+            child: ListView.separated(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: contact.addresses.length,
+              separatorBuilder: (context, index) {
+                return const Divider();
+              },
+              itemBuilder: (context, index) {
+                return Column(
+                  children: [
+                    _contentTitle(
+                      context,
+                      icon: Icons.label_outline,
+                      title: null,
+                      content:
+                          '${_addressLabelToString[contact.addresses[index].label]}',
+                      havePadding: false,
+                    ),
+                    _contentTitle(
+                      context,
+                      icon: Icons.location_city_outlined,
+                      title: null,
+                      content:
+                          GetContent.addressTransfer(contact.addresses[index]),
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
+          const Divider(),
+          _contentTitleWithChild(
+            icon: Icons.business_rounded,
+            child: ListView.separated(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: contact.organizations.length,
+              separatorBuilder: (context, index) {
+                return const Divider();
+              },
+              itemBuilder: (context, index) {
+                return Column(
+                  children: [
+                    _contentTitle(
+                      context,
+                      icon: Icons.label_outline,
+                      title: null,
+                      content: contact.organizations[index].company,
+                      havePadding: false,
+                    ),
+                    _contentTitle(
+                      context,
+                      icon: Icons.work_outline,
+                      title: null,
+                      content: contact.organizations[index].department,
+                    ),
+                    _contentTitle(
+                      context,
+                      icon: Icons.badge_outlined,
+                      title: null,
+                      content: contact.organizations[index].title,
+                    ),
+                    _contentTitle(
+                      context,
+                      icon: Icons.edit_note_outlined,
+                      title: null,
+                      content: contact.organizations[index].jobDescription,
+                    ),
+                    _contentTitle(
+                      context,
+                      icon: Icons.location_on_outlined,
+                      title: null,
+                      content: contact.organizations[index].officeLocation,
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
+          const Divider(),
+          _contentTitleWithChild(
+            icon: Icons.language,
+            child: ListView.separated(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: contact.websites.length,
+              separatorBuilder: (context, index) {
+                return const Divider();
+              },
+              itemBuilder: (context, index) {
+                return Column(
+                  children: [
+                    _contentTitle(
+                      context,
+                      icon: Icons.label_outline,
+                      title: null,
+                      content:
+                          '${_websiteLabelToString[contact.websites[index].label]}',
+                      havePadding: false,
+                    ),
+                    _contentTitle(
+                      context,
+                      icon: Icons.link,
+                      title: null,
+                      content: contact.websites[index].url,
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
         ];
         break;
       case QRCodeDataType.bookmark:
@@ -385,14 +604,15 @@ class QRCodeProvider extends ChangeNotifier {
     IconData? actionIcon,
     Function()? action,
     bool showAnyway = false,
+    bool havePadding = true,
   }) {
     if (content.isEmpty && !showAnyway) {
       return const SizedBox();
     }
     bool canTap = content.contains(':');
     return Padding(
-      padding: const EdgeInsets.symmetric(
-        vertical: 4,
+      padding: EdgeInsets.symmetric(
+        vertical: havePadding ? 4 : 0,
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -420,8 +640,7 @@ class QRCodeProvider extends ChangeNotifier {
               ),
               onTap: canTap
                   ? () async {
-                      launchUrlString(content)
-                          .onError((error, stackTrace) {
+                      launchUrlString(content).onError((error, stackTrace) {
                         ShowDialog.show(
                           context,
                           content: '${S.of(context).canNotOpen} $content',
@@ -442,4 +661,77 @@ class QRCodeProvider extends ChangeNotifier {
       ),
     );
   }
+
+  Widget _contentTitleWithChild(
+      {required IconData icon, required Widget child}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        vertical: 4,
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon),
+          const SizedBox(width: 8),
+          Expanded(child: child),
+        ],
+      ),
+    );
+  }
 }
+
+final _phoneLabelToString = {
+  PhoneLabel.assistant: 'assistant',
+  PhoneLabel.callback: 'callback',
+  PhoneLabel.car: 'car',
+  PhoneLabel.companyMain: 'companyMain',
+  PhoneLabel.faxHome: 'faxHome',
+  PhoneLabel.faxOther: 'faxOther',
+  PhoneLabel.faxWork: 'faxWork',
+  PhoneLabel.home: 'home',
+  PhoneLabel.iPhone: 'iPhone',
+  PhoneLabel.isdn: 'isdn',
+  PhoneLabel.main: 'main',
+  PhoneLabel.mms: 'mms',
+  PhoneLabel.mobile: 'mobile',
+  PhoneLabel.pager: 'pager',
+  PhoneLabel.radio: 'radio',
+  PhoneLabel.school: 'school',
+  PhoneLabel.telex: 'telex',
+  PhoneLabel.ttyTtd: 'ttyTtd',
+  PhoneLabel.work: 'work',
+  PhoneLabel.workMobile: 'workMobile',
+  PhoneLabel.workPager: 'workPager',
+  PhoneLabel.other: 'other',
+  PhoneLabel.custom: 'custom',
+};
+
+final _emailLabelToString = {
+  EmailLabel.home: 'home',
+  EmailLabel.iCloud: 'iCloud',
+  EmailLabel.mobile: 'mobile',
+  EmailLabel.school: 'school',
+  EmailLabel.work: 'work',
+  EmailLabel.other: 'other',
+  EmailLabel.custom: 'custom',
+};
+
+final _addressLabelToString = {
+  AddressLabel.home: 'home',
+  AddressLabel.school: 'school',
+  AddressLabel.work: 'work',
+  AddressLabel.other: 'other',
+  AddressLabel.custom: 'custom',
+};
+
+final _websiteLabelToString = {
+  WebsiteLabel.blog: 'blog',
+  WebsiteLabel.ftp: 'ftp',
+  WebsiteLabel.home: 'home',
+  WebsiteLabel.homepage: 'homepage',
+  WebsiteLabel.profile: 'profile',
+  WebsiteLabel.school: 'school',
+  WebsiteLabel.work: 'work',
+  WebsiteLabel.other: 'other',
+  WebsiteLabel.custom: 'custom',
+};

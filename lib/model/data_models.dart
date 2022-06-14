@@ -11,12 +11,12 @@ class UrlModel {
 
   factory UrlModel.transfer(String rawString) {
     if (rawString.toUpperCase().startsWith('MEBKM:')) {
-      final title = GetContent().getContent(
+      final title = GetContent.getContent(
         name: 'TITLE:',
         split: ';',
         rawString: rawString,
       );
-      final url = GetContent().getContent(
+      final url = GetContent.getContent(
         name: 'URL:',
         split: ';',
         rawString: rawString,
@@ -25,7 +25,7 @@ class UrlModel {
     }
     if (rawString.toUpperCase().startsWith('URL:')) {
       return UrlModel(
-          url: GetContent().getContent(
+          url: GetContent.getContent(
             name: 'URL:',
             split: ';',
             rawString: rawString,
@@ -34,7 +34,7 @@ class UrlModel {
     }
     if (rawString.toUpperCase().startsWith('URLTO:')) {
       return UrlModel(
-          url: GetContent().getContent(
+          url: GetContent.getContent(
             name: 'URLTO:',
             split: ';',
             rawString: rawString,
@@ -63,17 +63,17 @@ class MailModel {
 
   factory MailModel.transfer(String rawString) {
     if (rawString.toUpperCase().startsWith('MATMSG:')) {
-      final to = GetContent().getContent(
+      final to = GetContent.getContent(
         name: 'TO:',
         split: ';',
         rawString: rawString,
       );
-      final sub = GetContent().getContent(
+      final sub = GetContent.getContent(
         name: 'SUB:',
         split: ';',
         rawString: rawString,
       );
-      final body = GetContent().getContent(
+      final body = GetContent.getContent(
         name: 'BODY:',
         split: ';',
         rawString: rawString,
@@ -87,18 +87,18 @@ class MailModel {
         content: body,
       );
     }
-    final to = GetContent().getContent(
+    final to = GetContent.getContent(
       name: 'MAILTO:',
       split: '?',
       rawString: rawString,
     );
-    final sub = GetContent().getContent(
+    final sub = GetContent.getContent(
       name: 'SUBJECT=',
       split: '&',
       rawString: rawString,
     );
 
-    final ccRaw = GetContent().getContent(
+    final ccRaw = GetContent.getContent(
       name: 'CC=',
       split: '&',
       rawString: rawString,
@@ -106,14 +106,14 @@ class MailModel {
     );
     final cc = ccRaw.split(',');
 
-    final bccRaw = GetContent().getContent(
+    final bccRaw = GetContent.getContent(
       name: 'BCC=',
       split: '&',
       rawString: rawString,
     );
     final bcc = bccRaw.split(',');
 
-    final body = GetContent().getContent(
+    final body = GetContent.getContent(
       name: 'BODY=',
       split: '&',
       rawString: rawString,
@@ -137,7 +137,7 @@ class PhoneModel {
   });
 
   factory PhoneModel.transfer(String rawString) {
-    final phone = rawString.substring('TEL:'.length,rawString.length);
+    final phone = rawString.substring('TEL:'.length, rawString.length);
     return PhoneModel(
       phoneNumber: phone,
     );
@@ -163,7 +163,7 @@ class SMSModel {
     if (list.length > 2) {
       content = list[2];
     }
-    if(list.length > 3){
+    if (list.length > 3) {
       content = list[3];
     }
     return SMSModel(
@@ -187,7 +187,7 @@ class GEOModel {
   });
 
   factory GEOModel.transfer(String rawString) {
-    final location = GetContent().getContent(
+    final location = GetContent.getContent(
       name: 'GEO:',
       split: '?',
       rawString: rawString,
@@ -196,12 +196,12 @@ class GEOModel {
     final lon = locationSplit[0];
     final lat = locationSplit[1];
 
-    final name = GetContent().getContent(
+    final name = GetContent.getContent(
       name: 'Q=',
       split: '&',
       rawString: rawString,
     );
-    final zoom = GetContent().getContent(
+    final zoom = GetContent.getContent(
       name: 'Z=',
       split: '&',
       rawString: rawString,
@@ -226,6 +226,30 @@ class WifiModel {
     required this.name,
     required this.password,
   });
+
+  factory WifiModel.transfer(String rawString) {
+    final type = GetContent.getContent(
+      name: 'T:',
+      split: ';',
+      rawString: rawString,
+    );
+    final name = GetContent.getContent(
+      name: 'S:',
+      split: ';',
+      rawString: rawString,
+    );
+    final password = GetContent.getContent(
+      name: 'P:',
+      split: ';',
+      rawString: rawString,
+    );
+
+    return WifiModel(
+      type: type,
+      name: name,
+      password: password,
+    );
+  }
 }
 
 class CalendarModel {

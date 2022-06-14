@@ -1,5 +1,7 @@
+import 'package:flutter_contacts/flutter_contacts.dart';
+
 class GetContent {
-  String getContent({
+  static String getContent({
     required String name,
     required String split,
     required String rawString,
@@ -20,5 +22,28 @@ class GetContent {
       }
     }
     return '';
+  }
+
+  static String addressTransfer(Address address){
+    String text = '';
+    if(address.address.isNotEmpty){
+      text += address.address;
+    }
+    if(address.street.isNotEmpty){
+      text += ',' + address.street;
+    }
+    if(address.city.isNotEmpty){
+      text += ',' + address.city;
+    }
+    if(address.state.isNotEmpty){
+      text += ',' + address.state;
+    }
+    if(address.postalCode.isNotEmpty){
+      text += ',' + address.postalCode;
+    }
+    if(address.country.isNotEmpty){
+      text += ',' + address.country;
+    }
+    return text;
   }
 }
