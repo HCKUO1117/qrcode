@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_contacts/contact.dart';
 import 'package:flutter_contacts/properties/address.dart';
 import 'package:flutter_contacts/properties/email.dart';
+import 'package:flutter_contacts/properties/event.dart';
 import 'package:flutter_contacts/properties/phone.dart';
+import 'package:flutter_contacts/properties/social_media.dart';
 import 'package:flutter_contacts/properties/website.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:qrcode/generated/l10n.dart';
@@ -256,8 +258,7 @@ class QRCodeProvider extends ChangeNotifier {
 
         // Import contact from vCard
         contact = Contact.fromVCard(result.code ?? '');
-        print(contact.emails);
-        //TODO
+        //TODO 動作
         infoList = [
           const SizedBox(height: 16),
           _typeText('CONTACT'),
@@ -270,184 +271,324 @@ class QRCodeProvider extends ChangeNotifier {
             title: null,
             content: contact.displayName,
           ),
-          const Divider(),
-          _contentTitleWithChild(
-            icon: Icons.settings_phone_outlined,
-            child: ListView.separated(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: contact.phones.length,
-              separatorBuilder: (context, index) {
-                return const Divider();
-              },
-              itemBuilder: (context, index) {
-                return Column(
-                  children: [
-                    _contentTitle(
-                      context,
-                      icon: Icons.label_outline,
-                      title: null,
-                      content:
-                          '${_phoneLabelToString[contact.phones[index].label]}',
-                      havePadding: false,
-                    ),
-                    _contentTitle(
-                      context,
-                      icon: Icons.phone_outlined,
-                      title: null,
-                      content: contact.phones[index].number,
-                    ),
-                  ],
-                );
-              },
+          if (contact.phones.isNotEmpty) ...[
+            const Divider(),
+            _contentTitleWithChild(
+              icon: Icons.settings_phone_outlined,
+              child: ListView.separated(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: contact.phones.length,
+                separatorBuilder: (context, index) {
+                  return const Divider();
+                },
+                itemBuilder: (context, index) {
+                  return Column(
+                    children: [
+                      _contentTitle(
+                        context,
+                        icon: Icons.label_outline,
+                        title: null,
+                        content:
+                            '${_phoneLabelToString[contact.phones[index].label]}',
+                        havePadding: false,
+                      ),
+                      _contentTitle(
+                        context,
+                        icon: Icons.phone_outlined,
+                        title: null,
+                        content: contact.phones[index].number,
+                      ),
+                    ],
+                  );
+                },
+              ),
             ),
-          ),
-          const Divider(),
-          _contentTitleWithChild(
-            icon: Icons.mail_outline,
-            child: ListView.separated(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: contact.emails.length,
-              separatorBuilder: (context, index) {
-                return const Divider();
-              },
-              itemBuilder: (context, index) {
-                return Column(
-                  children: [
-                    _contentTitle(
-                      context,
-                      icon: Icons.label_outline,
-                      title: null,
-                      content:
-                          '${_emailLabelToString[contact.emails[index].label]}',
-                      havePadding: false,
-                    ),
-                    _contentTitle(
-                      context,
-                      icon: Icons.email_outlined,
-                      title: null,
-                      content: contact.emails[index].address,
-                    ),
-                  ],
-                );
-              },
+          ],
+          //TODO email problem
+          if (contact.emails.isNotEmpty) ...[
+            const Divider(),
+            _contentTitleWithChild(
+              icon: Icons.mail_outline,
+              child: ListView.separated(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: contact.emails.length,
+                separatorBuilder: (context, index) {
+                  return const Divider();
+                },
+                itemBuilder: (context, index) {
+                  return Column(
+                    children: [
+                      _contentTitle(
+                        context,
+                        icon: Icons.label_outline,
+                        title: null,
+                        content:
+                            '${_emailLabelToString[contact.emails[index].label]}',
+                        havePadding: false,
+                      ),
+                      _contentTitle(
+                        context,
+                        icon: Icons.email_outlined,
+                        title: null,
+                        content: contact.emails[index].address,
+                      ),
+                    ],
+                  );
+                },
+              ),
             ),
-          ),
-          const Divider(),
-          _contentTitleWithChild(
-            icon: Icons.location_on_outlined,
-            child: ListView.separated(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: contact.addresses.length,
-              separatorBuilder: (context, index) {
-                return const Divider();
-              },
-              itemBuilder: (context, index) {
-                return Column(
-                  children: [
-                    _contentTitle(
-                      context,
-                      icon: Icons.label_outline,
-                      title: null,
-                      content:
-                          '${_addressLabelToString[contact.addresses[index].label]}',
-                      havePadding: false,
-                    ),
-                    _contentTitle(
-                      context,
-                      icon: Icons.location_city_outlined,
-                      title: null,
-                      content:
-                          GetContent.addressTransfer(contact.addresses[index]),
-                    ),
-                  ],
-                );
-              },
+          ],
+          if (contact.addresses.isNotEmpty) ...[
+            const Divider(),
+            _contentTitleWithChild(
+              icon: Icons.location_on_outlined,
+              child: ListView.separated(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: contact.addresses.length,
+                separatorBuilder: (context, index) {
+                  return const Divider();
+                },
+                itemBuilder: (context, index) {
+                  return Column(
+                    children: [
+                      _contentTitle(
+                        context,
+                        icon: Icons.label_outline,
+                        title: null,
+                        content:
+                            '${_addressLabelToString[contact.addresses[index].label]}',
+                        havePadding: false,
+                      ),
+                      _contentTitle(
+                        context,
+                        icon: Icons.location_city_outlined,
+                        title: null,
+                        content: GetContent.addressTransfer(
+                            contact.addresses[index]),
+                      ),
+                    ],
+                  );
+                },
+              ),
             ),
-          ),
-          const Divider(),
-          _contentTitleWithChild(
-            icon: Icons.business_rounded,
-            child: ListView.separated(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: contact.organizations.length,
-              separatorBuilder: (context, index) {
-                return const Divider();
-              },
-              itemBuilder: (context, index) {
-                return Column(
-                  children: [
-                    _contentTitle(
-                      context,
-                      icon: Icons.label_outline,
-                      title: null,
-                      content: contact.organizations[index].company,
-                      havePadding: false,
-                    ),
-                    _contentTitle(
-                      context,
-                      icon: Icons.work_outline,
-                      title: null,
-                      content: contact.organizations[index].department,
-                    ),
-                    _contentTitle(
-                      context,
-                      icon: Icons.badge_outlined,
-                      title: null,
-                      content: contact.organizations[index].title,
-                    ),
-                    _contentTitle(
-                      context,
-                      icon: Icons.edit_note_outlined,
-                      title: null,
-                      content: contact.organizations[index].jobDescription,
-                    ),
-                    _contentTitle(
-                      context,
-                      icon: Icons.location_on_outlined,
-                      title: null,
-                      content: contact.organizations[index].officeLocation,
-                    ),
-                  ],
-                );
-              },
+          ],
+          if (contact.organizations.isNotEmpty) ...[
+            const Divider(),
+            _contentTitleWithChild(
+              icon: Icons.business_rounded,
+              child: ListView.separated(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: contact.organizations.length,
+                separatorBuilder: (context, index) {
+                  return const Divider();
+                },
+                itemBuilder: (context, index) {
+                  return Column(
+                    children: [
+                      _contentTitle(
+                        context,
+                        icon: Icons.label_outline,
+                        title: null,
+                        content: contact.organizations[index].company,
+                        havePadding: false,
+                      ),
+                      _contentTitle(
+                        context,
+                        icon: Icons.work_outline,
+                        title: null,
+                        content: contact.organizations[index].department,
+                      ),
+                      _contentTitle(
+                        context,
+                        icon: Icons.badge_outlined,
+                        title: null,
+                        content: contact.organizations[index].title,
+                      ),
+                      _contentTitle(
+                        context,
+                        icon: Icons.edit_note_outlined,
+                        title: null,
+                        content: contact.organizations[index].jobDescription,
+                      ),
+                      _contentTitle(
+                        context,
+                        icon: Icons.location_on_outlined,
+                        title: null,
+                        content: contact.organizations[index].officeLocation,
+                      ),
+                    ],
+                  );
+                },
+              ),
             ),
-          ),
-          const Divider(),
-          _contentTitleWithChild(
-            icon: Icons.language,
-            child: ListView.separated(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: contact.websites.length,
-              separatorBuilder: (context, index) {
-                return const Divider();
-              },
-              itemBuilder: (context, index) {
-                return Column(
-                  children: [
-                    _contentTitle(
-                      context,
-                      icon: Icons.label_outline,
-                      title: null,
-                      content:
-                          '${_websiteLabelToString[contact.websites[index].label]}',
-                      havePadding: false,
-                    ),
-                    _contentTitle(
-                      context,
-                      icon: Icons.link,
-                      title: null,
-                      content: contact.websites[index].url,
-                    ),
-                  ],
-                );
-              },
+          ],
+          if (contact.websites.isNotEmpty) ...[
+            const Divider(),
+            _contentTitleWithChild(
+              icon: Icons.language,
+              child: ListView.separated(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: contact.websites.length,
+                separatorBuilder: (context, index) {
+                  return const Divider();
+                },
+                itemBuilder: (context, index) {
+                  return Column(
+                    children: [
+                      _contentTitle(
+                        context,
+                        icon: Icons.label_outline,
+                        title: null,
+                        content:
+                            '${_websiteLabelToString[contact.websites[index].label]}',
+                        havePadding: false,
+                      ),
+                      _contentTitle(
+                        context,
+                        icon: Icons.link,
+                        title: null,
+                        content: contact.websites[index].url,
+                      ),
+                    ],
+                  );
+                },
+              ),
             ),
-          ),
+          ],
+          if (contact.socialMedias.isNotEmpty) ...[
+            const Divider(),
+            _contentTitleWithChild(
+              icon: Icons.face,
+              child: ListView.separated(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: contact.socialMedias.length,
+                separatorBuilder: (context, index) {
+                  return const Divider();
+                },
+                itemBuilder: (context, index) {
+                  return Column(
+                    children: [
+                      _contentTitle(
+                        context,
+                        icon: Icons.label_outline,
+                        title: null,
+                        content:
+                            '${_socialMediaLabelToString[contact.socialMedias[index].label]}',
+                        havePadding: false,
+                      ),
+                      _contentTitle(
+                        context,
+                        icon: Icons.drive_file_rename_outline,
+                        title: null,
+                        content: contact.socialMedias[index].userName,
+                      ),
+                    ],
+                  );
+                },
+              ),
+            ),
+          ],
+          if (contact.events.isNotEmpty) ...[
+            const Divider(),
+            _contentTitleWithChild(
+              icon: Icons.event,
+              child: ListView.separated(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: contact.events.length,
+                separatorBuilder: (context, index) {
+                  return const Divider();
+                },
+                itemBuilder: (context, index) {
+                  return Column(
+                    children: [
+                      _contentTitle(
+                        context,
+                        icon: Icons.label_outline,
+                        title: null,
+                        content:
+                            '${_eventLabelToString[contact.events[index].label]}',
+                        havePadding: false,
+                      ),
+                      _contentTitle(
+                        context,
+                        icon: Icons.calendar_today,
+                        title: null,
+                        content:
+                            '${contact.events[index].year}${contact.events[index].year != null ? '/' : ''}${contact.events[index].month}/${contact.events[index].day}',
+                      ),
+                    ],
+                  );
+                },
+              ),
+            ),
+          ],
+          if (contact.notes.isNotEmpty) ...[
+            const Divider(),
+            _contentTitleWithChild(
+              icon: Icons.edit,
+              child: ListView.separated(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: contact.notes.length,
+                separatorBuilder: (context, index) {
+                  return const Divider();
+                },
+                itemBuilder: (context, index) {
+                  return Column(
+                    children: [
+                      _contentTitle(
+                        context,
+                        icon: Icons.label_outline,
+                        title: null,
+                        content: contact.notes[index].note,
+                        havePadding: false,
+                      ),
+                    ],
+                  );
+                },
+              ),
+            ),
+          ],
+          if (contact.groups.isNotEmpty) ...[
+            const Divider(),
+            _contentTitleWithChild(
+              icon: Icons.groups_outlined,
+              child: ListView.separated(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: contact.groups.length,
+                separatorBuilder: (context, index) {
+                  return const Divider();
+                },
+                itemBuilder: (context, index) {
+                  return Column(
+                    children: [
+                      _contentTitle(
+                        context,
+                        icon: Icons.label_outline,
+                        title: null,
+                        content: contact.groups[index].id,
+                        havePadding: false,
+                      ),
+                      _contentTitle(
+                        context,
+                        icon: Icons.edit,
+                        title: null,
+                        content: contact.groups[index].name,
+                      ),
+                    ],
+                  );
+                },
+              ),
+            ),
+          ],
         ];
         break;
       case QRCodeDataType.bookmark:
@@ -734,4 +875,53 @@ final _websiteLabelToString = {
   WebsiteLabel.work: 'work',
   WebsiteLabel.other: 'other',
   WebsiteLabel.custom: 'custom',
+};
+
+final _socialMediaLabelToString = {
+  SocialMediaLabel.aim: 'aim',
+  SocialMediaLabel.baiduTieba: 'baiduTieba',
+  SocialMediaLabel.discord: 'discord',
+  SocialMediaLabel.facebook: 'facebook',
+  SocialMediaLabel.flickr: 'flickr',
+  SocialMediaLabel.gaduGadu: 'gaduGadu',
+  SocialMediaLabel.gameCenter: 'gameCenter',
+  SocialMediaLabel.googleTalk: 'googleTalk',
+  SocialMediaLabel.icq: 'icq',
+  SocialMediaLabel.instagram: 'instagram',
+  SocialMediaLabel.jabber: 'jabber',
+  SocialMediaLabel.line: 'line',
+  SocialMediaLabel.linkedIn: 'linkedIn',
+  SocialMediaLabel.medium: 'medium',
+  SocialMediaLabel.messenger: 'messenger',
+  SocialMediaLabel.msn: 'msn',
+  SocialMediaLabel.mySpace: 'mySpace',
+  SocialMediaLabel.netmeeting: 'netmeeting',
+  SocialMediaLabel.pinterest: 'pinterest',
+  SocialMediaLabel.qqchat: 'qqchat',
+  SocialMediaLabel.qzone: 'qzone',
+  SocialMediaLabel.reddit: 'reddit',
+  SocialMediaLabel.sinaWeibo: 'sinaWeibo',
+  SocialMediaLabel.skype: 'skype',
+  SocialMediaLabel.snapchat: 'snapchat',
+  SocialMediaLabel.telegram: 'telegram',
+  SocialMediaLabel.tencentWeibo: 'tencentWeibo',
+  SocialMediaLabel.tikTok: 'tikTok',
+  SocialMediaLabel.tumblr: 'tumblr',
+  SocialMediaLabel.twitter: 'twitter',
+  SocialMediaLabel.viber: 'viber',
+  SocialMediaLabel.wechat: 'wechat',
+  SocialMediaLabel.whatsapp: 'whatsapp',
+  SocialMediaLabel.yahoo: 'yahoo',
+  SocialMediaLabel.yelp: 'yelp',
+  SocialMediaLabel.youtube: 'youtube',
+  SocialMediaLabel.zoom: 'zoom',
+  SocialMediaLabel.other: 'other',
+  SocialMediaLabel.custom: 'custom',
+};
+
+final _eventLabelToString = {
+  EventLabel.anniversary: 'anniversary',
+  EventLabel.birthday: 'birthday',
+  EventLabel.other: 'other',
+  EventLabel.custom: 'custom',
 };
