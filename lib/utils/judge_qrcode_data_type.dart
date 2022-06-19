@@ -36,7 +36,8 @@ class JudgeQrcodeDataType {
         data.startsWith('BIZCARD:')) {
       return QRCodeDataType.contract;
     }
-    if (data.startsWith('BEGIN:VEVENT')) {
+    if (data.startsWith('BEGIN:VEVENT') ||
+     data.startsWith('BEGIN:VCALENDAR')) {
       return QRCodeDataType.calendar;
     }
     return QRCodeDataType.text;

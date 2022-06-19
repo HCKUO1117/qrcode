@@ -41,6 +41,7 @@ dependencies:
   cupertino_icons: ^1.0.2
   vcard_maintained: ^0.0.1+1
   flutter_contacts: ^1.1.4
+  icalendar_parser:
 
 dev_dependencies:
   flutter_test:

@@ -9,6 +9,7 @@ import 'package:flutter_contacts/properties/note.dart';
 import 'package:flutter_contacts/properties/phone.dart';
 import 'package:flutter_contacts/properties/social_media.dart';
 import 'package:flutter_contacts/properties/website.dart';
+import 'package:icalendar_parser/icalendar_parser.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:qrcode/generated/l10n.dart';
 import 'package:qrcode/model/action_type.dart';
@@ -630,10 +631,17 @@ class QRCodeProvider extends ChangeNotifier {
         ];
         break;
       case QRCodeDataType.calendar:
-        //TODO
+        String code =
+            'BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//hacksw/handcal//NONSGML v1.0//EN' +
+                (result.code ?? '');
+        code = code + '\n' + 'END:VCALENDAR';
+        final iCalendar = ICalendar.fromString(code);
+        print(iCalendar.data);
+        //TODO 動作
         infoList = [
-          const Icon(Icons.calendar_month_outlined),
-          Text(result.code ?? ''),
+          const SizedBox(height: 16),
+          _typeText('CALENDAR'),
+          const SizedBox(height: 16),
         ];
         break;
     }
