@@ -1,9 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/contact.dart';
+import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:flutter_contacts/properties/address.dart';
 import 'package:flutter_contacts/properties/email.dart';
 import 'package:flutter_contacts/properties/event.dart';
+import 'package:flutter_contacts/properties/note.dart';
 import 'package:flutter_contacts/properties/phone.dart';
 import 'package:flutter_contacts/properties/social_media.dart';
 import 'package:flutter_contacts/properties/website.dart';
@@ -257,7 +259,17 @@ class QRCodeProvider extends ChangeNotifier {
         Contact contact = Contact();
 
         // Import contact from vCard
-        contact = Contact.fromVCard(result.code ?? '');
+
+        if (result.code!.toUpperCase().startsWith('MECARD:')) {
+          contact = handleMeCard(result.code ?? '');
+        }
+        if (result.code!.toUpperCase().startsWith('BIZCARD:')) {
+          contact = handleBizCard(result.code ?? '');
+        }
+        if (result.code!.toUpperCase().startsWith('BEGIN:VCARD')) {
+          contact = Contact.fromVCard(result.code ?? '');
+        }
+
         //TODO 動作
         infoList = [
           const SizedBox(height: 16),
@@ -270,6 +282,12 @@ class QRCodeProvider extends ChangeNotifier {
             icon: Icons.person_outline,
             title: null,
             content: contact.displayName,
+          ),
+          _contentTitle(
+            context,
+            icon: Icons.person_outline,
+            title: null,
+            content: contact.name.nickname,
           ),
           if (contact.phones.isNotEmpty) ...[
             const Divider(),
@@ -366,8 +384,7 @@ class QRCodeProvider extends ChangeNotifier {
                         context,
                         icon: Icons.location_city_outlined,
                         title: null,
-                        content: GetContent.addressTransfer(
-                            contact.addresses[index]),
+                        content: contact.addresses[index].address,
                       ),
                     ],
                   );
@@ -709,6 +726,175 @@ class QRCodeProvider extends ChangeNotifier {
         ],
       ),
     );
+  }
+
+  Contact handleMeCard(String rawString) {
+    Contact contact = Contact();
+
+    String name = GetContent.getContent(
+      name: 'N:',
+      split: ';',
+      rawString: rawString,
+    );
+    contact.name.last = name.split(',')[0];
+    if (name.split(',').length > 1) {
+      contact.name.first = name.split(',')[1];
+    }
+    contact.displayName = name.replaceAll(',', ' ');
+
+    String sound = GetContent.getContent(
+      name: 'SOUND:',
+      split: ';',
+      rawString: rawString,
+    );
+    contact.name.lastPhonetic = sound.split(',')[0];
+    if (sound.split(',').length > 1) {
+      contact.name.firstPhonetic = sound.split(',')[1];
+    }
+
+    List<String> tels = [];
+    for (final element in rawString.split(';')) {
+      if (element.toUpperCase().startsWith('TEL:')) {
+        tels.add(element.substring('TEL:'.length, element.length));
+      }
+    }
+    for (final element in tels) {
+      contact.phones.add(Phone(element, label: PhoneLabel.home));
+    }
+
+    List<String> telAVs = [];
+    for (final element in rawString.split(';')) {
+      if (element.toUpperCase().startsWith('TEL-AV:')) {
+        telAVs.add(element.substring('TEL-AV:'.length, element.length));
+      }
+    }
+    for (final element in telAVs) {
+      contact.phones.add(Phone(element, label: PhoneLabel.radio));
+    }
+
+    List<String> emails = [];
+    for (final element in rawString.split(';')) {
+      if (element.toUpperCase().startsWith('EMAIL:')) {
+        emails.add(element.substring('EMAIL:'.length, element.length));
+      }
+    }
+    for (final element in emails) {
+      contact.emails.add(Email(element, label: EmailLabel.home));
+    }
+
+    List<String> notes = [];
+    for (final element in rawString.split(';')) {
+      if (element.toUpperCase().startsWith('NOTE:')) {
+        notes.add(element.substring('NOTE:'.length, element.length));
+      }
+    }
+    for (final element in notes) {
+      contact.notes.add(Note(element));
+    }
+
+    ///Not Use
+    String birthday = GetContent.getContent(
+      name: 'BDAY:',
+      split: ';',
+      rawString: rawString,
+    );
+
+    List<String> address = [];
+    for (final element in rawString.split(';')) {
+      if (element.toUpperCase().startsWith('ADR:')) {
+        address.add(element.substring('ADR:'.length, element.length));
+      }
+    }
+    for (final element in address) {
+      List<String> addressList = element.split(',');
+      contact.addresses.add(
+        Address(
+          element.replaceAll(',', ' '),
+          pobox: addressList[0],
+          street: '${addressList[1]} ${addressList[2]}',
+          city: addressList[3],
+          state: addressList[4],
+          postalCode: addressList[5],
+          country: addressList[6],
+        ),
+      );
+    }
+
+    List<String> urls = [];
+    for (final element in rawString.split(';')) {
+      if (element.toUpperCase().startsWith('URL:')) {
+        urls.add(element.substring('URL:'.length, element.length));
+      }
+    }
+    for (final element in urls) {
+      contact.websites.add(Website(element, label: WebsiteLabel.homepage));
+    }
+
+    String nickname = GetContent.getContent(
+      name: 'NICKNAME:',
+      split: ';',
+      rawString: rawString,
+    );
+    contact.name.nickname = nickname;
+    return contact;
+  }
+
+  Contact handleBizCard(String rawString) {
+    Contact contact = Contact();
+
+    String firstname = GetContent.getContent(
+      name: 'N:',
+      split: ';',
+      rawString: rawString,
+    );
+    contact.name.first = firstname;
+    String lastname = GetContent.getContent(
+      name: 'X:',
+      split: ';',
+      rawString: rawString,
+    );
+    contact.name.last = lastname;
+    contact.displayName = lastname + ' ' + firstname;
+
+    String title = GetContent.getContent(
+      name: 'T:',
+      split: ';',
+      rawString: rawString,
+    );
+    String company = GetContent.getContent(
+      name: 'C:',
+      split: ';',
+      rawString: rawString,
+    );
+    contact.organizations.add(Organization(title: title, company: company));
+
+    String address = GetContent.getContent(
+      name: 'A:',
+      split: ';',
+      rawString: rawString,
+    );
+    contact.addresses.add(
+      Address(
+        address.replaceAll(',', ' '),
+        label: AddressLabel.work,
+      ),
+    );
+
+    String phone = GetContent.getContent(
+      name: 'B:',
+      split: ';',
+      rawString: rawString,
+    );
+    contact.phones.add(Phone(phone, label: PhoneLabel.work));
+
+    String email = GetContent.getContent(
+      name: 'E:',
+      split: ';',
+      rawString: rawString,
+    );
+    contact.emails.add(Email(email, label: EmailLabel.work));
+
+    return contact;
   }
 
   String listToString(List<String> list) {
