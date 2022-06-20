@@ -1,14 +1,5 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_contacts/contact.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
-import 'package:flutter_contacts/properties/address.dart';
-import 'package:flutter_contacts/properties/email.dart';
-import 'package:flutter_contacts/properties/event.dart';
-import 'package:flutter_contacts/properties/note.dart';
-import 'package:flutter_contacts/properties/phone.dart';
-import 'package:flutter_contacts/properties/social_media.dart';
-import 'package:flutter_contacts/properties/website.dart';
 import 'package:icalendar_parser/icalendar_parser.dart';
 import 'package:intl/intl.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
@@ -18,9 +9,7 @@ import 'package:qrcode/model/data_models.dart';
 import 'package:qrcode/model/qrcode_data_type.dart';
 import 'package:qrcode/utils/dialog.dart';
 import 'package:qrcode/utils/get_content.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:url_launcher/url_launcher_string.dart';
-import 'package:vcard_maintained/vcard_maintained.dart';
 
 class QRCodeProvider extends ChangeNotifier {
   Widget mainAction = const SizedBox();
@@ -115,7 +104,13 @@ class QRCodeProvider extends ChangeNotifier {
           const SizedBox(height: 16),
           _typeText('TEXT'),
           const SizedBox(height: 16),
-          Text(result.code ?? ''),
+          _contentTitle(context,
+              icon: null,
+              title: null,
+              content: result.code ?? '',
+              actionIcon: Icons.search, action: () {
+            launchUrlString('https://www.google.com/search?q=${result.code}');
+          }),
         ];
         break;
       case QRCodeDataType.url:
@@ -200,6 +195,10 @@ class QRCodeProvider extends ChangeNotifier {
             icon: Icons.phone_outlined,
             title: null,
             content: smsModel.phoneNumber,
+            actionIcon: Icons.phone_outlined,
+            action: () {
+              launchUrlString('tel:${smsModel.phoneNumber}');
+            },
           ),
           _contentTitle(
             context,
@@ -221,12 +220,21 @@ class QRCodeProvider extends ChangeNotifier {
             icon: Icons.my_location_outlined,
             title: null,
             content: '${geoModel.lon},${geoModel.lat}',
+            actionIcon: Icons.map_outlined,
+            action: () {
+              launchUrlString('geo:${geoModel.lon},${geoModel.lat}');
+            },
           ),
           _contentTitle(
             context,
             icon: Icons.location_on_outlined,
             title: null,
             content: geoModel.name,
+            actionIcon: Icons.search,
+            action: () {
+              launchUrlString(
+                  'https://www.google.com/search?q=${geoModel.name}');
+            },
           ),
         ];
         break;
@@ -318,6 +326,11 @@ class QRCodeProvider extends ChangeNotifier {
                         icon: Icons.phone_outlined,
                         title: null,
                         content: contact.phones[index].number,
+                        actionIcon: Icons.phone_outlined,
+                        action: () {
+                          launchUrlString(
+                              'tel:${contact.phones[index].number}');
+                        },
                       ),
                     ],
                   );
@@ -353,6 +366,11 @@ class QRCodeProvider extends ChangeNotifier {
                         icon: Icons.email_outlined,
                         title: null,
                         content: contact.emails[index].address,
+                        actionIcon: Icons.email_outlined,
+                        action: () {
+                          launchUrlString(
+                              'emailto:${contact.phones[index].number}');
+                        },
                       ),
                     ],
                   );
@@ -387,6 +405,11 @@ class QRCodeProvider extends ChangeNotifier {
                         icon: Icons.location_city_outlined,
                         title: null,
                         content: contact.addresses[index].address,
+                        actionIcon: Icons.map_outlined,
+                        action: () {
+                          launchUrlString(
+                              'https://www.google.com/maps/search/?api=1&query=${contact.addresses[index].address}');
+                        },
                       ),
                     ],
                   );
@@ -438,6 +461,11 @@ class QRCodeProvider extends ChangeNotifier {
                         icon: Icons.location_on_outlined,
                         title: null,
                         content: contact.organizations[index].officeLocation,
+                        actionIcon: Icons.map_outlined,
+                        action: () {
+                          launchUrlString(
+                              'https://www.google.com/maps/search/?api=1&query=${contact.organizations[index].officeLocation}');
+                        },
                       ),
                     ],
                   );
@@ -472,6 +500,10 @@ class QRCodeProvider extends ChangeNotifier {
                         icon: Icons.link,
                         title: null,
                         content: contact.websites[index].url,
+                        actionIcon: Icons.launch,
+                        action: (){
+                          launchUrlString(contact.websites[index].url);
+                        },
                       ),
                     ],
                   );
@@ -1111,10 +1143,14 @@ class QRCodeProvider extends ChangeNotifier {
           ),
           const Spacer(),
           if (actionIcon != null)
-            IconButton(
+            ElevatedButton(
               onPressed: action,
-              icon: Icon(actionIcon),
-            ),
+              child: Icon(actionIcon, color: Colors.white),
+              style: ElevatedButton.styleFrom(
+                shape: const CircleBorder(),
+                primary: Colors.blue, // <-- Button color
+              ),
+            )
         ],
       ),
     );

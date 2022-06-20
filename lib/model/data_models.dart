@@ -211,7 +211,7 @@ class GEOModel {
       lon: double.parse(lon),
       lat: double.parse(lat),
       name: name,
-      zoom: double.parse(zoom),
+      zoom: zoom.isNotEmpty ? double.parse(zoom) : 1,
     );
   }
 }
