@@ -10,6 +10,7 @@ import 'package:flutter_contacts/properties/phone.dart';
 import 'package:flutter_contacts/properties/social_media.dart';
 import 'package:flutter_contacts/properties/website.dart';
 import 'package:icalendar_parser/icalendar_parser.dart';
+import 'package:intl/intl.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:qrcode/generated/l10n.dart';
 import 'package:qrcode/model/action_type.dart';
@@ -632,17 +633,132 @@ class QRCodeProvider extends ChangeNotifier {
         break;
       case QRCodeDataType.calendar:
         String code =
-            'BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//hacksw/handcal//NONSGML v1.0//EN' +
+            'BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//hacksw/handcal//NONSGML v1.0//EN\n' +
                 (result.code ?? '');
         code = code + '\n' + 'END:VCALENDAR';
         final iCalendar = ICalendar.fromString(code);
-        print(iCalendar.data);
+        int index =
+            iCalendar.data.indexWhere((element) => element['type'] == 'VEVENT');
         //TODO 動作
-        infoList = [
-          const SizedBox(height: 16),
-          _typeText('CALENDAR'),
-          const SizedBox(height: 16),
-        ];
+        if (index == -1) {
+          infoList = [
+            const SizedBox(height: 16),
+            _typeText('CALENDAR'),
+            const SizedBox(height: 16),
+            _contentTitle(
+              context,
+              icon: Icons.subject,
+              title: null,
+              content: result.code ?? '',
+            ),
+          ];
+        } else {
+          final dateTimeFormat = DateFormat('yyyy/MM/dd, HH:mm');
+          String start = '';
+          String end = '';
+          String timeStamp = '';
+          if (iCalendar.data[index]['dtstart'] != null) {
+            final time = DateTime.parse(
+                (iCalendar.data[index]['dtstart'] as IcsDateTime).dt);
+            start = dateTimeFormat.format(time);
+          }
+          if (iCalendar.data[index]['dtend'] != null) {
+            final time = DateTime.parse(
+                (iCalendar.data[index]['dtend'] as IcsDateTime).dt);
+            end = dateTimeFormat.format(time);
+          }
+          if (iCalendar.data[index]['dtstamp'] != null) {
+            final time = DateTime.parse(
+                (iCalendar.data[index]['dtstamp'] as IcsDateTime).dt);
+            timeStamp = dateTimeFormat.format(time);
+          }
+
+          infoList = [
+            const SizedBox(height: 16),
+            _typeText('CALENDAR'),
+            const SizedBox(height: 16),
+            _contentTitle(
+              context,
+              icon: Icons.title,
+              title: null,
+              content: iCalendar.data[index]['summary'] ?? '',
+            ),
+            _contentTitle(
+              context,
+              icon: Icons.start,
+              title: null,
+              content: start,
+              allowTap: false,
+            ),
+            _contentTitle(
+              context,
+              icon: Icons.start,
+              title: null,
+              content: end,
+              quarterTurns: 2,
+              allowTap: false,
+            ),
+            _contentTitle(
+              context,
+              icon: Icons.access_time_outlined,
+              title: null,
+              content: timeStamp,
+              allowTap: false,
+            ),
+            _contentTitle(
+              context,
+              icon: Icons.email_outlined,
+              title: null,
+              content: iCalendar.data[index]['uid'] ?? '',
+            ),
+            _contentTitle(
+              context,
+              icon: Icons.edit_note_outlined,
+              title: null,
+              content: iCalendar.data[index]['description'] ?? '',
+            ),
+            _contentTitle(
+              context,
+              icon: Icons.location_city_rounded,
+              title: null,
+              content: iCalendar.data[index]['location'] ?? '',
+            ),
+            _contentTitle(
+              context,
+              icon: Icons.language,
+              title: null,
+              content: iCalendar.data[index]['url'] ?? '',
+            ),
+            if (iCalendar.data[index]['geo'] != null)
+              _contentTitle(
+                context,
+                icon: Icons.location_on_outlined,
+                title: null,
+                content: iCalendar.data[index]['geo'].toString(),
+              ),
+            if (iCalendar.data[index]['organizer'] != null)
+              _contentTitleWithChild(
+                icon: Icons.business_rounded,
+                child: Column(
+                  children: [
+                    _contentTitle(
+                      context,
+                      icon: Icons.label_outline,
+                      title: null,
+                      content: iCalendar.data[index]['organizer']['name'] ?? '',
+                      havePadding: false,
+                    ),
+                    _contentTitle(
+                      context,
+                      icon: Icons.email_outlined,
+                      title: null,
+                      content: iCalendar.data[index]['organizer']['mail'] ?? '',
+                    ),
+                  ],
+                ),
+              )
+          ];
+        }
         break;
     }
     notifyListeners();
@@ -940,6 +1056,8 @@ class QRCodeProvider extends ChangeNotifier {
     Function()? action,
     bool showAnyway = false,
     bool havePadding = true,
+    int quarterTurns = 0,
+    bool allowTap = true,
   }) {
     if (content.isEmpty && !showAnyway) {
       return const SizedBox();
@@ -952,7 +1070,11 @@ class QRCodeProvider extends ChangeNotifier {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          if (icon != null) Icon(icon),
+          if (icon != null)
+            RotatedBox(
+              quarterTurns: quarterTurns,
+              child: Icon(icon),
+            ),
           if (title != null)
             Text(
               title,
@@ -966,14 +1088,15 @@ class QRCodeProvider extends ChangeNotifier {
             child: SelectableText(
               content,
               style: TextStyle(
-                color: canTap ? Colors.blue : null,
-                decoration: canTap ? TextDecoration.underline : null,
+                color: canTap && allowTap ? Colors.blue : null,
+                decoration:
+                    canTap && allowTap ? TextDecoration.underline : null,
               ),
               strutStyle: const StrutStyle(
                 forceStrutHeight: true,
                 leading: 0.5,
               ),
-              onTap: canTap
+              onTap: canTap && allowTap
                   ? () async {
                       launchUrlString(content).onError((error, stackTrace) {
                         ShowDialog.show(

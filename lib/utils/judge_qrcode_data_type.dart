@@ -38,7 +38,9 @@ class JudgeQrcodeDataType {
     }
     if (data.startsWith('BEGIN:VEVENT') ||
      data.startsWith('BEGIN:VCALENDAR')) {
-      return QRCodeDataType.calendar;
+      if(data.contains('BEGIN:VEVENT')){
+        return QRCodeDataType.calendar;
+      }
     }
     return QRCodeDataType.text;
   }
