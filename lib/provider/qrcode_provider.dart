@@ -9,6 +9,7 @@ import 'package:qrcode/model/data_models.dart';
 import 'package:qrcode/model/qrcode_data_type.dart';
 import 'package:qrcode/utils/dialog.dart';
 import 'package:qrcode/utils/get_content.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 class QRCodeProvider extends ChangeNotifier {
@@ -109,7 +110,7 @@ class QRCodeProvider extends ChangeNotifier {
               title: null,
               content: result.code ?? '',
               actionIcon: Icons.search, action: () {
-            launchUrlString('https://www.google.com/search?q=${result.code}');
+            launch('https://www.google.com/search?q=${result.code}');
           }),
         ];
         break;
@@ -197,7 +198,7 @@ class QRCodeProvider extends ChangeNotifier {
             content: smsModel.phoneNumber,
             actionIcon: Icons.phone_outlined,
             action: () {
-              launchUrlString('tel:${smsModel.phoneNumber}');
+              launch('tel:${smsModel.phoneNumber}');
             },
           ),
           _contentTitle(
@@ -222,7 +223,7 @@ class QRCodeProvider extends ChangeNotifier {
             content: '${geoModel.lon},${geoModel.lat}',
             actionIcon: Icons.map_outlined,
             action: () {
-              launchUrlString('geo:${geoModel.lon},${geoModel.lat}');
+              launch('geo:${geoModel.lon},${geoModel.lat}');
             },
           ),
           _contentTitle(
@@ -232,7 +233,7 @@ class QRCodeProvider extends ChangeNotifier {
             content: geoModel.name,
             actionIcon: Icons.search,
             action: () {
-              launchUrlString(
+              launch(
                   'https://www.google.com/search?q=${geoModel.name}');
             },
           ),
@@ -279,7 +280,7 @@ class QRCodeProvider extends ChangeNotifier {
         if (result.code!.toUpperCase().startsWith('BEGIN:VCARD')) {
           contact = Contact.fromVCard(result.code ?? '');
         }
-
+        print(contact);
         //TODO 動作
         infoList = [
           const SizedBox(height: 16),
@@ -292,6 +293,12 @@ class QRCodeProvider extends ChangeNotifier {
             icon: Icons.person_outline,
             title: null,
             content: contact.displayName,
+          ),
+          _contentTitle(
+            context,
+            icon: Icons.person,
+            title: null,
+            content: '${contact.name.last}${contact.name.middle}${contact.name.first}',
           ),
           _contentTitle(
             context,
@@ -328,7 +335,7 @@ class QRCodeProvider extends ChangeNotifier {
                         content: contact.phones[index].number,
                         actionIcon: Icons.phone_outlined,
                         action: () {
-                          launchUrlString(
+                          launch(
                               'tel:${contact.phones[index].number}');
                         },
                       ),
@@ -368,7 +375,7 @@ class QRCodeProvider extends ChangeNotifier {
                         content: contact.emails[index].address,
                         actionIcon: Icons.email_outlined,
                         action: () {
-                          launchUrlString(
+                          launch(
                               'emailto:${contact.phones[index].number}');
                         },
                       ),
@@ -407,7 +414,7 @@ class QRCodeProvider extends ChangeNotifier {
                         content: contact.addresses[index].address,
                         actionIcon: Icons.map_outlined,
                         action: () {
-                          launchUrlString(
+                          launch(
                               'https://www.google.com/maps/search/?api=1&query=${contact.addresses[index].address}');
                         },
                       ),
@@ -463,7 +470,7 @@ class QRCodeProvider extends ChangeNotifier {
                         content: contact.organizations[index].officeLocation,
                         actionIcon: Icons.map_outlined,
                         action: () {
-                          launchUrlString(
+                          launch(
                               'https://www.google.com/maps/search/?api=1&query=${contact.organizations[index].officeLocation}');
                         },
                       ),
@@ -502,7 +509,7 @@ class QRCodeProvider extends ChangeNotifier {
                         content: contact.websites[index].url,
                         actionIcon: Icons.launch,
                         action: (){
-                          launchUrlString(contact.websites[index].url);
+                          launch(contact.websites[index].url);
                         },
                       ),
                     ],
@@ -1171,6 +1178,10 @@ class QRCodeProvider extends ChangeNotifier {
         ],
       ),
     );
+  }
+  
+  void launch(String url){
+    launchUrl(Uri.parse(url),mode: LaunchMode.externalApplication);
   }
 }
 
