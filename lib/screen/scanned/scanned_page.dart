@@ -30,15 +30,17 @@ class _ScannedPageState extends State<ScannedPage> {
 
   @override
   void initState() {
-    super.initState();
+
     final qrcodeProvider = Provider.of<QRCodeProvider>(context, listen: false);
-    qrcodeProvider.setInfoList(
-      context,
-      type: widget.type,
-      result: widget.result,
-    );
-    qrcodeProvider.setActionList(MyApp.navigatorKey.currentContext!,
-        type: widget.type);
+    Future.delayed(Duration.zero,(){
+      qrcodeProvider.setInfoList(
+        context,
+        type: widget.type,
+        result: widget.result,
+      );
+    });
+
+    super.initState();
   }
 
   @override

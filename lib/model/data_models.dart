@@ -47,7 +47,7 @@ class UrlModel {
 }
 
 class MailModel {
-  String target;
+  List<String> target;
   String title;
   List<String> cc;
   List<String> bcc;
@@ -80,7 +80,7 @@ class MailModel {
       );
 
       return MailModel(
-        target: to,
+        target: [to],
         title: sub,
         cc: [],
         bcc: [],
@@ -92,6 +92,7 @@ class MailModel {
       split: '?',
       rawString: rawString,
     );
+    final toList = to.split(',');
     final sub = GetContent.getContent(
       name: 'SUBJECT=',
       split: '&',
@@ -120,7 +121,7 @@ class MailModel {
     );
 
     return MailModel(
-      target: to,
+      target: toList,
       title: sub,
       cc: cc,
       bcc: bcc,

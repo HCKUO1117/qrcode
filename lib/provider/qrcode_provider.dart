@@ -11,6 +11,7 @@ import 'package:qrcode/utils/dialog.dart';
 import 'package:qrcode/utils/get_content.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:url_launcher/url_launcher_string.dart';
+import 'package:flutter_email_sender/flutter_email_sender.dart' as email_sender;
 
 class QRCodeProvider extends ChangeNotifier {
   Widget mainAction = const SizedBox();
@@ -87,9 +88,6 @@ class QRCodeProvider extends ChangeNotifier {
         break;
     }
 
-    for (int i = 0; i < actions.length; i++) {
-      actionList.add(actionButton(context, type: actions[i]));
-    }
     notifyListeners();
   }
 
@@ -105,14 +103,27 @@ class QRCodeProvider extends ChangeNotifier {
           const SizedBox(height: 16),
           _typeText('TEXT'),
           const SizedBox(height: 16),
-          _contentTitle(context,
-              icon: null,
-              title: null,
-              content: result.code ?? '',
-              actionIcon: Icons.search, action: () {
-            launch(context, 'https://www.google.com/search?q=${result.code}');
-          }),
+          _contentTitle(
+            context,
+            icon: null,
+            title: null,
+            content: result.code ?? '',
+            actionIcon: Icons.search,
+            action: () {
+              launch(context, 'https://www.google.com/search?q=${result.code}');
+            },
+          ),
         ];
+        actionList = [
+          actionButton(
+            context,
+            type: ActionType.launchApp,
+            onTap: () {
+              launch(context, result.code ?? '');
+            },
+          ),
+        ];
+
         break;
       case QRCodeDataType.url:
         UrlModel urlModel = UrlModel.transfer(result.code ?? '');
@@ -126,11 +137,34 @@ class QRCodeProvider extends ChangeNotifier {
             icon: Icons.link,
             title: null,
             content: urlModel.url,
+            actionIcon: Icons.search,
+            action: () {
+              launch(
+                  context, 'https://www.google.com/search?q=${urlModel.url}');
+            },
+          ),
+        ];
+        actionList = [
+          actionButton(
+            context,
+            type: ActionType.launchUrl,
+            onTap: () {
+              launch(context, urlModel.url);
+            },
           ),
         ];
         break;
       case QRCodeDataType.mail:
         MailModel mailModel = MailModel.transfer(result.code ?? '');
+
+        final email_sender.Email email = email_sender.Email(
+          body: mailModel.content,
+          subject: mailModel.title,
+          recipients: mailModel.target,
+          cc: mailModel.cc,
+          bcc: mailModel.bcc,
+          isHTML: false,
+        );
         //TODO 動作
         infoList = [
           const SizedBox(height: 16),
@@ -140,7 +174,7 @@ class QRCodeProvider extends ChangeNotifier {
             context,
             icon: Icons.mail_outline,
             title: null,
-            content: mailModel.target,
+            content: listToString(mailModel.target),
             showAnyway: true,
           ),
           _contentTitle(
@@ -166,6 +200,15 @@ class QRCodeProvider extends ChangeNotifier {
             icon: Icons.subject,
             title: null,
             content: mailModel.content,
+          ),
+        ];
+        actionList = [
+          actionButton(
+            context,
+            type: ActionType.sendEmail,
+            onTap: () async {
+              await email_sender.FlutterEmailSender.send(email);
+            },
           ),
         ];
         break;
@@ -839,70 +882,58 @@ class QRCodeProvider extends ChangeNotifier {
   Widget actionButton(
     BuildContext context, {
     required ActionType type,
+    required Function() onTap,
   }) {
     String title = '';
-    Function() onTap = () {};
     IconData? iconData;
     switch (type) {
       case ActionType.launchApp:
         title = S.of(context).launch;
         iconData = Icons.launch;
-        onTap = () {};
         break;
       case ActionType.copy:
         title = S.of(context).copy;
         iconData = Icons.copy;
-        onTap = () {};
         break;
       case ActionType.search:
         title = S.of(context).search;
         iconData = Icons.search;
-        onTap = () {};
         break;
       case ActionType.launchUrl:
         title = S.of(context).launchUrl;
         iconData = Icons.language;
-        onTap = () {};
         break;
       case ActionType.saveBookmark:
         title = S.of(context).saveBookmark;
         iconData = Icons.bookmark_border_outlined;
-        onTap = () {};
         break;
       case ActionType.sendEmail:
         title = S.of(context).sendEmail;
         iconData = Icons.email_outlined;
-        onTap = () {};
         break;
       case ActionType.sendSms:
         title = S.of(context).sendSMS;
         iconData = Icons.sms_outlined;
-        onTap = () {};
         break;
       case ActionType.call:
         title = S.of(context).call;
         iconData = Icons.phone_outlined;
-        onTap = () {};
         break;
       case ActionType.openMap:
         title = S.of(context).openMap;
         iconData = Icons.location_on_outlined;
-        onTap = () {};
         break;
       case ActionType.connectWifi:
         title = S.of(context).connectWifi;
         iconData = Icons.wifi;
-        onTap = () {};
         break;
       case ActionType.saveContact:
         title = S.of(context).saveContact;
         iconData = Icons.contact_mail_outlined;
-        onTap = () {};
         break;
       case ActionType.saveCalendar:
         title = S.of(context).saveCalendar;
         iconData = Icons.calendar_month_outlined;
-        onTap = () {};
         break;
     }
     return ElevatedButton(
@@ -1170,13 +1201,7 @@ class QRCodeProvider extends ChangeNotifier {
               ),
               onTap: canTap && allowTap
                   ? () async {
-                      launchUrlString(content).onError((error, stackTrace) {
-                        ShowDialog.show(
-                          context,
-                          content: '${S.of(context).canNotOpen} $content',
-                        );
-                        return true;
-                      });
+                      launch(context, content);
                     }
                   : null,
             ),
@@ -1245,7 +1270,7 @@ class QRCodeProvider extends ChangeNotifier {
         .onError((error, stackTrace) {
       ShowDialog.show(
         context,
-        content: '${S.of(context).canNotOpen} $url',
+        content: '${S.of(context).canNotOpen}\n$url',
       );
       return true;
     });

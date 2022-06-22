@@ -43,6 +43,7 @@ dependencies:
   flutter_contacts: ^1.1.4
   icalendar_parser:
   wifi_iot: ^0.3.16
+  flutter_email_sender: ^5.1.0
 
 dev_dependencies:
   flutter_test:
