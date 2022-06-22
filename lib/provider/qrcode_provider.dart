@@ -30,13 +30,13 @@ class QRCodeProvider extends ChangeNotifier {
       case QRCodeDataType.text:
         actions = [
           ActionType.launchApp,
-          ActionType.search,
+          // ActionType.search,
         ];
         break;
       case QRCodeDataType.url:
         actions = [
           ActionType.launchUrl,
-          ActionType.search,
+          // ActionType.search,
         ];
         break;
       case QRCodeDataType.mail:
@@ -67,17 +67,17 @@ class QRCodeProvider extends ChangeNotifier {
       case QRCodeDataType.contract:
         actions = [
           ActionType.saveContact,
-          ActionType.call,
-          ActionType.sendSms,
-          ActionType.sendEmail,
-          ActionType.openMap,
+          // ActionType.call,
+          // ActionType.sendSms,
+          // ActionType.sendEmail,
+          // ActionType.openMap,
         ];
         break;
       case QRCodeDataType.bookmark:
         actions = [
           ActionType.saveBookmark,
           ActionType.launchUrl,
-          ActionType.search,
+          // ActionType.search,
         ];
         break;
       case QRCodeDataType.calendar:
