@@ -193,8 +193,8 @@ class GEOModel {
       rawString: rawString,
     );
     final locationSplit = location.split(',');
-    final lon = locationSplit[0];
-    final lat = locationSplit[1];
+    String lat = locationSplit[0];
+    String lon = locationSplit[1];
 
     final name = GetContent.getContent(
       name: 'Q=',
@@ -206,6 +206,10 @@ class GEOModel {
       split: '&',
       rawString: rawString,
     );
+    lon = lon.replaceAll('S', '-');
+    lon = lon.replaceAll('N', '');
+    lat = lat.replaceAll('W', '-');
+    lat = lat.replaceAll('E', '');
 
     return GEOModel(
       lon: double.parse(lon),

@@ -110,7 +110,7 @@ class QRCodeProvider extends ChangeNotifier {
               title: null,
               content: result.code ?? '',
               actionIcon: Icons.search, action: () {
-            launch('https://www.google.com/search?q=${result.code}');
+            launch(context, 'https://www.google.com/search?q=${result.code}');
           }),
         ];
         break;
@@ -198,7 +198,7 @@ class QRCodeProvider extends ChangeNotifier {
             content: smsModel.phoneNumber,
             actionIcon: Icons.phone_outlined,
             action: () {
-              launch('tel:${smsModel.phoneNumber}');
+              launch(context, 'tel:${smsModel.phoneNumber}');
             },
           ),
           _contentTitle(
@@ -220,10 +220,10 @@ class QRCodeProvider extends ChangeNotifier {
             context,
             icon: Icons.my_location_outlined,
             title: null,
-            content: '${geoModel.lon},${geoModel.lat}',
+            content: '${geoModel.lat},${geoModel.lon}',
             actionIcon: Icons.map_outlined,
             action: () {
-              launch('geo:${geoModel.lon},${geoModel.lat}');
+              launch(context, 'geo:${geoModel.lat},${geoModel.lon}');
             },
           ),
           _contentTitle(
@@ -234,7 +234,7 @@ class QRCodeProvider extends ChangeNotifier {
             actionIcon: Icons.search,
             action: () {
               launch(
-                  'https://www.google.com/search?q=${geoModel.name}');
+                  context, 'https://www.google.com/search?q=${geoModel.name}');
             },
           ),
         ];
@@ -280,7 +280,7 @@ class QRCodeProvider extends ChangeNotifier {
         if (result.code!.toUpperCase().startsWith('BEGIN:VCARD')) {
           contact = Contact.fromVCard(result.code ?? '');
         }
-        print(contact);
+        String geo = vcardGEO(result.code ?? '');
         //TODO 動作
         infoList = [
           const SizedBox(height: 16),
@@ -296,9 +296,10 @@ class QRCodeProvider extends ChangeNotifier {
           ),
           _contentTitle(
             context,
-            icon: Icons.person,
+            icon: Icons.person_outline,
             title: null,
-            content: '${contact.name.last}${contact.name.middle}${contact.name.first}',
+            content:
+                '${contact.name.last}${contact.name.last.isNotEmpty ? ' ' : ''}${contact.name.middle}${contact.name.middle.isNotEmpty ? ' ' : ''}${contact.name.first}',
           ),
           _contentTitle(
             context,
@@ -336,7 +337,7 @@ class QRCodeProvider extends ChangeNotifier {
                         actionIcon: Icons.phone_outlined,
                         action: () {
                           launch(
-                              'tel:${contact.phones[index].number}');
+                              context, 'tel:${contact.phones[index].number}');
                         },
                       ),
                     ],
@@ -375,8 +376,8 @@ class QRCodeProvider extends ChangeNotifier {
                         content: contact.emails[index].address,
                         actionIcon: Icons.email_outlined,
                         action: () {
-                          launch(
-                              'emailto:${contact.phones[index].number}');
+                          launch(context,
+                              'mailto:${contact.emails[index].address}');
                         },
                       ),
                     ],
@@ -385,6 +386,16 @@ class QRCodeProvider extends ChangeNotifier {
               ),
             ),
           ],
+          _contentTitle(
+            context,
+            icon: Icons.my_location_outlined,
+            title: null,
+            content: geo,
+            actionIcon: Icons.map_outlined,
+            action: () {
+              launch(context, 'geo:${geo.split(',')[0]},${geo.split(',')[1]}');
+            },
+          ),
           if (contact.addresses.isNotEmpty) ...[
             const Divider(),
             _contentTitleWithChild(
@@ -414,7 +425,7 @@ class QRCodeProvider extends ChangeNotifier {
                         content: contact.addresses[index].address,
                         actionIcon: Icons.map_outlined,
                         action: () {
-                          launch(
+                          launch(context,
                               'https://www.google.com/maps/search/?api=1&query=${contact.addresses[index].address}');
                         },
                       ),
@@ -438,13 +449,15 @@ class QRCodeProvider extends ChangeNotifier {
                 itemBuilder: (context, index) {
                   return Column(
                     children: [
-                      _contentTitle(
-                        context,
-                        icon: Icons.label_outline,
-                        title: null,
-                        content: contact.organizations[index].company,
-                        havePadding: false,
-                      ),
+                      _contentTitle(context,
+                          icon: Icons.label_outline,
+                          title: null,
+                          content: contact.organizations[index].company,
+                          havePadding: false,
+                          actionIcon: Icons.search, action: () {
+                        launch(context,
+                            'https://www.google.com/search?q=${contact.organizations[index].company}');
+                      }),
                       _contentTitle(
                         context,
                         icon: Icons.work_outline,
@@ -470,7 +483,7 @@ class QRCodeProvider extends ChangeNotifier {
                         content: contact.organizations[index].officeLocation,
                         actionIcon: Icons.map_outlined,
                         action: () {
-                          launch(
+                          launch(context,
                               'https://www.google.com/maps/search/?api=1&query=${contact.organizations[index].officeLocation}');
                         },
                       ),
@@ -508,8 +521,8 @@ class QRCodeProvider extends ChangeNotifier {
                         title: null,
                         content: contact.websites[index].url,
                         actionIcon: Icons.launch,
-                        action: (){
-                          launch(contact.websites[index].url);
+                        action: () {
+                          launch(context, contact.websites[index].url);
                         },
                       ),
                     ],
@@ -574,13 +587,14 @@ class QRCodeProvider extends ChangeNotifier {
                             '${_eventLabelToString[contact.events[index].label]}',
                         havePadding: false,
                       ),
-                      _contentTitle(
-                        context,
-                        icon: Icons.calendar_today,
-                        title: null,
-                        content:
-                            '${contact.events[index].year}${contact.events[index].year != null ? '/' : ''}${contact.events[index].month}/${contact.events[index].day}',
-                      ),
+                      _contentTitle(context,
+                          icon: Icons.calendar_today,
+                          title: null,
+                          content:
+                              '${contact.events[index].year}${contact.events[index].year != null ? '/' : ''}${contact.events[index].month}/${contact.events[index].day}',
+                          actionIcon: Icons.event, action: () {
+                        //TODO加入行事曆
+                      }),
                     ],
                   );
                 },
@@ -667,6 +681,10 @@ class QRCodeProvider extends ChangeNotifier {
             icon: Icons.link,
             title: null,
             content: urlModel.url,
+            actionIcon: Icons.launch,
+            action: () {
+              launch(context, urlModel.url);
+            },
           ),
         ];
         break;
@@ -744,55 +762,70 @@ class QRCodeProvider extends ChangeNotifier {
               content: timeStamp,
               allowTap: false,
             ),
-            _contentTitle(
-              context,
-              icon: Icons.email_outlined,
-              title: null,
-              content: iCalendar.data[index]['uid'] ?? '',
-            ),
+            _contentTitle(context,
+                icon: Icons.email_outlined,
+                title: null,
+                content: iCalendar.data[index]['uid'] ?? '',
+                actionIcon: Icons.email_outlined, action: () {
+              launch(context, 'mailto:${iCalendar.data[index]['uid'] ?? ''}');
+            }),
             _contentTitle(
               context,
               icon: Icons.edit_note_outlined,
               title: null,
               content: iCalendar.data[index]['description'] ?? '',
             ),
-            _contentTitle(
-              context,
-              icon: Icons.location_city_rounded,
-              title: null,
-              content: iCalendar.data[index]['location'] ?? '',
-            ),
+            _contentTitle(context,
+                icon: Icons.location_city_rounded,
+                title: null,
+                content: iCalendar.data[index]['location'] ?? '',
+                actionIcon: Icons.search, action: () {
+              launch(context,
+                  'https://www.google.com/search?q=${iCalendar.data[index]['location'] ?? ''}');
+            }),
             _contentTitle(
               context,
               icon: Icons.language,
               title: null,
               content: iCalendar.data[index]['url'] ?? '',
+              actionIcon: Icons.launch,
+              action: () {
+                launch(context, iCalendar.data[index]['url'] ?? '');
+              },
             ),
             if (iCalendar.data[index]['geo'] != null)
-              _contentTitle(
-                context,
-                icon: Icons.location_on_outlined,
-                title: null,
-                content: iCalendar.data[index]['geo'].toString(),
-              ),
+              _contentTitle(context,
+                  icon: Icons.location_on_outlined,
+                  title: null,
+                  content: iCalendar.data[index]['geo'].toString(),
+                  actionIcon: Icons.map_outlined, action: () {
+                launch(context,
+                    'geo:${iCalendar.data[index]['geo']['latitude']},${iCalendar.data[index]['geo']['longitude']}');
+              }),
             if (iCalendar.data[index]['organizer'] != null)
               _contentTitleWithChild(
                 icon: Icons.business_rounded,
                 child: Column(
                   children: [
-                    _contentTitle(
-                      context,
-                      icon: Icons.label_outline,
-                      title: null,
-                      content: iCalendar.data[index]['organizer']['name'] ?? '',
-                      havePadding: false,
-                    ),
-                    _contentTitle(
-                      context,
-                      icon: Icons.email_outlined,
-                      title: null,
-                      content: iCalendar.data[index]['organizer']['mail'] ?? '',
-                    ),
+                    _contentTitle(context,
+                        icon: Icons.label_outline,
+                        title: null,
+                        content:
+                            iCalendar.data[index]['organizer']['name'] ?? '',
+                        havePadding: false,
+                        actionIcon: Icons.search, action: () {
+                      launch(context,
+                          'https://www.google.com/search?q=${iCalendar.data[index]['organizer']['name'] ?? ''}');
+                    }),
+                    _contentTitle(context,
+                        icon: Icons.email_outlined,
+                        title: null,
+                        content:
+                            iCalendar.data[index]['organizer']['mail'] ?? '',
+                        actionIcon: Icons.email_outlined, action: () {
+                      launch(context,
+                          'mailto:${iCalendar.data[index]['organizer']['mail'] ?? ''}');
+                    }),
                   ],
                 ),
               )
@@ -1148,7 +1181,7 @@ class QRCodeProvider extends ChangeNotifier {
                   : null,
             ),
           ),
-          const Spacer(),
+          const SizedBox(width: 8),
           if (actionIcon != null)
             ElevatedButton(
               onPressed: action,
@@ -1179,9 +1212,43 @@ class QRCodeProvider extends ChangeNotifier {
       ),
     );
   }
-  
-  void launch(String url){
-    launchUrl(Uri.parse(url),mode: LaunchMode.externalApplication);
+
+  String vcardGEO(String raw) {
+    List<String> list = raw.split('\n');
+    String version = '';
+    String location = '';
+    for (final element in list) {
+      if (element.toUpperCase().startsWith('VERSION:')) {
+        version = element.substring('VERSION:'.length, element.length);
+      }
+    }
+    for (final element in list) {
+      if (element.toUpperCase().startsWith('GEO:')) {
+        if (version == '4.0') {
+          location = element.substring('GEO:geo:'.length, element.length);
+        } else {
+          location = element
+              .substring('GEO:'.length, element.length)
+              .replaceAll(';', ',');
+        }
+      }
+    }
+    location = location.replaceAll('S', '-');
+    location = location.replaceAll('N', '');
+    location = location.replaceAll('W', '-');
+    location = location.replaceAll('E', '');
+    return location;
+  }
+
+  void launch(BuildContext context, String url) {
+    launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication)
+        .onError((error, stackTrace) {
+      ShowDialog.show(
+        context,
+        content: '${S.of(context).canNotOpen} $url',
+      );
+      return true;
+    });
   }
 }
 
