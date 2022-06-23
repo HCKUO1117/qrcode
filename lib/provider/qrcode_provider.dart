@@ -8,6 +8,7 @@ import 'package:qrcode/generated/l10n.dart';
 import 'package:qrcode/model/action_type.dart';
 import 'package:qrcode/model/data_models.dart';
 import 'package:qrcode/model/qrcode_data_type.dart';
+import 'package:qrcode/utils/add_contact.dart';
 import 'package:qrcode/utils/dialog.dart';
 import 'package:qrcode/utils/get_content.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -100,7 +101,6 @@ class QRCodeProvider extends ChangeNotifier {
   }) {
     switch (type) {
       case QRCodeDataType.text:
-        //TODO 動作
         infoList = [
           const SizedBox(height: 16),
           _typeText('TEXT'),
@@ -129,7 +129,6 @@ class QRCodeProvider extends ChangeNotifier {
         break;
       case QRCodeDataType.url:
         UrlModel urlModel = UrlModel.transfer(result.code ?? '');
-        //TODO 動作
         infoList = [
           const SizedBox(height: 16),
           _typeText('URL'),
@@ -167,7 +166,6 @@ class QRCodeProvider extends ChangeNotifier {
           bcc: mailModel.bcc,
           isHTML: false,
         );
-        //TODO 動作
         infoList = [
           const SizedBox(height: 16),
           _typeText('EMAIL'),
@@ -216,7 +214,6 @@ class QRCodeProvider extends ChangeNotifier {
         break;
       case QRCodeDataType.phone:
         PhoneModel phoneModel = PhoneModel.transfer(result.code ?? '');
-        //TODO 動作
         infoList = [
           const SizedBox(height: 16),
           _typeText('TEL'),
@@ -244,7 +241,6 @@ class QRCodeProvider extends ChangeNotifier {
         break;
       case QRCodeDataType.sms:
         SMSModel smsModel = SMSModel.transfer(result.code ?? '');
-        //TODO 動作
         infoList = [
           const SizedBox(height: 16),
           _typeText('SMS'),
@@ -278,7 +274,6 @@ class QRCodeProvider extends ChangeNotifier {
         break;
       case QRCodeDataType.geo:
         GEOModel geoModel = GEOModel.transfer(result.code ?? '');
-        //TODO 動作
         infoList = [
           const SizedBox(height: 16),
           _typeText('GEO'),
@@ -315,20 +310,19 @@ class QRCodeProvider extends ChangeNotifier {
                 launch(context, 'geo:${geoModel.lat},${geoModel.lon}');
               },
             ),
-          if(geoModel.name.isNotEmpty)
-          actionButton(
-            context,
-            type: ActionType.openMapByName,
-            onTap: () async {
-              launch(context,
-                  'https://www.google.com/maps/search/?api=1&query=${geoModel.name}');
-            },
-          ),
+          if (geoModel.name.isNotEmpty)
+            actionButton(
+              context,
+              type: ActionType.openMapByName,
+              onTap: () async {
+                launch(context,
+                    'https://www.google.com/maps/search/?api=1&query=${geoModel.name}');
+              },
+            ),
         ];
         break;
       case QRCodeDataType.wifi:
         WifiModel wifiModel = WifiModel.transfer(result.code ?? '');
-        //TODO 動作
         infoList = [
           const SizedBox(height: 16),
           _typeText('WIFI'),
@@ -353,20 +347,25 @@ class QRCodeProvider extends ChangeNotifier {
           ),
         ];
         actionList = [
-            actionButton(
-              context,
-              type: ActionType.connectWifi,
-              onTap: () async {
-                if(await WiFiForIoTPlugin.isEnabled()){
-                  WiFiForIoTPlugin.findAndConnect(wifiModel.name,password: wifiModel.password,joinOnce: false,);
-                  return;
-                }
-                ShowDialog.show(
-                  context,
-                  content: S.of(context).openWifi,
+          //TODO wifi連接問題
+          actionButton(
+            context,
+            type: ActionType.connectWifi,
+            onTap: () async {
+              if (await WiFiForIoTPlugin.isEnabled()) {
+                WiFiForIoTPlugin.findAndConnect(
+                  wifiModel.name,
+                  password: wifiModel.password,
+                  joinOnce: false,
                 );
-              },
-            ),
+                return;
+              }
+              ShowDialog.show(
+                context,
+                content: S.of(context).openWifi,
+              );
+            },
+          ),
         ];
         break;
       case QRCodeDataType.contract:
@@ -764,6 +763,18 @@ class QRCodeProvider extends ChangeNotifier {
               ),
             ),
           ],
+        ];
+        actionList = [
+          actionButton(
+            context,
+            type: ActionType.saveContact,
+            onTap: () async {
+              AddContact.add({'asda':'asdasd'});
+              // if (await FlutterContacts.requestPermission()) {
+              //   FlutterContacts.insertContact(contact);
+              // }
+            },
+          ),
         ];
         break;
       case QRCodeDataType.bookmark:
