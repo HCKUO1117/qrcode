@@ -12,5 +12,8 @@
   "saveContact": "Save Contact",
   "saveCalendar": "Save Calendar",
   "confirm": "Confirm",
-  "canNotOpen": "Cannot open"
+  "canNotOpen": "Cannot open",
+  "coordinate": "coordinate",
+  "name": "name",
+  "openWifi": "Please turn on Wifi first"
 }

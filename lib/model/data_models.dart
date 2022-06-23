@@ -175,8 +175,8 @@ class SMSModel {
 }
 
 class GEOModel {
-  double lon;
-  double lat;
+  double? lon;
+  double? lat;
   String name;
   double zoom;
 
@@ -213,8 +213,8 @@ class GEOModel {
     lat = lat.replaceAll('E', '');
 
     return GEOModel(
-      lon: double.parse(lon),
-      lat: double.parse(lat),
+      lon: lon.isNotEmpty ? double.parse(lon) : null,
+      lat: lat.isNotEmpty ? double.parse(lat) : null,
       name: name,
       zoom: zoom.isNotEmpty ? double.parse(zoom) : 1,
     );

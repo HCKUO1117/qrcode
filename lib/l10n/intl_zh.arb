@@ -12,5 +12,8 @@
   "saveContact": "儲存聯絡人",
   "saveCalendar": "儲存日曆",
   "confirm": "確認",
-  "canNotOpen": "無法開啟"
+  "canNotOpen": "無法開啟",
+  "coordinate":"坐標",
+  "name": "名稱",
+  "openWifi": "請先開啟Wifi"
 }

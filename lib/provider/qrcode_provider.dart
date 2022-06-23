@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
+import 'package:flutter_sms/flutter_sms.dart';
 import 'package:icalendar_parser/icalendar_parser.dart';
 import 'package:intl/intl.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
@@ -12,6 +13,7 @@ import 'package:qrcode/utils/get_content.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:flutter_email_sender/flutter_email_sender.dart' as email_sender;
+import 'package:wifi_iot/wifi_iot.dart';
 
 class QRCodeProvider extends ChangeNotifier {
   Widget mainAction = const SizedBox();
@@ -224,6 +226,19 @@ class QRCodeProvider extends ChangeNotifier {
             icon: Icons.phone_outlined,
             title: null,
             content: phoneModel.phoneNumber,
+            actionIcon: Icons.phone_outlined,
+            action: () {
+              launch(context, 'tel:${phoneModel.phoneNumber}');
+            },
+          ),
+        ];
+        actionList = [
+          actionButton(
+            context,
+            type: ActionType.call,
+            onTap: () async {
+              launch(context, 'tel:${phoneModel.phoneNumber}');
+            },
           ),
         ];
         break;
@@ -251,6 +266,15 @@ class QRCodeProvider extends ChangeNotifier {
             content: smsModel.content,
           ),
         ];
+        actionList = [
+          actionButton(
+            context,
+            type: ActionType.sendSms,
+            onTap: () async {
+              _sendSMS(smsModel.content, [smsModel.phoneNumber]);
+            },
+          ),
+        ];
         break;
       case QRCodeDataType.geo:
         GEOModel geoModel = GEOModel.transfer(result.code ?? '');
@@ -259,16 +283,17 @@ class QRCodeProvider extends ChangeNotifier {
           const SizedBox(height: 16),
           _typeText('GEO'),
           const SizedBox(height: 16),
-          _contentTitle(
-            context,
-            icon: Icons.my_location_outlined,
-            title: null,
-            content: '${geoModel.lat},${geoModel.lon}',
-            actionIcon: Icons.map_outlined,
-            action: () {
-              launch(context, 'geo:${geoModel.lat},${geoModel.lon}');
-            },
-          ),
+          if (geoModel.lon != null && geoModel.lat != null)
+            _contentTitle(
+              context,
+              icon: Icons.my_location_outlined,
+              title: null,
+              content: '${geoModel.lat},${geoModel.lon}',
+              actionIcon: Icons.map_outlined,
+              action: () {
+                launch(context, 'geo:${geoModel.lat},${geoModel.lon}');
+              },
+            ),
           _contentTitle(
             context,
             icon: Icons.location_on_outlined,
@@ -278,6 +303,25 @@ class QRCodeProvider extends ChangeNotifier {
             action: () {
               launch(
                   context, 'https://www.google.com/search?q=${geoModel.name}');
+            },
+          ),
+        ];
+        actionList = [
+          if (geoModel.lon != null && geoModel.lat != null)
+            actionButton(
+              context,
+              type: ActionType.openMap,
+              onTap: () async {
+                launch(context, 'geo:${geoModel.lat},${geoModel.lon}');
+              },
+            ),
+          if(geoModel.name.isNotEmpty)
+          actionButton(
+            context,
+            type: ActionType.openMapByName,
+            onTap: () async {
+              launch(context,
+                  'https://www.google.com/maps/search/?api=1&query=${geoModel.name}');
             },
           ),
         ];
@@ -307,6 +351,22 @@ class QRCodeProvider extends ChangeNotifier {
             title: null,
             content: wifiModel.type,
           ),
+        ];
+        actionList = [
+            actionButton(
+              context,
+              type: ActionType.connectWifi,
+              onTap: () async {
+                if(await WiFiForIoTPlugin.isEnabled()){
+                  WiFiForIoTPlugin.findAndConnect(wifiModel.name,password: wifiModel.password,joinOnce: false,);
+                  return;
+                }
+                ShowDialog.show(
+                  context,
+                  content: S.of(context).openWifi,
+                );
+              },
+            ),
         ];
         break;
       case QRCodeDataType.contract:
@@ -920,7 +980,7 @@ class QRCodeProvider extends ChangeNotifier {
         iconData = Icons.phone_outlined;
         break;
       case ActionType.openMap:
-        title = S.of(context).openMap;
+        title = S.of(context).openMap + '(${S.of(context).coordinate})';
         iconData = Icons.location_on_outlined;
         break;
       case ActionType.connectWifi:
@@ -934,6 +994,10 @@ class QRCodeProvider extends ChangeNotifier {
       case ActionType.saveCalendar:
         title = S.of(context).saveCalendar;
         iconData = Icons.calendar_month_outlined;
+        break;
+      case ActionType.openMapByName:
+        title = S.of(context).openMap + '(${S.of(context).name})';
+        iconData = Icons.map_outlined;
         break;
     }
     return ElevatedButton(
@@ -1274,6 +1338,14 @@ class QRCodeProvider extends ChangeNotifier {
       );
       return true;
     });
+  }
+
+  void _sendSMS(String message, List<String> recipents) async {
+    String _result = await sendSMS(message: message, recipients: recipents)
+        .catchError((onError) {
+      print(onError);
+    });
+    print(_result);
   }
 }
 

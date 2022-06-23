@@ -10,6 +10,7 @@ enum ActionType {
   sendSms,
   call,
   openMap,
+  openMapByName,
   connectWifi,
   saveContact,
   saveCalendar
