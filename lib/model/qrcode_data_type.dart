@@ -6,7 +6,7 @@ enum QRCodeDataType {
   sms,
   geo,
   wifi,
-  contract,
+  contact,
   bookmark,
   calendar,
 }
