@@ -12,7 +12,6 @@ import 'package:qrcode/utils/add_contact.dart';
 import 'package:qrcode/utils/dialog.dart';
 import 'package:qrcode/utils/get_content.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:url_launcher/url_launcher_string.dart';
 import 'package:flutter_email_sender/flutter_email_sender.dart' as email_sender;
 import 'package:wifi_iot/wifi_iot.dart';
 
@@ -68,7 +67,7 @@ class QRCodeProvider extends ChangeNotifier {
           ActionType.connectWifi,
         ];
         break;
-      case QRCodeDataType.contract:
+      case QRCodeDataType.contact:
         actions = [
           ActionType.saveContact,
           // ActionType.call,
@@ -368,7 +367,7 @@ class QRCodeProvider extends ChangeNotifier {
           ),
         ];
         break;
-      case QRCodeDataType.contract:
+      case QRCodeDataType.contact:
         Contact contact = Contact();
 
         // Import contact from vCard
@@ -383,7 +382,6 @@ class QRCodeProvider extends ChangeNotifier {
           contact = Contact.fromVCard(result.code ?? '');
         }
         String geo = vcardGEO(result.code ?? '');
-        //TODO 動作
         infoList = [
           const SizedBox(height: 16),
           _typeText('CONTACT'),
@@ -769,10 +767,7 @@ class QRCodeProvider extends ChangeNotifier {
             context,
             type: ActionType.saveContact,
             onTap: () async {
-              AddContact.add({'asda':'asdasd'});
-              // if (await FlutterContacts.requestPermission()) {
-              //   FlutterContacts.insertContact(contact);
-              // }
+              AddContact.add(contact.toJson());
             },
           ),
         ];
