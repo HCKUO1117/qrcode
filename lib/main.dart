@@ -10,6 +10,7 @@ import 'package:qrcode/generated/l10n.dart';
 import 'package:qrcode/model/qrcode_data_type.dart';
 import 'package:qrcode/provider/qrcode_provider.dart';
 import 'package:qrcode/screen/scanned/scanned_page.dart';
+import 'package:qrcode/utils/connect_wifi.dart';
 import 'package:qrcode/utils/judge_qrcode_data_type.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
@@ -111,7 +112,9 @@ class _MyHomePageState extends State<MyHomePage> {
               child: Stack(
                 children: [
                   GestureDetector(
-                    onTap: () {},
+                    onTap: () {
+                      ConnectWifi.connect({"ssid":"LONGINGO","password":"0932111861"});
+                    },
                     child: QRView(
                       key: qrKey,
                       onQRViewCreated: _onQRViewCreated,

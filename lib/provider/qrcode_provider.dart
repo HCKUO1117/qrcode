@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:flutter_sms/flutter_sms.dart';
 import 'package:icalendar_parser/icalendar_parser.dart';
 import 'package:intl/intl.dart';
+import 'package:open_settings/open_settings.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:qrcode/generated/l10n.dart';
 import 'package:qrcode/model/action_type.dart';
@@ -351,18 +353,20 @@ class QRCodeProvider extends ChangeNotifier {
             context,
             type: ActionType.connectWifi,
             onTap: () async {
-              if (await WiFiForIoTPlugin.isEnabled()) {
-                WiFiForIoTPlugin.findAndConnect(
-                  wifiModel.name,
-                  password: wifiModel.password,
-                  joinOnce: false,
-                );
-                return;
-              }
-              ShowDialog.show(
-                context,
-                content: S.of(context).openWifi,
-              );
+              Clipboard.setData(ClipboardData(text: wifiModel.password));
+              OpenSettings.openWIFISetting();
+              // if (await WiFiForIoTPlugin.isEnabled()) {
+              //   WiFiForIoTPlugin.findAndConnect(
+              //     wifiModel.name,
+              //     password: wifiModel.password,
+              //     joinOnce: false,
+              //   );
+              //   return;
+              // }
+              // ShowDialog.show(
+              //   context,
+              //   content: S.of(context).openWifi,
+              // );
             },
           ),
         ];

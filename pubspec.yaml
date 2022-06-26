@@ -45,6 +45,7 @@ dependencies:
   wifi_iot: ^0.3.16
   flutter_email_sender: ^5.1.0
   flutter_sms: ^2.3.3
+  open_settings: ^2.0.2
 
 dev_dependencies:
   flutter_test:

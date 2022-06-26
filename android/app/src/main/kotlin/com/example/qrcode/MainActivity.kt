@@ -1,9 +1,19 @@
 package com.example.qrcode
 
-import android.content.ContentValues
-import android.content.Intent
+import android.content.*
+import android.net.ConnectivityManager
+import android.net.Network
+import android.net.NetworkCapabilities
+import android.net.NetworkRequest
+import android.net.wifi.WifiConfiguration
+import android.net.wifi.WifiManager
+import android.net.wifi.WifiNetworkSpecifier
+import android.net.wifi.WifiNetworkSuggestion
+import android.os.Build
 import android.provider.ContactsContract
+import android.widget.Toast
 import androidx.annotation.NonNull
+import androidx.annotation.RequiresApi
 import co.quis.flutter_contacts.properties.Email
 import co.quis.flutter_contacts.properties.Organization
 import co.quis.flutter_contacts.properties.Website
@@ -12,13 +22,14 @@ import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
 
 class MainActivity : FlutterActivity() {
-    private val CHANNEL = "contact"
+    private val contact = "contact"
+    private val wifi = "wifi"
 
     override fun configureFlutterEngine(@NonNull flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
         MethodChannel(
-            flutterEngine.dartExecutor.binaryMessenger,
-            CHANNEL
+                flutterEngine.dartExecutor.binaryMessenger,
+                contact
         ).setMethodCallHandler { call, result ->
             val intent = Intent(Intent.ACTION_INSERT).apply {
                 type = ContactsContract.Contacts.CONTENT_TYPE
@@ -51,8 +62,8 @@ class MainActivity : FlutterActivity() {
                 element as Map<*, *>
                 val row = ContentValues()
                 row.put(
-                    ContactsContract.Data.MIMETYPE,
-                    ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE
+                        ContactsContract.Data.MIMETYPE,
+                        ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE
                 )
                 var type = ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE
                 when (element["label"]) {
@@ -89,8 +100,8 @@ class MainActivity : FlutterActivity() {
                 element as Map<*, *>
                 val row = ContentValues()
                 row.put(
-                    ContactsContract.Data.MIMETYPE,
-                    ContactsContract.CommonDataKinds.Email.CONTENT_ITEM_TYPE
+                        ContactsContract.Data.MIMETYPE,
+                        ContactsContract.CommonDataKinds.Email.CONTENT_ITEM_TYPE
                 )
                 var type = ContactsContract.CommonDataKinds.Email.TYPE_HOME
                 when (element["label"]) {
@@ -104,8 +115,8 @@ class MainActivity : FlutterActivity() {
                 }
                 row.put(ContactsContract.CommonDataKinds.Email.TYPE, type)
                 row.put(
-                    ContactsContract.CommonDataKinds.Email.ADDRESS,
-                    element["address"].toString()
+                        ContactsContract.CommonDataKinds.Email.ADDRESS,
+                        element["address"].toString()
                 )
                 data.add(row)
             }
@@ -116,8 +127,8 @@ class MainActivity : FlutterActivity() {
                 element as Map<*, *>
                 val row = ContentValues()
                 row.put(
-                    ContactsContract.Data.MIMETYPE,
-                    ContactsContract.CommonDataKinds.StructuredPostal.CONTENT_ITEM_TYPE
+                        ContactsContract.Data.MIMETYPE,
+                        ContactsContract.CommonDataKinds.StructuredPostal.CONTENT_ITEM_TYPE
                 )
                 var type = ContactsContract.CommonDataKinds.StructuredPostal.TYPE_HOME
                 when (element["label"]) {
@@ -130,43 +141,43 @@ class MainActivity : FlutterActivity() {
                 }
 
                 if (element["street"].toString().isEmpty() && element["city"].toString()
-                        .isEmpty() && element["state"].toString()
-                        .isEmpty() && element["country"].toString().isEmpty()
+                                .isEmpty() && element["state"].toString()
+                                .isEmpty() && element["country"].toString().isEmpty()
                 ) {
                     intent.putExtra(
-                        ContactsContract.Intents.Insert.POSTAL,
-                        element["address"].toString()
+                            ContactsContract.Intents.Insert.POSTAL,
+                            element["address"].toString()
                     )
                     intent.putExtra(ContactsContract.Intents.Insert.POSTAL_TYPE, type)
                 } else {
                     row.put(ContactsContract.CommonDataKinds.StructuredPostal.TYPE, type)
                     row.put(
-                        ContactsContract.CommonDataKinds.StructuredPostal.STREET,
-                        element["street"].toString()
+                            ContactsContract.CommonDataKinds.StructuredPostal.STREET,
+                            element["street"].toString()
                     )
                     row.put(
-                        ContactsContract.CommonDataKinds.StructuredPostal.POBOX,
-                        element["pobox"].toString()
+                            ContactsContract.CommonDataKinds.StructuredPostal.POBOX,
+                            element["pobox"].toString()
                     )
                     row.put(
-                        ContactsContract.CommonDataKinds.StructuredPostal.NEIGHBORHOOD,
-                        element["neighborhood"].toString()
+                            ContactsContract.CommonDataKinds.StructuredPostal.NEIGHBORHOOD,
+                            element["neighborhood"].toString()
                     )
                     row.put(
-                        ContactsContract.CommonDataKinds.StructuredPostal.CITY,
-                        element["city"].toString()
+                            ContactsContract.CommonDataKinds.StructuredPostal.CITY,
+                            element["city"].toString()
                     )
                     row.put(
-                        ContactsContract.CommonDataKinds.StructuredPostal.REGION,
-                        element["state"].toString()
+                            ContactsContract.CommonDataKinds.StructuredPostal.REGION,
+                            element["state"].toString()
                     )
                     row.put(
-                        ContactsContract.CommonDataKinds.StructuredPostal.POSTCODE,
-                        element["postalCode"].toString()
+                            ContactsContract.CommonDataKinds.StructuredPostal.POSTCODE,
+                            element["postalCode"].toString()
                     )
                     row.put(
-                        ContactsContract.CommonDataKinds.StructuredPostal.COUNTRY,
-                        element["country"].toString()
+                            ContactsContract.CommonDataKinds.StructuredPostal.COUNTRY,
+                            element["country"].toString()
                     )
                     data.add(row)
                 }
@@ -178,37 +189,37 @@ class MainActivity : FlutterActivity() {
                 element as Map<*, *>
                 val row = ContentValues()
                 row.put(
-                    ContactsContract.Data.MIMETYPE,
-                    ContactsContract.CommonDataKinds.Organization.CONTENT_ITEM_TYPE
+                        ContactsContract.Data.MIMETYPE,
+                        ContactsContract.CommonDataKinds.Organization.CONTENT_ITEM_TYPE
                 )
 
                 row.put(
-                    ContactsContract.CommonDataKinds.Organization.COMPANY,
-                    element["company"].toString()
+                        ContactsContract.CommonDataKinds.Organization.COMPANY,
+                        element["company"].toString()
                 )
                 row.put(
-                    ContactsContract.CommonDataKinds.Organization.TITLE,
-                    element["title"].toString()
+                        ContactsContract.CommonDataKinds.Organization.TITLE,
+                        element["title"].toString()
                 )
                 row.put(
-                    ContactsContract.CommonDataKinds.Organization.DEPARTMENT,
-                    element["department"].toString()
+                        ContactsContract.CommonDataKinds.Organization.DEPARTMENT,
+                        element["department"].toString()
                 )
                 row.put(
-                    ContactsContract.CommonDataKinds.Organization.JOB_DESCRIPTION,
-                    element["jobDescription"].toString()
+                        ContactsContract.CommonDataKinds.Organization.JOB_DESCRIPTION,
+                        element["jobDescription"].toString()
                 )
                 row.put(
-                    ContactsContract.CommonDataKinds.Organization.SYMBOL,
-                    element["symbol"].toString()
+                        ContactsContract.CommonDataKinds.Organization.SYMBOL,
+                        element["symbol"].toString()
                 )
                 row.put(
-                    ContactsContract.CommonDataKinds.Organization.PHONETIC_NAME,
-                    element["phoneticName"].toString()
+                        ContactsContract.CommonDataKinds.Organization.PHONETIC_NAME,
+                        element["phoneticName"].toString()
                 )
                 row.put(
-                    ContactsContract.CommonDataKinds.Organization.OFFICE_LOCATION,
-                    element["officeLocation"].toString()
+                        ContactsContract.CommonDataKinds.Organization.OFFICE_LOCATION,
+                        element["officeLocation"].toString()
                 )
                 data.add(row)
             }
@@ -219,8 +230,8 @@ class MainActivity : FlutterActivity() {
                 element as Map<*, *>
                 val row = ContentValues()
                 row.put(
-                    ContactsContract.Data.MIMETYPE,
-                    ContactsContract.CommonDataKinds.Website.CONTENT_ITEM_TYPE
+                        ContactsContract.Data.MIMETYPE,
+                        ContactsContract.CommonDataKinds.Website.CONTENT_ITEM_TYPE
                 )
                 var type = ContactsContract.CommonDataKinds.Website.TYPE_HOME
                 when (element["label"]) {
@@ -237,8 +248,8 @@ class MainActivity : FlutterActivity() {
                 }
                 row.put(ContactsContract.CommonDataKinds.Website.TYPE, type)
                 row.put(
-                    ContactsContract.CommonDataKinds.Website.URL,
-                    element["url"].toString()
+                        ContactsContract.CommonDataKinds.Website.URL,
+                        element["url"].toString()
                 )
                 data.add(row)
             }
@@ -249,8 +260,8 @@ class MainActivity : FlutterActivity() {
                 element as Map<*, *>
                 val row = ContentValues()
                 row.put(
-                    ContactsContract.Data.MIMETYPE,
-                    ContactsContract.CommonDataKinds.Event.CONTENT_ITEM_TYPE
+                        ContactsContract.Data.MIMETYPE,
+                        ContactsContract.CommonDataKinds.Event.CONTENT_ITEM_TYPE
                 )
                 var type = ContactsContract.CommonDataKinds.Event.TYPE_CUSTOM
                 when (element["label"]) {
@@ -261,8 +272,8 @@ class MainActivity : FlutterActivity() {
                 }
                 row.put(ContactsContract.CommonDataKinds.Event.TYPE, type)
                 row.put(
-                    ContactsContract.CommonDataKinds.Event.START_DATE,
-                    element["year"].toString() + "/" + element["month"].toString() + "/" + element["day"].toString()
+                        ContactsContract.CommonDataKinds.Event.START_DATE,
+                        element["year"].toString() + "/" + element["month"].toString() + "/" + element["day"].toString()
                 )
                 data.add(row)
             }
@@ -270,11 +281,11 @@ class MainActivity : FlutterActivity() {
             //notes
             val notes = content["notes"] as List<*>
             for (element in notes) {
-                element as Map<*,*>
+                element as Map<*, *>
                 val row = ContentValues()
                 row.put(
-                    ContactsContract.Data.MIMETYPE,
-                    ContactsContract.CommonDataKinds.Note.CONTENT_ITEM_TYPE
+                        ContactsContract.Data.MIMETYPE,
+                        ContactsContract.CommonDataKinds.Note.CONTENT_ITEM_TYPE
                 )
                 row.put(ContactsContract.CommonDataKinds.Note.NOTE, element["note"].toString())
                 data.add(row)
@@ -285,6 +296,127 @@ class MainActivity : FlutterActivity() {
             context.startActivity(intent)
             result.success(call.arguments)
         }
+
+        MethodChannel(
+                flutterEngine.dartExecutor.binaryMessenger,
+                wifi
+        ).setMethodCallHandler { call, result ->
+            val wifiConfig = call.arguments as Map<*, *>
+            val networkSSID = wifiConfig["ssid"].toString()
+            val networkPass = wifiConfig["password"].toString()
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                val wifiNetworkSpecifier: WifiNetworkSpecifier?
+
+                if (networkPass.isEmpty()) {
+                    wifiNetworkSpecifier =
+                            WifiNetworkSpecifier.Builder().setSsid(networkSSID).build()
+                } else {
+                    wifiNetworkSpecifier = WifiNetworkSpecifier.Builder().setSsid(networkSSID)
+                            .setWpa2Passphrase(networkPass).build()
+                }
+
+                val networkRequest = NetworkRequest.Builder()
+                        .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
+                        .removeCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+                        .setNetworkSpecifier(wifiNetworkSpecifier)
+                        .build()
+
+                val connectivityManager =
+                        context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager?
+
+                val networkCallback = object : ConnectivityManager.NetworkCallback() {
+                    override fun onUnavailable() {
+                        super.onUnavailable()
+                    }
+
+                    override fun onLosing(network: Network, maxMsToLive: Int) {
+                        super.onLosing(network, maxMsToLive)
+
+                    }
+
+                    override fun onAvailable(network: Network) {
+                        super.onAvailable(network)
+                        connectivityManager?.bindProcessToNetwork(network)
+                    }
+
+                    override fun onLost(network: Network) {
+                        super.onLost(network)
+
+                    }
+                }
+                connectivityManager?.requestNetwork(networkRequest, networkCallback)
+
+
+            } else {
+                val wifiManager = context.getSystemService(WIFI_SERVICE) as WifiManager?
+
+//                if (havePermission) {
+//                    var found = false
+//                    for (config in wifiManager?.configuredNetworks!!) {
+//                        if (config.SSID == String.format("\"%s\"", wifi.SSID)) {
+//                            wifiManager.enableNetwork(config.networkId, true)
+//                            found = true
+//                            break
+//                        }
+//                    }
+//
+//                    if (!found) {
+//                        val wifiConfiguration = WifiConfiguration()
+//                        wifiConfiguration.SSID = String.format("\"%s\"", networkSSID)
+//                        wifiConfiguration.preSharedKey = String.format("\"%s\"", networkPass)
+//                        val wifiID = wifiManager?.addNetwork(wifiConfiguration)
+//                        if (wifiID != null) {
+//                            wifiManager?.enableNetwork(wifiID, true)
+//                        }
+//                    }
+//                }
+            }
+            result.success("success")
+        }
     }
 
+    private var lastSuggestedNetwork: WifiNetworkSuggestion? = null
+    var wifiManager: WifiManager? = null
+
+    @RequiresApi(Build.VERSION_CODES.Q)
+    private fun connectUsingNetworkSuggestion(ssid: String, password: String) {
+        val wifiNetworkSuggestion = WifiNetworkSuggestion.Builder()
+                .setSsid(ssid)
+                .setWpa2Passphrase(password)
+                .build()
+        val intentFilter =
+                IntentFilter(WifiManager.ACTION_WIFI_NETWORK_SUGGESTION_POST_CONNECTION);
+
+        val broadcastReceiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context, intent: Intent) {
+                if (!intent.action.equals(WifiManager.ACTION_WIFI_NETWORK_SUGGESTION_POST_CONNECTION)) {
+                    return
+                }
+                showToast("Connection Suggestion Succeeded")
+            }
+        }
+
+
+        registerReceiver(broadcastReceiver, intentFilter)
+
+        lastSuggestedNetwork?.let {
+            val status = wifiManager!!.removeNetworkSuggestions(listOf(it))
+        }
+        val suggestionsList = listOf(wifiNetworkSuggestion)
+
+        var status = wifiManager!!.addNetworkSuggestions(suggestionsList)
+        if (status == WifiManager.STATUS_NETWORK_SUGGESTIONS_ERROR_ADD_DUPLICATE) {
+            showToast("Suggestion Update Needed")
+            status = wifiManager!!.removeNetworkSuggestions(suggestionsList)
+            status = wifiManager!!.addNetworkSuggestions(suggestionsList)
+        }
+        if (status == WifiManager.STATUS_NETWORK_SUGGESTIONS_SUCCESS) {
+            lastSuggestedNetwork = wifiNetworkSuggestion
+            showToast("Suggestion Added")
+        }
+    }
+
+    private fun showToast(s: String) {
+        Toast.makeText(applicationContext, s, Toast.LENGTH_LONG).show()
+    }
 }
