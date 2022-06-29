@@ -15,5 +15,7 @@
   "canNotOpen": "Cannot open",
   "coordinate": "coordinate",
   "name": "name",
-  "openWifi": "Please turn on Wifi first"
+  "openWifi": "Please turn on Wifi first",
+  "copied": "Copied",
+  "password": "password"
 }

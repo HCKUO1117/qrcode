@@ -46,6 +46,7 @@ dependencies:
   flutter_email_sender: ^5.1.0
   flutter_sms: ^2.3.3
   open_settings: ^2.0.2
+  fluttertoast: ^8.0.9
 
 dev_dependencies:
   flutter_test:

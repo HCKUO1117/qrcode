@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:flutter_sms/flutter_sms.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:icalendar_parser/icalendar_parser.dart';
 import 'package:intl/intl.dart';
 import 'package:open_settings/open_settings.dart';
@@ -354,6 +355,18 @@ class QRCodeProvider extends ChangeNotifier {
             type: ActionType.connectWifi,
             onTap: () async {
               Clipboard.setData(ClipboardData(text: wifiModel.password));
+              Fluttertoast.showToast(
+                msg: S.of(context).copied +
+                    ' WIFI:' +
+                    wifiModel.name +
+                    ' ' +
+                    S.of(context).password,
+                toastLength: Toast.LENGTH_LONG,
+                gravity: ToastGravity.BOTTOM,
+                timeInSecForIosWeb: 1,
+                textColor: Colors.white,
+                fontSize: 16.0,
+              );
               OpenSettings.openWIFISetting();
               // if (await WiFiForIoTPlugin.isEnabled()) {
               //   WiFiForIoTPlugin.findAndConnect(

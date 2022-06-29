@@ -15,5 +15,7 @@
   "canNotOpen": "無法開啟",
   "coordinate":"坐標",
   "name": "名稱",
-  "openWifi": "請先開啟Wifi"
+  "openWifi": "請先開啟Wifi",
+  "copied": "已複製",
+  "password": "密碼"
 }
