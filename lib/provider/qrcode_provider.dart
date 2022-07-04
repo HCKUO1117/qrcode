@@ -16,7 +16,7 @@ import 'package:qrcode/utils/dialog.dart';
 import 'package:qrcode/utils/get_content.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_email_sender/flutter_email_sender.dart' as email_sender;
-import 'package:wifi_iot/wifi_iot.dart';
+import 'package:add_2_calendar/add_2_calendar.dart' as add_2_calendar;
 
 class QRCodeProvider extends ChangeNotifier {
   Widget mainAction = const SizedBox();
@@ -813,6 +813,15 @@ class QRCodeProvider extends ChangeNotifier {
             },
           ),
         ];
+        actionList = [
+          actionButton(
+            context,
+            type: ActionType.launchUrl,
+            onTap: () {
+              launch(context, urlModel.url);
+            },
+          ),
+        ];
         break;
       case QRCodeDataType.calendar:
         String code =
@@ -833,6 +842,16 @@ class QRCodeProvider extends ChangeNotifier {
               icon: Icons.subject,
               title: null,
               content: result.code ?? '',
+            ),
+          ];
+
+          actionList = [
+            actionButton(
+              context,
+              type: ActionType.search,
+              onTap: () {
+                launch(context, result.code ?? '');
+              },
             ),
           ];
         } else {
@@ -955,6 +974,31 @@ class QRCodeProvider extends ChangeNotifier {
                   ],
                 ),
               )
+          ];
+
+          actionList = [
+            actionButton(
+              context,
+              type: ActionType.saveCalendar,
+              onTap: () {
+                final add_2_calendar.Event event = add_2_calendar.Event(
+                  title: iCalendar.data[index]['summary'] ?? '',
+                  description: iCalendar.data[index]['description'] ?? '',
+                  location: iCalendar.data[index]['location'] ?? '',
+                  startDate: DateTime.parse(
+                      (iCalendar.data[index]['dtstart'] as IcsDateTime).dt),
+                  endDate: DateTime.parse(
+                      (iCalendar.data[index]['dtend'] as IcsDateTime).dt),
+                  // iosParams: add_2_calendar.IOSParams(
+                  //   reminder: Duration(/* Ex. hours:1 */),
+                  // ),
+                  androidParams: add_2_calendar.AndroidParams(
+                    emailInvites: [iCalendar.data[index]['uid'] ?? ''],
+                  ),
+                );
+                add_2_calendar.Add2Calendar.addEvent2Cal(event);
+              },
+            ),
           ];
         }
         break;
