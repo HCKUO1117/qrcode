@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 import 'package:qrcode/generated/l10n.dart';
 import 'package:qrcode/main.dart';
 import 'package:qrcode/model/qrcode_data_type.dart';
@@ -30,9 +31,8 @@ class _ScannedPageState extends State<ScannedPage> {
 
   @override
   void initState() {
-
     final qrcodeProvider = Provider.of<QRCodeProvider>(context, listen: false);
-    Future.delayed(Duration.zero,(){
+    Future.delayed(Duration.zero, () {
       qrcodeProvider.setInfoList(
         context,
         type: widget.type,
@@ -47,98 +47,108 @@ class _ScannedPageState extends State<ScannedPage> {
   Widget build(BuildContext context) {
     final qrcodeProvider = Provider.of<QRCodeProvider>(context);
     return Scaffold(
-        appBar: AppBar(),
-        body: Column(
-          children: [
-            Row(
+      appBar: AppBar(),
+      body: Column(
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: GestureDetector(
+                  onTap: () {
+                    setSelectIndex(0);
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    decoration: selectIndex == 0
+                        ? null
+                        : const BoxDecoration(
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.grey,
+                              ),
+                              BoxShadow(
+                                color: Colors.white54,
+                                spreadRadius: -3.0,
+                                blurRadius: 3.0,
+                              ),
+                            ],
+                          ),
+                    child: const Icon(Icons.format_list_bulleted),
+                  ),
+                ),
+              ),
+              Expanded(
+                child: GestureDetector(
+                  onTap: () {
+                    setSelectIndex(1);
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    decoration: selectIndex == 1
+                        ? null
+                        : const BoxDecoration(
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.grey,
+                              ),
+                              BoxShadow(
+                                color: Colors.white54,
+                                spreadRadius: -3.0,
+                                blurRadius: 3.0,
+                              ),
+                            ],
+                          ),
+                    child: const Icon(Icons.raw_on),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          Expanded(
+            child: PageView(
+              controller: pageController,
+              onPageChanged: (index) {
+                setState(() {
+                  selectIndex = index;
+                });
+              },
               children: [
-                Expanded(
-                  child: GestureDetector(
-                    onTap: () {
-                      setSelectIndex(0);
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 10),
-                      decoration: selectIndex == 0
-                          ? null
-                          : const BoxDecoration(
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.grey,
-                                ),
-                                BoxShadow(
-                                  color: Colors.white54,
-                                  spreadRadius: -3.0,
-                                  blurRadius: 3.0,
-                                ),
-                              ],
-                            ),
-                      child: const Icon(Icons.format_list_bulleted),
-                    ),
+                Center(
+                  child: Column(
+                    children: [
+                      Expanded(
+                        child: ListView(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          children: qrcodeProvider.infoList,
+                        ),
+                      ),
+                      ListView(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        children: qrcodeProvider.actionList,
+                      ),
+                      const SizedBox(height: 8),
+                    ],
                   ),
                 ),
-                Expanded(
-                  child: GestureDetector(
-                    onTap: () {
-                      setSelectIndex(1);
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 10),
-                      decoration: selectIndex == 1
-                          ? null
-                          : const BoxDecoration(
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.grey,
-                                ),
-                                BoxShadow(
-                                  color: Colors.white54,
-                                  spreadRadius: -3.0,
-                                  blurRadius: 3.0,
-                                ),
-                              ],
-                            ),
-                      child: const Icon(Icons.raw_on),
-                    ),
+                Center(
+                  child: ListView(
+                    children: [
+                      QrImage(
+                        data: widget.result.code ?? '',
+                        padding: const EdgeInsets.all(40),
+                        errorCorrectionLevel: QrErrorCorrectLevel.H,
+                      ),
+                      Padding(padding: EdgeInsets.symmetric(horizontal: 20),child: SelectableText(
+                          'Barcode Type: ${describeEnum(widget.result.format)}   Data: ${widget.result.code}'),)
+                    ],
                   ),
-                ),
+                )
               ],
             ),
-            Expanded(
-              child: PageView(
-                controller: pageController,
-                onPageChanged: (index) {
-                  setState(() {
-                    selectIndex = index;
-                  });
-                },
-                children: [
-                  Center(
-                    child: Column(
-                      children: [
-                        Expanded(
-                          child: ListView(
-                            padding: const EdgeInsets.symmetric(horizontal: 16),
-                            children: qrcodeProvider.infoList,
-                          ),
-                        ),
-                        ListView(
-                          shrinkWrap: true,
-                          children: qrcodeProvider.actionList,
-                        ),
-                        const SizedBox(height: 8),
-                      ],
-                    ),
-                  ),
-                  Center(
-                    child: SelectableText(
-                        'Barcode Type: ${describeEnum(widget.result.format)}   Data: ${widget.result.code}'),
-                  )
-                ],
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
+      ),
     );
   }
 
