@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_vibrate/flutter_vibrate.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:qrcode/generated/l10n.dart';
@@ -21,6 +22,7 @@ Future<void> main() async {
 class MyApp extends StatefulWidget {
   const MyApp({Key? key}) : super(key: key);
   static final GlobalKey<NavigatorState> navigatorKey = GlobalKey();
+
   @override
   _MyAppState createState() => _MyAppState();
 
@@ -80,6 +82,10 @@ class _MyHomePageState extends State<MyHomePage> {
 
   int selectIndex = 0;
 
+  double qrWidth = 250;
+
+  double qrHeight = 250;
+
   @override
   void initState() {
     super.initState();
@@ -111,17 +117,76 @@ class _MyHomePageState extends State<MyHomePage> {
                 children: [
                   GestureDetector(
                     onTap: () {
-                      ConnectWifi.connect({"ssid":"LONGINGO","password":"0932111861"});
+                      // ConnectWifi.connect({"ssid":"LONGINGO","password":"0932111861"});
                     },
                     child: QRView(
                       key: qrKey,
                       onQRViewCreated: _onQRViewCreated,
-                      overlay: QrScannerOverlayShape(),
+                      overlay: QrScannerOverlayShape(
+                        cutOutWidth: qrWidth,
+                        cutOutHeight: qrHeight,
+                        borderColor: Colors.amberAccent,
+                        borderWidth: 5,
+                        borderLength: 30,
+                      ),
                     ),
                   ),
+                  Positioned(
+                      right: MediaQuery.of(context).size.width / 2 -
+                          qrWidth / 2 +
+                          8,
+                      bottom: MediaQuery.of(context).size.height / 2 -
+                          qrHeight / 2 -
+                          MediaQuery.of(context).padding.top / 2 +
+                          8,
+                      child: GestureDetector(
+                        onPanUpdate: (dragDetail) {
+                          if (dragDetail.globalPosition.dx * 2 -
+                                  MediaQuery.of(context).size.width >=
+                              100) {
+                            setState(() {
+                              qrWidth = dragDetail.globalPosition.dx * 2 -
+                                  MediaQuery.of(context).size.width;
+                            });
+                          }
+                          if (dragDetail.globalPosition.dy * 2 -
+                                  MediaQuery.of(context).size.height >=
+                              100) {
+                            setState(() {
+                              qrHeight = dragDetail.globalPosition.dy * 2 -
+                                  MediaQuery.of(context).size.height;
+                            });
+                          }
+                        },
+                        child: const RotatedBox(
+                          quarterTurns: 1,
+                          child: Icon(
+                            Icons.open_in_full,
+                            color: Colors.amberAccent,
+                          ),
+                        ),
+                      )),
+                  Positioned(
+                      bottom: 20,
+                      child: Row(
+                        children: [],
+                      )),
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
                     children: [
+                      Builder(
+                        builder: (context) {
+                          return IconButton(
+                            onPressed: () {
+                              Scaffold.of(context).openDrawer();
+                            },
+                            icon: const Icon(
+                              Icons.menu,
+                              color: Colors.white,
+                            ),
+                          );
+                        },
+                      ),
+                      const Spacer(),
                       IconButton(
                           onPressed: () async {
                             controller!.flipCamera();
@@ -147,7 +212,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         icon: flashOn
                             ? const Icon(
                                 Icons.flash_on,
-                                color: Colors.white,
+                                color: Colors.yellow,
                               )
                             : const Icon(
                                 Icons.flash_off,
@@ -162,6 +227,7 @@ class _MyHomePageState extends State<MyHomePage> {
           ],
         ),
       ),
+      drawer: const Drawer(),
     );
   }
 
