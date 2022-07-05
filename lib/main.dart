@@ -1,9 +1,12 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_barcode_sdk/dynamsoft_barcode.dart';
+import 'package:flutter_barcode_sdk/flutter_barcode_sdk.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_vibrate/flutter_vibrate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:qrcode/generated/l10n.dart';
@@ -12,6 +15,7 @@ import 'package:qrcode/provider/qrcode_provider.dart';
 import 'package:qrcode/screen/scanned/scanned_page.dart';
 import 'package:qrcode/utils/connect_wifi.dart';
 import 'package:qrcode/utils/judge_qrcode_data_type.dart';
+import 'package:scan/scan.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -166,11 +170,6 @@ class _MyHomePageState extends State<MyHomePage> {
                           ),
                         ),
                       )),
-                  Positioned(
-                      bottom: 20,
-                      child: Row(
-                        children: [],
-                      )),
                   Row(
                     children: [
                       Builder(
@@ -187,6 +186,19 @@ class _MyHomePageState extends State<MyHomePage> {
                         },
                       ),
                       const Spacer(),
+                      IconButton(
+                          onPressed: () async {
+                            final _barcodeReader = FlutterBarcodeSdk();
+                            await _barcodeReader.setLicense('DLS2eyJoYW5kc2hha2VDb2RlIjoiMjAwMDAxLTE2NDk4Mjk3OTI2MzUiLCJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSIsInNlc3Npb25QYXNzd29yZCI6IndTcGR6Vm05WDJrcEQ5YUoifQ==');
+                            await _barcodeReader.init();
+                            final image = await ImagePicker().pickImage(source: ImageSource.gallery);
+                            List<BarcodeResult> results = await _barcodeReader.decodeFile(image?.path ?? '');
+                            print(results[0].x1);
+                          },
+                          icon: const Icon(
+                            Icons.image_outlined,
+                            color: Colors.white,
+                          )),
                       IconButton(
                           onPressed: () async {
                             controller!.flipCamera();
