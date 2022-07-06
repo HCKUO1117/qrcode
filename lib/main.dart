@@ -1,11 +1,11 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_barcode_sdk/dynamsoft_barcode.dart';
-import 'package:flutter_barcode_sdk/flutter_barcode_sdk.dart';
+import 'package:flutter_barcode_sdk/dynamsoft_barcode.dart' as dynamsoft_barcode;
+import 'package:flutter_barcode_sdk/flutter_barcode_sdk.dart' as flutter_barcode_sdk;
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_vibrate/flutter_vibrate.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
@@ -13,9 +13,7 @@ import 'package:qrcode/generated/l10n.dart';
 import 'package:qrcode/model/qrcode_data_type.dart';
 import 'package:qrcode/provider/qrcode_provider.dart';
 import 'package:qrcode/screen/scanned/scanned_page.dart';
-import 'package:qrcode/utils/connect_wifi.dart';
 import 'package:qrcode/utils/judge_qrcode_data_type.dart';
-import 'package:scan/scan.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -30,8 +28,7 @@ class MyApp extends StatefulWidget {
   @override
   _MyAppState createState() => _MyAppState();
 
-  static _MyAppState? of(BuildContext context) =>
-      context.findAncestorStateOfType<_MyAppState>();
+  static _MyAppState? of(BuildContext context) => context.findAncestorStateOfType<_MyAppState>();
 }
 
 class _MyAppState extends State<MyApp> {
@@ -90,9 +87,16 @@ class _MyHomePageState extends State<MyHomePage> {
 
   double qrHeight = 250;
 
+  final _barcodeReader = flutter_barcode_sdk.FlutterBarcodeSdk();
+
   @override
   void initState() {
     super.initState();
+    Future.microtask(() async {
+      await _barcodeReader.setLicense(
+          'DLS2eyJoYW5kc2hha2VDb2RlIjoiMjAwMDAxLTE2NDk4Mjk3OTI2MzUiLCJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSIsInNlc3Npb25QYXNzd29yZCI6IndTcGR6Vm05WDJrcEQ5YUoifQ==');
+      await _barcodeReader.init();
+    });
   }
 
   @override
@@ -136,9 +140,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                   ),
                   Positioned(
-                      right: MediaQuery.of(context).size.width / 2 -
-                          qrWidth / 2 +
-                          8,
+                      right: MediaQuery.of(context).size.width / 2 - qrWidth / 2 + 8,
                       bottom: MediaQuery.of(context).size.height / 2 -
                           qrHeight / 2 -
                           MediaQuery.of(context).padding.top / 2 +
@@ -188,12 +190,27 @@ class _MyHomePageState extends State<MyHomePage> {
                       const Spacer(),
                       IconButton(
                           onPressed: () async {
-                            final _barcodeReader = FlutterBarcodeSdk();
-                            await _barcodeReader.setLicense('DLS2eyJoYW5kc2hha2VDb2RlIjoiMjAwMDAxLTE2NDk4Mjk3OTI2MzUiLCJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSIsInNlc3Npb25QYXNzd29yZCI6IndTcGR6Vm05WDJrcEQ5YUoifQ==');
-                            await _barcodeReader.init();
-                            final image = await ImagePicker().pickImage(source: ImageSource.gallery);
-                            List<BarcodeResult> results = await _barcodeReader.decodeFile(image?.path ?? '');
-                            print(results[0].x1);
+
+                            final image =
+                                await ImagePicker().pickImage(source: ImageSource.gallery);
+
+                            if (image != null) {
+                              final croppedFile = await ImageCropper().cropImage(
+                                sourcePath: image.path,
+                                uiSettings: [
+                                  AndroidUiSettings(
+                                    toolbarTitle: S.of(context).choose,
+                                    toolbarColor: Colors.black,
+                                    toolbarWidgetColor: Colors.white,
+                                    lockAspectRatio: false,
+                                  )
+                                ],
+                              );
+                              List<dynamsoft_barcode.BarcodeResult> results =
+                                  await _barcodeReader.decodeFile(croppedFile?.path ?? '');
+
+                              print(results[0].format + results[0].text);
+                            }
                           },
                           icon: const Icon(
                             Icons.image_outlined,
@@ -250,8 +267,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
       Vibrate.vibrate();
 
-      final QRCodeDataType type =
-          JudgeQrcodeDataType().judgeType(scanData.code ?? '');
+      final QRCodeDataType type = JudgeQrcodeDataType().judgeType(scanData.code ?? '');
 
       setState(() {
         haveResult = true;
@@ -268,6 +284,61 @@ class _MyHomePageState extends State<MyHomePage> {
         haveResult = false;
       });
     });
+  }
+
+  void _onMultiResult(){
+
+  }
+
+  List<Barcode> _resultTransfer(List<dynamsoft_barcode.BarcodeResult> rawList){
+    List<Barcode> barcodeResults = [];
+    for(final element in rawList){
+
+      BarcodeFormat format = BarcodeFormat.qrcode;
+      switch (element.format) {
+        case 'AZTEC':
+          return barcode_widget.Barcode.aztec();
+        case BarcodeFormat.codabar:
+          return barcode_widget.Barcode.codabar();
+        case BarcodeFormat.code39:
+          return barcode_widget.Barcode.code39();
+        case BarcodeFormat.code93:
+          return barcode_widget.Barcode.code93();
+        case BarcodeFormat.code128:
+          return barcode_widget.Barcode.code128();
+        case BarcodeFormat.dataMatrix:
+          return barcode_widget.Barcode.dataMatrix();
+        case BarcodeFormat.ean8:
+          return barcode_widget.Barcode.ean8();
+        case BarcodeFormat.ean13:
+          return barcode_widget.Barcode.ean13();
+        case BarcodeFormat.itf:
+          return barcode_widget.Barcode.itf();
+        case BarcodeFormat.maxicode:
+        //TODO 沒有這個類型
+          return barcode_widget.Barcode.qrCode();
+        case BarcodeFormat.pdf417:
+          return barcode_widget.Barcode.pdf417();
+        case BarcodeFormat.qrcode:
+          return barcode_widget.Barcode.qrCode();
+        case BarcodeFormat.rss14:
+        //TODO 沒有這個類型
+          return barcode_widget.Barcode.code128();
+        case BarcodeFormat.rssExpanded:
+        //TODO 沒有這個類型
+          return barcode_widget.Barcode.code128();
+        case BarcodeFormat.upcA:
+          return barcode_widget.Barcode.upcA();
+        case BarcodeFormat.upcE:
+          return barcode_widget.Barcode.upcE();
+        case BarcodeFormat.upcEanExtension:
+        //TODO 沒有這個類型
+          return barcode_widget.Barcode.upcE();
+        case BarcodeFormat.unknown:
+          return barcode_widget.Barcode.qrCode();
+      }
+      barcodeResults.add(Barcode(element.text,));
+    }
   }
 
   @override

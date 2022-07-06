@@ -17,5 +17,6 @@
   "name": "名稱",
   "openWifi": "請先開啟Wifi",
   "copied": "已複製",
-  "password": "密碼"
+  "password": "密碼",
+  "choose": "選取"
 }
