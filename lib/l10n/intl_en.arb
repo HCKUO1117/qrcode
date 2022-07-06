@@ -18,5 +18,6 @@
   "openWifi": "Please turn on Wifi first",
   "copied": "Copied",
   "password": "password",
-  "choose": "Choose"
+  "choose": "Choose",
+  "result": "result"
 }
