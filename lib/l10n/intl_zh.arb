@@ -21,5 +21,6 @@
   "choose": "選取",
   "result": "結果",
   "saveError": "儲存失敗",
-  "saveSuccess": "儲存成功"
+  "saveSuccess": "儲存成功",
+  "history": "歷史紀錄"
 }

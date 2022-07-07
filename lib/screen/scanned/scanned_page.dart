@@ -59,7 +59,10 @@ class _ScannedPageState extends State<ScannedPage> {
     final qrcodeProvider = Provider.of<QRCodeProvider>(context);
     return Scaffold(
       appBar: AppBar(
-        actions: [IconButton(onPressed: () {}, icon: const Icon(Icons.star_border_outlined))],
+        actions: [
+          IconButton(
+              onPressed: () {}, icon: const Icon(Icons.star_border_outlined))
+        ],
       ),
       body: Column(
         children: [
@@ -164,7 +167,8 @@ class _ScannedPageState extends State<ScannedPage> {
                               Screenshot(
                                   child: Builder(
                                     builder: (context) {
-                                      final type = getType(widget.result.format);
+                                      final type =
+                                          getType(widget.result.format);
                                       return Container(
                                         padding: const EdgeInsets.all(16),
                                         color: Colors.white,
@@ -185,23 +189,44 @@ class _ScannedPageState extends State<ScannedPage> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
-                          IconButton(
-                              onPressed: shareBarcodeInfo,
-                              icon: const Icon(
-                                Icons.share,
-                                size: 32,
-                              )),
-                          IconButton(
-                            onPressed:
-                              saveBarcodeToImage,
-                            icon: const Icon(
-                              Icons.save_alt,
-                              size: 32,
+                          Expanded(
+                            child: InkWell(
+                              onTap: shareBarcodeInfo,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                    border: Border.all(
+                                  color: Colors.grey,
+                                  width: 0.5,
+                                )),
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 16),
+                                child: const Icon(
+                                  Icons.share,
+                                  size: 32,
+                                ),
+                              ),
                             ),
-                          )
+                          ),
+                          Expanded(
+                            child: InkWell(
+                              onTap: saveBarcodeToImage,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                    border: Border.all(
+                                  color: Colors.grey,
+                                  width: 0.5,
+                                )),
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 16),
+                                child: const Icon(
+                                  Icons.save_alt,
+                                  size: 32,
+                                ),
+                              ),
+                            ),
+                          ),
                         ],
                       ),
-                      const SizedBox(height: 16),
                     ],
                   ),
                 )
@@ -224,7 +249,8 @@ class _ScannedPageState extends State<ScannedPage> {
   void saveBarcodeToImage() {
     try {
       screenshotController.capture().then((image) async {
-        final result = await ImageGallerySaver.saveImage(image!, name: "hello");
+        await ImageGallerySaver.saveImage(image!,
+            name: 'qrcode${DateTime.now()}');
         Fluttertoast.showToast(msg: S.of(context).saveSuccess);
       });
     } catch (e) {
@@ -234,13 +260,12 @@ class _ScannedPageState extends State<ScannedPage> {
 
   void shareBarcodeInfo() {
     screenshotController.capture().then((image) async {
-      final imageFile = File.fromRawPath(image!);
       final directory = await getApplicationDocumentsDirectory();
       String tempPath = directory.path;
       String fileName = RandomString().getRandomString(10);
-      await File(tempPath + '/$fileName.png').writeAsBytes(image);
-      print(tempPath);
-      Share.shareFilesWithResult([tempPath + '/$fileName.png'], text: widget.result.code);
+      await File(tempPath + '/$fileName.png').writeAsBytes(image!);
+      Share.shareFilesWithResult([tempPath + '/$fileName.png'],
+          text: widget.result.code);
     });
   }
 

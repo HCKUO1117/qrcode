@@ -14,9 +14,13 @@ import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:qrcode/generated/l10n.dart';
 import 'package:qrcode/model/qrcode_data_type.dart';
 import 'package:qrcode/provider/qrcode_provider.dart';
+import 'package:qrcode/screen/barcode_history_page.dart';
 import 'package:qrcode/screen/barcode_list_page.dart';
 import 'package:qrcode/screen/scanned/scanned_page.dart';
+import 'package:qrcode/sql/history_db.dart';
+import 'package:qrcode/sql/history_model.dart';
 import 'package:qrcode/utils/judge_qrcode_data_type.dart';
+import 'package:sqflite/sqflite.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -212,13 +216,26 @@ class _MyHomePageState extends State<MyHomePage> {
                                   )
                                 ],
                               );
-                              if(croppedFile == null) return;
+                              if (croppedFile == null) return;
                               List<dynamsoft_barcode.BarcodeResult> results =
                                   await _barcodeReader
                                       .decodeFile(croppedFile.path);
                               List<Barcode> barcodeList =
                                   _resultTransfer(results);
 
+                              for (final element in barcodeList) {
+                                final type = JudgeQrcodeDataType()
+                                    .judgeType(element.code ?? '');
+                                HistoryDB.insertData(
+                                  HistoryModel(
+                                    createDate: DateTime.now(),
+                                    qrcodeType: element.format.name,
+                                    contentType: type.name,
+                                    content: element.code ?? '',
+                                    favorite: false,
+                                  ),
+                                );
+                              }
                               Navigator.of(context).push(
                                 MaterialPageRoute(
                                   builder: (context) =>
@@ -271,7 +288,46 @@ class _MyHomePageState extends State<MyHomePage> {
           ],
         ),
       ),
-      drawer: const Drawer(),
+      drawer: Drawer(
+        child: ListView(
+          children: [
+            drawerTitle(
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) {
+                      return const BarcodeHistoryPage();
+                    },
+                  ),
+                );
+              },
+              iconData: Icons.history,
+              title: S.of(context).history,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget drawerTitle({
+    required Function() onTap,
+    required IconData iconData,
+    required String title,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+        child: Row(
+          children: [
+            Icon(iconData),
+            const SizedBox(width: 8),
+            Text(title),
+          ],
+        ),
+      ),
     );
   }
 
@@ -288,6 +344,15 @@ class _MyHomePageState extends State<MyHomePage> {
       setState(() {
         haveResult = true;
       });
+      HistoryDB.insertData(
+        HistoryModel(
+          createDate: DateTime.now(),
+          qrcodeType: scanData.format.name,
+          contentType: type.name,
+          content: scanData.code ?? '',
+          favorite: false,
+        ),
+      );
       await Navigator.of(context).push(
         MaterialPageRoute(
           builder: (context) => ScannedPage(
@@ -301,8 +366,6 @@ class _MyHomePageState extends State<MyHomePage> {
       });
     });
   }
-
-  void _onMultiResult() {}
 
   List<Barcode> _resultTransfer(List<dynamsoft_barcode.BarcodeResult> rawList) {
     List<Barcode> barcodeResults = [];

@@ -1,32 +1,47 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:qrcode/generated/l10n.dart';
 import 'package:qrcode/model/qrcode_data_type.dart';
 import 'package:qrcode/screen/scanned/scanned_page.dart';
+import 'package:qrcode/sql/history_db.dart';
+import 'package:qrcode/sql/history_model.dart';
 import 'package:qrcode/utils/judge_qrcode_data_type.dart';
 
-class BarcodeListPage extends StatefulWidget {
-  final List<Barcode> barcodes;
-
-
-  const BarcodeListPage({
+class BarcodeHistoryPage extends StatefulWidget {
+  const BarcodeHistoryPage({
     Key? key,
-    required this.barcodes,
   }) : super(key: key);
 
   @override
-  State<BarcodeListPage> createState() => _BarcodeListPageState();
+  State<BarcodeHistoryPage> createState() => _BarcodeHistoryPageState();
 }
 
-class _BarcodeListPageState extends State<BarcodeListPage> {
+class _BarcodeHistoryPageState extends State<BarcodeHistoryPage>
+    with TickerProviderStateMixin {
   bool editMode = false;
 
   List<int> editList = [];
 
+  List<HistoryModel> histories = [];
+
+  late AnimationController expandController;
+  late Animation<double> animation;
+
   @override
   void initState() {
     super.initState();
+    Future.microtask(() async {
+      histories = await HistoryDB.displayAllData();
+      setState(() {});
+    });
+    expandController = AnimationController(
+        vsync: this, duration: const Duration(milliseconds: 200));
+    animation = CurvedAnimation(
+      parent: expandController,
+      curve: Curves.fastOutSlowIn,
+    );
   }
 
   @override
@@ -35,40 +50,49 @@ class _BarcodeListPageState extends State<BarcodeListPage> {
       appBar: AppBar(
         title: Text(S.of(context).result),
         actions: [
-          if (editMode)
-            IconButton(
-              onPressed: () {},
-              icon: const Icon(Icons.delete_outline),
+          SizeTransition(
+            axis: Axis.horizontal,
+            axisAlignment: 0,
+            sizeFactor: animation,
+            child: Center(
+              child: IconButton(
+                onPressed: () {},
+                icon: const Icon(Icons.delete_outline),
+              ),
             ),
+          ),
           IconButton(
             onPressed: () {
               if (editMode) {
                 setState(() {
                   editMode = false;
                   editList.clear();
+                  expandController.reverse();
                 });
               } else {
                 setState(() {
                   editMode = true;
+                  expandController.forward();
                 });
               }
             },
-            icon: Icon(editMode ? Icons.done : Icons.mode_edit_outlined),
-          )
+            icon: Icon(editMode ? Icons.clear : Icons.mode_edit_outlined),
+          ),
         ],
       ),
       body: Column(
         children: [
-          if (editMode)
-            Row(
+          SizeTransition(
+            sizeFactor: animation,
+            child: Row(
               children: [
                 Checkbox(
-                  value: editList.length == widget.barcodes.length,
+                  value: editList.length == histories.length,
                   onChanged: (value) {
                     setState(() {
-                      if (editList.length != widget.barcodes.length) {
+                      if (editList.length != histories.length) {
                         editList.clear();
-                        for (int i = 0; i < widget.barcodes.length; i++) {
+                        for (int i = 0; i < histories.length; i++) {
                           editList.add(i);
                         }
                       } else {
@@ -79,29 +103,33 @@ class _BarcodeListPageState extends State<BarcodeListPage> {
                 ),
               ],
             ),
+          ),
           Expanded(
             child: ListView.separated(
               shrinkWrap: true,
-              itemCount: widget.barcodes.length,
+              itemCount: histories.length,
               itemBuilder: (context, index) {
                 QRCodeDataType type =
-                    JudgeQrcodeDataType().judgeType(widget.barcodes[index].code ?? '');
-
+                    JudgeQrcodeDataType().judgeType(histories[index].content);
                 return Row(
                   children: [
-                    if (editMode)
-                      Checkbox(
+                    SizeTransition(
+                      axis: Axis.horizontal,
+                      sizeFactor: animation,
+                      child: Checkbox(
                         value: editList.contains(index),
                         onChanged: (value) {
                           setState(() {
                             if (editList.contains(index)) {
-                              editList.removeWhere((element) => element == index);
+                              editList
+                                  .removeWhere((element) => element == index);
                             } else {
                               editList.add(index);
                             }
                           });
                         },
                       ),
+                    ),
                     Expanded(
                       child: Card(
                         shape: RoundedRectangleBorder(
@@ -114,7 +142,8 @@ class _BarcodeListPageState extends State<BarcodeListPage> {
                               ? () {
                                   setState(() {
                                     if (editList.contains(index)) {
-                                      editList.removeWhere((element) => element == index);
+                                      editList.removeWhere(
+                                          (element) => element == index);
                                     } else {
                                       editList.add(index);
                                     }
@@ -124,13 +153,19 @@ class _BarcodeListPageState extends State<BarcodeListPage> {
                                   Navigator.of(context).push(
                                     MaterialPageRoute(
                                       builder: (context) => ScannedPage(
-                                        result: widget.barcodes[index],
+                                        result: Barcode(
+                                          histories[index].content,
+                                          BarcodeTypesExtension.fromString(
+                                              histories[index].qrcodeType),
+                                          [],
+                                        ),
                                         type: type,
                                       ),
                                     ),
                                   );
                                 },
-                          child: Padding(
+                          child: Container(
+                            height: 110,
                             padding: const EdgeInsets.all(8),
                             child: Row(
                               children: [
@@ -141,10 +176,12 @@ class _BarcodeListPageState extends State<BarcodeListPage> {
                                 const SizedBox(width: 8),
                                 Expanded(
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        widget.barcodes[index].code ?? '',
+                                        histories[index].content + '\n123',
                                         overflow: TextOverflow.ellipsis,
                                         maxLines: 3,
                                         style: const TextStyle(
@@ -153,11 +190,29 @@ class _BarcodeListPageState extends State<BarcodeListPage> {
                                         ),
                                       ),
                                       Text(
-                                        type.name + ' · ' + widget.barcodes[index].format.name,
-                                        style: const TextStyle(color: Colors.grey),
+                                        type.name +
+                                            ' · ' +
+                                            histories[index].contentType,
+                                        style: const TextStyle(
+                                          color: Colors.grey,
+                                          fontSize: 12,
+                                        ),
                                       ),
                                     ],
                                   ),
+                                ),
+                                Column(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    Text(
+                                      DateFormat('yyyy/MM/dd')
+                                          .format(histories[index].createDate),
+                                      style: const TextStyle(
+                                        fontSize: 12,
+                                        color: Colors.grey,
+                                      ),
+                                    )
+                                  ],
                                 ),
                               ],
                             ),
