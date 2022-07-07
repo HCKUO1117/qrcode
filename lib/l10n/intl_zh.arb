@@ -19,5 +19,7 @@
   "copied": "已複製",
   "password": "密碼",
   "choose": "選取",
-  "result": "結果"
+  "result": "結果",
+  "saveError": "儲存失敗",
+  "saveSuccess": "儲存成功"
 }

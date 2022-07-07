@@ -212,11 +212,13 @@ class _MyHomePageState extends State<MyHomePage> {
                                   )
                                 ],
                               );
+                              if(croppedFile == null) return;
                               List<dynamsoft_barcode.BarcodeResult> results =
                                   await _barcodeReader
-                                      .decodeFile(croppedFile?.path ?? '');
+                                      .decodeFile(croppedFile.path);
                               List<Barcode> barcodeList =
                                   _resultTransfer(results);
+
                               Navigator.of(context).push(
                                 MaterialPageRoute(
                                   builder: (context) =>

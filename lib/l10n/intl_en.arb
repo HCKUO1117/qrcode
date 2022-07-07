@@ -19,5 +19,7 @@
   "copied": "Copied",
   "password": "password",
   "choose": "Choose",
-  "result": "result"
+  "result": "result",
+  "saveError": "Save failed",
+  "saveSuccess": "Save successfully"
 }

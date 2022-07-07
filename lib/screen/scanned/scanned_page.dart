@@ -1,10 +1,21 @@
+import 'dart:io';
+import 'dart:math';
+import 'dart:typed_data';
+
 import 'package:barcode_widget/barcode_widget.dart' as barcode_widget;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:image_gallery_saver/image_gallery_saver.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
+import 'package:qrcode/generated/l10n.dart';
 import 'package:qrcode/model/qrcode_data_type.dart';
 import 'package:qrcode/provider/qrcode_provider.dart';
+import 'package:qrcode/utils/random_string.dart';
+import 'package:screenshot/screenshot.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../../model/data_models.dart';
 
@@ -23,6 +34,8 @@ class ScannedPage extends StatefulWidget {
 }
 
 class _ScannedPageState extends State<ScannedPage> {
+  ScreenshotController screenshotController = ScreenshotController();
+
   int selectIndex = 0;
 
   PageController pageController = PageController();
@@ -45,7 +58,9 @@ class _ScannedPageState extends State<ScannedPage> {
   Widget build(BuildContext context) {
     final qrcodeProvider = Provider.of<QRCodeProvider>(context);
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        actions: [IconButton(onPressed: () {}, icon: const Icon(Icons.star_border_outlined))],
+      ),
       body: Column(
         children: [
           Row(
@@ -130,20 +145,63 @@ class _ScannedPageState extends State<ScannedPage> {
                   ),
                 ),
                 Center(
-                  child: ListView(
+                  child: Column(
                     children: [
-                      Builder(builder: (context) {
-                        final type = getType(widget.result.format);
-                        return barcode_widget.BarcodeWidget(
-                          data: widget.result.code ?? '',
-                          barcode: type,
-                        );
-                      }),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        child: SelectableText(
-                            'Barcode Type: ${describeEnum(widget.result.format)}   Data: ${widget.result.code}'),
-                      )
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: ListView(
+                            children: [
+                              const SizedBox(height: 16),
+                              SelectableText(
+                                describeEnum(widget.result.format),
+                                textAlign: TextAlign.end,
+                                style: const TextStyle(
+                                  color: Colors.grey,
+                                ),
+                              ),
+                              const SizedBox(height: 16),
+                              Screenshot(
+                                  child: Builder(
+                                    builder: (context) {
+                                      final type = getType(widget.result.format);
+                                      return Container(
+                                        padding: const EdgeInsets.all(16),
+                                        color: Colors.white,
+                                        child: barcode_widget.BarcodeWidget(
+                                          data: widget.result.code ?? '',
+                                          barcode: type,
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                  controller: screenshotController),
+                              const SizedBox(height: 16),
+                              SelectableText('${widget.result.code}'),
+                            ],
+                          ),
+                        ),
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          IconButton(
+                              onPressed: shareBarcodeInfo,
+                              icon: const Icon(
+                                Icons.share,
+                                size: 32,
+                              )),
+                          IconButton(
+                            onPressed:
+                              saveBarcodeToImage,
+                            icon: const Icon(
+                              Icons.save_alt,
+                              size: 32,
+                            ),
+                          )
+                        ],
+                      ),
+                      const SizedBox(height: 16),
                     ],
                   ),
                 )
@@ -160,6 +218,29 @@ class _ScannedPageState extends State<ScannedPage> {
       selectIndex = index;
       pageController.animateToPage(index,
           duration: const Duration(milliseconds: 200), curve: Curves.ease);
+    });
+  }
+
+  void saveBarcodeToImage() {
+    try {
+      screenshotController.capture().then((image) async {
+        final result = await ImageGallerySaver.saveImage(image!, name: "hello");
+        Fluttertoast.showToast(msg: S.of(context).saveSuccess);
+      });
+    } catch (e) {
+      Fluttertoast.showToast(msg: S.of(context).saveError);
+    }
+  }
+
+  void shareBarcodeInfo() {
+    screenshotController.capture().then((image) async {
+      final imageFile = File.fromRawPath(image!);
+      final directory = await getApplicationDocumentsDirectory();
+      String tempPath = directory.path;
+      String fileName = RandomString().getRandomString(10);
+      await File(tempPath + '/$fileName.png').writeAsBytes(image);
+      print(tempPath);
+      Share.shareFilesWithResult([tempPath + '/$fileName.png'], text: widget.result.code);
     });
   }
 

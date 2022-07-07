@@ -55,7 +55,11 @@ dependencies:
   barcode_widget: ^2.0.2 #生成barcode
   barcode_image: ^2.0.1 #生成barcode image
   image_picker: ^0.8.5+3
-  image_cropper: ^2.0.3
+  image_cropper: ^2.0.3 #裁切圖片
+  screenshot: ^1.2.3 #截圖
+  image_gallery_saver: ^1.7.1 #存到相簿
+  share_plus: ^4.0.10
+  path_provider: ^2.0.11
 
 dev_dependencies:
   flutter_test:

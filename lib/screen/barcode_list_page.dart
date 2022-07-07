@@ -23,7 +23,6 @@ class _BarcodeListPageState extends State<BarcodeListPage> {
 
   List<int> editList = [];
 
-
   @override
   void initState() {
     super.initState();
@@ -35,12 +34,11 @@ class _BarcodeListPageState extends State<BarcodeListPage> {
       appBar: AppBar(
         title: Text(S.of(context).result),
         actions: [
-          if(editMode)
-          IconButton(
-            onPressed: () {
-            },
-            icon: const Icon(Icons.delete_outline),
-          ),
+          if (editMode)
+            IconButton(
+              onPressed: () {},
+              icon: const Icon(Icons.delete_outline),
+            ),
           IconButton(
             onPressed: () {
               if (editMode) {
@@ -80,102 +78,100 @@ class _BarcodeListPageState extends State<BarcodeListPage> {
                 ),
               ],
             ),
-          ListView.separated(
-            shrinkWrap: true,
-            itemCount: widget.barcodes.length,
-            itemBuilder: (context, index) {
-              QRCodeDataType type = JudgeQrcodeDataType()
-                  .judgeType(widget.barcodes[index].code ?? '');
+          Expanded(
+            child: ListView.separated(
+              shrinkWrap: true,
+              itemCount: widget.barcodes.length,
+              itemBuilder: (context, index) {
+                QRCodeDataType type =
+                    JudgeQrcodeDataType().judgeType(widget.barcodes[index].code ?? '');
 
-              return Row(
-                children: [
-                  if (editMode)
-                    Checkbox(
-                      value: editList.contains(index),
-                      onChanged: (value) {
-                        setState(() {
-                          if (editList.contains(index)) {
-                            editList.removeWhere((element) => element == index);
-                          } else {
-                            editList.add(index);
-                          }
-                        });
-                      },
-                    ),
-                  Expanded(
-                    child: Card(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(15.0),
+                return Row(
+                  children: [
+                    if (editMode)
+                      Checkbox(
+                        value: editList.contains(index),
+                        onChanged: (value) {
+                          setState(() {
+                            if (editList.contains(index)) {
+                              editList.removeWhere((element) => element == index);
+                            } else {
+                              editList.add(index);
+                            }
+                          });
+                        },
                       ),
-                      color: const Color(0xffedf3ff),
-                      elevation: editMode ? 2 : 0,
-                      child: InkWell(
-                        onTap: editMode
-                            ? () {
-                                setState(() {
-                                  if (editList.contains(index)) {
-                                    editList.removeWhere(
-                                        (element) => element == index);
-                                  } else {
-                                    editList.add(index);
-                                  }
-                                });
-                              }
-                            : () {
-                                Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                    builder: (context) => ScannedPage(
-                                      result: widget.barcodes[index],
-                                      type: type,
-                                    ),
-                                  ),
-                                );
-                              },
-                        child: Padding(
-                          padding: const EdgeInsets.all(8),
-                          child: Row(
-                            children: [
-                              Icon(
-                                type.icon,
-                                size: 30,
-                              ),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      widget.barcodes[index].code ?? '',
-                                      overflow: TextOverflow.ellipsis,
-                                      maxLines: 3,
-                                      style: const TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
+                    Expanded(
+                      child: Card(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15.0),
+                        ),
+                        color: const Color(0xffedf3ff),
+                        elevation: editMode ? 2 : 0,
+                        child: InkWell(
+                          onTap: editMode
+                              ? () {
+                                  setState(() {
+                                    if (editList.contains(index)) {
+                                      editList.removeWhere((element) => element == index);
+                                    } else {
+                                      editList.add(index);
+                                    }
+                                  });
+                                }
+                              : () {
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (context) => ScannedPage(
+                                        result: widget.barcodes[index],
+                                        type: type,
                                       ),
                                     ),
-                                    Text(
-                                      type.name +
-                                          ' · ' +
-                                          widget.barcodes[index].format.name,
-                                      style:
-                                          const TextStyle(color: Colors.grey),
-                                    ),
-                                  ],
+                                  );
+                                },
+                          child: Padding(
+                            padding: const EdgeInsets.all(8),
+                            child: Row(
+                              children: [
+                                Icon(
+                                  type.icon,
+                                  size: 30,
                                 ),
-                              ),
-                            ],
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        widget.barcodes[index].code ?? '',
+                                        overflow: TextOverflow.ellipsis,
+                                        maxLines: 3,
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      Text(
+                                        type.name + ' · ' + widget.barcodes[index].format.name,
+                                        style: const TextStyle(color: Colors.grey),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                ],
-              );
-            },
-            separatorBuilder: (context, index) {
-              return const SizedBox(height: 4);
-            },
-          )
+                  ],
+                );
+              },
+              separatorBuilder: (context, index) {
+                return const SizedBox(height: 4);
+              },
+            ),
+          ),
         ],
       ),
     );
