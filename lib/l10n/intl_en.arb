@@ -22,5 +22,6 @@
   "result": "result",
   "saveError": "Save failed",
   "saveSuccess": "Save successfully",
-  "history": "History"
+  "history": "History",
+  "chooseAll": "Choose All"
 }

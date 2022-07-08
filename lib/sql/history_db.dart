@@ -117,7 +117,7 @@ class HistoryDB {
   }
 
   static Future<bool> updateData(
-      HistoryModel historyModel, bool? favorite) async {
+      HistoryModel historyModel) async {
     final Database? db = await getDataBase();
 
     await db!.update(
@@ -129,13 +129,13 @@ class HistoryDB {
     return true;
   }
 
-  static Future<void> deleteData(HistoryModel historyModel, int id) async {
+  static Future<void> deleteData(int id) async {
     final db = await getDataBase();
 
     await db!.delete(
       tableName,
       where: '$columnId = ?',
-      whereArgs: [historyModel.id],
+      whereArgs: [id],
     );
     return;
   }

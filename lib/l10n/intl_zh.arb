@@ -22,5 +22,6 @@
   "result": "結果",
   "saveError": "儲存失敗",
   "saveSuccess": "儲存成功",
-  "history": "歷史紀錄"
+  "history": "歷史紀錄",
+  "chooseAll": "全選"
 }

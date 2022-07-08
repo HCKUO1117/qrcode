@@ -21,7 +21,7 @@ class HistoryModel {
       'qrcodeType': qrcodeType,
       'contentType': contentType,
       'content': content,
-      'favorite': favorite,
+      'favorite': favorite.toString(),
     };
   }
 
