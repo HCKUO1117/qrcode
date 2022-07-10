@@ -1,5 +1,7 @@
 import 'dart:io';
+import 'dart:math';
 
+import 'package:floating_action_bubble/floating_action_bubble.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_barcode_sdk/dynamsoft_barcode.dart'
     as dynamsoft_barcode;
@@ -7,8 +9,10 @@ import 'package:flutter_barcode_sdk/flutter_barcode_sdk.dart'
     as flutter_barcode_sdk;
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_vibrate/flutter_vibrate.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:qrcode/generated/l10n.dart';
@@ -20,7 +24,6 @@ import 'package:qrcode/screen/scanned/scanned_page.dart';
 import 'package:qrcode/sql/history_db.dart';
 import 'package:qrcode/sql/history_model.dart';
 import 'package:qrcode/utils/judge_qrcode_data_type.dart';
-import 'package:sqflite/sqflite.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -81,7 +84,7 @@ class MyHomePage extends StatefulWidget {
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
   bool haveResult = false;
 
@@ -97,14 +100,44 @@ class _MyHomePageState extends State<MyHomePage> {
 
   final _barcodeReader = flutter_barcode_sdk.FlutterBarcodeSdk();
 
+  String version = '';
+
+  bool multiMode = false;
+  List<Barcode> multiScanList = [];
+
+  double bottomSheetHeight = 50;
+
+  late AnimationController expandController;
+  late Animation<double> animation;
+
+  late Animation<double> bubbleAnimation;
+  late AnimationController bubbleAnimationController;
+
   @override
   void initState() {
     super.initState();
     Future.microtask(() async {
+      PackageInfo packageInfo = await PackageInfo.fromPlatform();
+      version = packageInfo.version;
       await _barcodeReader.setLicense(
           'DLS2eyJoYW5kc2hha2VDb2RlIjoiMjAwMDAxLTE2NDk4Mjk3OTI2MzUiLCJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSIsInNlc3Npb25QYXNzd29yZCI6IndTcGR6Vm05WDJrcEQ5YUoifQ==');
       await _barcodeReader.init();
+      setState(() {});
     });
+    expandController = AnimationController(
+        vsync: this, duration: const Duration(milliseconds: 200));
+    animation = CurvedAnimation(
+      parent: expandController,
+      curve: Curves.fastOutSlowIn,
+    );
+    bubbleAnimationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 200),
+    );
+
+    final curvedAnimation = CurvedAnimation(
+        curve: Curves.easeInOut, parent: bubbleAnimationController);
+    bubbleAnimation = Tween<double>(begin: 0, end: 1).animate(curvedAnimation);
   }
 
   @override
@@ -166,8 +199,14 @@ class _MyHomePageState extends State<MyHomePage> {
                             });
                           }
                           if (dragDetail.globalPosition.dy * 2 -
-                                  MediaQuery.of(context).size.height >=
-                              100) {
+                                      MediaQuery.of(context).size.height >=
+                                  100 &&
+                              dragDetail.globalPosition.dy * 2 -
+                                      MediaQuery.of(context).size.height <=
+                                  MediaQuery.of(context).size.height -
+                                      MediaQuery.of(context).padding.top -
+                                      MediaQuery.of(context).padding.bottom -
+                                      180) {
                             setState(() {
                               qrHeight = dragDetail.globalPosition.dy * 2 -
                                   MediaQuery.of(context).size.height;
@@ -222,24 +261,27 @@ class _MyHomePageState extends State<MyHomePage> {
                                       .decodeFile(croppedFile.path);
                               List<Barcode> barcodeList =
                                   _resultTransfer(results);
-
+                              final list = <HistoryModel>[];
                               for (final element in barcodeList) {
-                                final type = JudgeQrcodeDataType()
+                                final QRCodeDataType type =
+                                JudgeQrcodeDataType()
                                     .judgeType(element.code ?? '');
+                                final model = HistoryModel(
+                                  createDate: DateTime.now(),
+                                  qrcodeType: element.format.formatName,
+                                  contentType: type.name,
+                                  content: element.code ?? '',
+                                  favorite: false,
+                                );
+                                list.add(model);
                                 HistoryDB.insertData(
-                                  HistoryModel(
-                                    createDate: DateTime.now(),
-                                    qrcodeType: element.format.name,
-                                    contentType: type.name,
-                                    content: element.code ?? '',
-                                    favorite: false,
-                                  ),
+                                  model,
                                 );
                               }
                               Navigator.of(context).push(
                                 MaterialPageRoute(
                                   builder: (context) =>
-                                      BarcodeListPage(barcodes: barcodeList),
+                                      BarcodeListPage(histories: list,),
                                 ),
                               );
                             }
@@ -282,6 +324,129 @@ class _MyHomePageState extends State<MyHomePage> {
                       ),
                     ],
                   ),
+                  Positioned(
+                    right: 16,
+                    bottom: 16,
+                    child: Column(
+                      children: [
+                        Stack(children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8),
+                            child: const Icon(
+                              Icons.fast_forward,
+                              color: Colors.white,
+                            ),
+                          ),
+                          Positioned(
+                              bottom: 0,
+                              right: 0,
+                              child: Image.asset(
+                                'assets/icons/pro_logo_icon.png',
+                                height: 10,
+                                width: 10,
+                                color: Colors.orangeAccent,
+                              ))
+                        ]),
+                        Switch(
+                          value: multiMode,
+                          trackColor: MaterialStateProperty.all(Colors.grey),
+                          onChanged: (value) {
+                            setState(() {
+                              multiMode = value;
+                            });
+                            if (value) {
+                              expandController.forward();
+                            } else {
+                              setState(() {
+                                multiScanList.clear();
+                              });
+                              expandController.reverse();
+                            }
+                          },
+                        )
+                      ],
+                    ),
+                  ),
+                  Positioned(
+                    bottom: 16,
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                          maxWidth: MediaQuery.of(context).size.width - 100),
+                      child: SizeTransition(
+                        axis: Axis.horizontal,
+                        sizeFactor: animation,
+                        child: Container(
+                          decoration: const BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.only(
+                              bottomRight: Radius.circular(16),
+                              topRight: Radius.circular(16),
+                            ),
+                          ),
+                          padding: const EdgeInsets.all(16),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(S.of(context).total +
+                                        ' : ${multiScanList.length}'),
+                                    Text(
+                                      S.of(context).data +
+                                          ' : ' +
+                                          (multiScanList.isNotEmpty
+                                              ? multiScanList.last.code ?? ''
+                                              : ''),
+                                      maxLines: 3,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  if (multiScanList.isEmpty) {
+                                    Fluttertoast.showToast(
+                                        msg: S.of(context).youHaveNotScan);
+                                    return;
+                                  }
+                                  final list = <HistoryModel>[];
+                                  for (var element in multiScanList) {
+
+                                    final QRCodeDataType type =
+                                        JudgeQrcodeDataType()
+                                            .judgeType(element.code ?? '');
+                                    final model = HistoryModel(
+                                      createDate: DateTime.now(),
+                                      qrcodeType: element.format.formatName,
+                                      contentType: type.name,
+                                      content: element.code ?? '',
+                                      favorite: false,
+                                    );
+                                    list.add(model);
+                                    HistoryDB.insertData(
+                                      model,
+                                    );
+                                  }
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          BarcodeListPage(histories: list,),
+                                    ),
+                                  );
+                                  setState(() {
+                                    multiScanList.clear();
+                                  });
+                                },
+                                child: Text(S.of(context).complete),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -289,21 +454,69 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ),
       drawer: Drawer(
-        child: ListView(
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+              topRight: Radius.circular(20), bottomRight: Radius.circular(20)),
+        ),
+        child: Column(
           children: [
-            drawerTitle(
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) {
-                      return const BarcodeHistoryPage();
-                    },
+            Expanded(
+              child: ListView(
+                children: [
+                  const DrawerHeader(
+                    decoration: BoxDecoration(color: Colors.blueGrey),
+                    child: Text(''),
                   ),
-                );
-              },
-              iconData: Icons.history,
-              title: S.of(context).history,
+                  drawerTitle(
+                    onTap: () {},
+                    iconData: Icons.qr_code_2,
+                    title: S.of(context).buildQrcode,
+                  ),
+                  drawerTitle(
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) {
+                            return const BarcodeHistoryPage();
+                          },
+                        ),
+                      );
+                    },
+                    iconData: Icons.history,
+                    title: S.of(context).history,
+                  ),
+                  drawerTitle(
+                    onTap: () {},
+                    iconData: Icons.settings,
+                    title: S.of(context).setting,
+                  ),
+                  drawerTitle(
+                    onTap: () {},
+                    iconData: Icons.info_outline,
+                    title: S.of(context).info,
+                  ),
+                  drawerTitle(
+                      onTap: () {},
+                      image: 'assets/icons/pro_logo_icon.png',
+                      title: S.of(context).pro,
+                      iconColor: Colors.orangeAccent),
+                ],
+              ),
+            ),
+            Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 16,
+              ),
+              alignment: Alignment.centerLeft,
+              child: Text(
+                'ver ' + version,
+                style: TextStyle(
+                  color: Theme.of(context).hintColor,
+                  fontSize: 12,
+                ),
+              ),
             ),
           ],
         ),
@@ -313,7 +526,9 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Widget drawerTitle({
     required Function() onTap,
-    required IconData iconData,
+    IconData? iconData,
+    String? image,
+    Color? iconColor,
     required String title,
   }) {
     return InkWell(
@@ -322,9 +537,26 @@ class _MyHomePageState extends State<MyHomePage> {
         padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
         child: Row(
           children: [
-            Icon(iconData),
-            const SizedBox(width: 8),
-            Text(title),
+            if (iconData != null)
+              Icon(
+                iconData,
+                color: iconColor ?? Theme.of(context).hintColor,
+              ),
+            if (image != null)
+              Image.asset(
+                image,
+                width: 24,
+                height: 24,
+                color: iconColor ?? Theme.of(context).hintColor,
+              ),
+            const SizedBox(width: 16),
+            Text(
+              title,
+              style: Theme.of(context)
+                  .textTheme
+                  .subtitle2
+                  ?.copyWith(color: Theme.of(context).hintColor),
+            ),
           ],
         ),
       ),
@@ -334,6 +566,17 @@ class _MyHomePageState extends State<MyHomePage> {
   void _onQRViewCreated(QRViewController controller) {
     this.controller = controller;
     controller.scannedDataStream.listen((scanData) async {
+      if (multiMode) {
+        if (multiScanList
+                .indexWhere((element) => element.code == scanData.code) ==
+            -1) {
+          Vibrate.vibrate();
+          setState(() {
+            multiScanList.add(scanData);
+          });
+        }
+        return;
+      }
       if (haveResult) return;
 
       Vibrate.vibrate();
@@ -344,10 +587,17 @@ class _MyHomePageState extends State<MyHomePage> {
       setState(() {
         haveResult = true;
       });
+      final HistoryModel model = HistoryModel(
+        createDate: DateTime.now(),
+        qrcodeType: scanData.format.formatName,
+        contentType: type.name,
+        content: scanData.code ?? '',
+        favorite: false,
+      );
       HistoryDB.insertData(
         HistoryModel(
           createDate: DateTime.now(),
-          qrcodeType: scanData.format.name,
+          qrcodeType: scanData.format.formatName,
           contentType: type.name,
           content: scanData.code ?? '',
           favorite: false,
@@ -357,7 +607,7 @@ class _MyHomePageState extends State<MyHomePage> {
         MaterialPageRoute(
           builder: (context) => ScannedPage(
             type: type,
-            result: scanData,
+            historyModel: model,
           ),
         ),
       );

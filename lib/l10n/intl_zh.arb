@@ -23,5 +23,13 @@
   "saveError": "儲存失敗",
   "saveSuccess": "儲存成功",
   "history": "歷史紀錄",
-  "chooseAll": "全選"
+  "chooseAll": "全選",
+  "buildQrcode": "建立QRCode",
+  "setting": "設定",
+  "info": "資訊",
+  "pro": "升級專業版",
+  "total": "總共",
+  "data": "資料",
+  "complete": "完成",
+  "youHaveNotScan": "您尚未掃描任何code"
 }

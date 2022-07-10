@@ -1,6 +1,4 @@
 import 'dart:io';
-import 'dart:math';
-import 'dart:typed_data';
 
 import 'package:barcode_widget/barcode_widget.dart' as barcode_widget;
 import 'package:flutter/foundation.dart';
@@ -13,20 +11,18 @@ import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:qrcode/generated/l10n.dart';
 import 'package:qrcode/model/qrcode_data_type.dart';
 import 'package:qrcode/provider/qrcode_provider.dart';
+import 'package:qrcode/sql/history_model.dart';
 import 'package:qrcode/utils/random_string.dart';
 import 'package:screenshot/screenshot.dart';
 import 'package:share_plus/share_plus.dart';
 
-import '../../model/data_models.dart';
-
 class ScannedPage extends StatefulWidget {
-  final Barcode result;
   final QRCodeDataType type;
+  final HistoryModel historyModel;
 
   const ScannedPage({
     Key? key,
-    required this.result,
-    required this.type,
+    required this.type, required this.historyModel,
   }) : super(key: key);
 
   @override
@@ -47,7 +43,8 @@ class _ScannedPageState extends State<ScannedPage> {
       qrcodeProvider.setInfoList(
         context,
         type: widget.type,
-        result: widget.result,
+        result: Barcode(widget.historyModel.content, BarcodeTypesExtension.fromString(
+            widget.historyModel.qrcodeType), []),
       );
     });
 
@@ -157,7 +154,8 @@ class _ScannedPageState extends State<ScannedPage> {
                             children: [
                               const SizedBox(height: 16),
                               SelectableText(
-                                describeEnum(widget.result.format),
+                                describeEnum(BarcodeTypesExtension.fromString(
+                                    widget.historyModel.qrcodeType)),
                                 textAlign: TextAlign.end,
                                 style: const TextStyle(
                                   color: Colors.grey,
@@ -168,12 +166,13 @@ class _ScannedPageState extends State<ScannedPage> {
                                   child: Builder(
                                     builder: (context) {
                                       final type =
-                                          getType(widget.result.format);
+                                          getType(BarcodeTypesExtension.fromString(
+                                              widget.historyModel.qrcodeType));
                                       return Container(
                                         padding: const EdgeInsets.all(16),
                                         color: Colors.white,
                                         child: barcode_widget.BarcodeWidget(
-                                          data: widget.result.code ?? '',
+                                          data: widget.historyModel.content,
                                           barcode: type,
                                         ),
                                       );
@@ -181,7 +180,7 @@ class _ScannedPageState extends State<ScannedPage> {
                                   ),
                                   controller: screenshotController),
                               const SizedBox(height: 16),
-                              SelectableText('${widget.result.code}'),
+                              SelectableText(widget.historyModel.content),
                             ],
                           ),
                         ),
@@ -265,7 +264,7 @@ class _ScannedPageState extends State<ScannedPage> {
       String fileName = RandomString().getRandomString(10);
       await File(tempPath + '/$fileName.png').writeAsBytes(image!);
       Share.shareFilesWithResult([tempPath + '/$fileName.png'],
-          text: widget.result.code);
+          text: widget.historyModel.content);
     });
   }
 

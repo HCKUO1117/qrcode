@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:qrcode/generated/l10n.dart';
 import 'package:qrcode/model/qrcode_data_type.dart';
 import 'package:qrcode/screen/scanned/scanned_page.dart';
@@ -17,7 +16,8 @@ class BarcodeHistoryPage extends StatefulWidget {
   State<BarcodeHistoryPage> createState() => _BarcodeHistoryPageState();
 }
 
-class _BarcodeHistoryPageState extends State<BarcodeHistoryPage> with TickerProviderStateMixin {
+class _BarcodeHistoryPageState extends State<BarcodeHistoryPage>
+    with TickerProviderStateMixin {
   bool editMode = false;
 
   List<int> editList = [];
@@ -34,8 +34,8 @@ class _BarcodeHistoryPageState extends State<BarcodeHistoryPage> with TickerProv
       histories = await HistoryDB.displayAllData();
       setState(() {});
     });
-    expandController =
-        AnimationController(vsync: this, duration: const Duration(milliseconds: 200));
+    expandController = AnimationController(
+        vsync: this, duration: const Duration(milliseconds: 200));
     animation = CurvedAnimation(
       parent: expandController,
       curve: Curves.fastOutSlowIn,
@@ -123,7 +123,8 @@ class _BarcodeHistoryPageState extends State<BarcodeHistoryPage> with TickerProv
               shrinkWrap: true,
               itemCount: histories.length,
               itemBuilder: (context, index) {
-                QRCodeDataType type = JudgeQrcodeDataType().judgeType(histories[index].content);
+                QRCodeDataType type =
+                    JudgeQrcodeDataType().judgeType(histories[index].content);
                 print(histories[index]);
                 return Row(
                   children: [
@@ -135,7 +136,8 @@ class _BarcodeHistoryPageState extends State<BarcodeHistoryPage> with TickerProv
                         onChanged: (value) {
                           setState(() {
                             if (editList.contains(index)) {
-                              editList.removeWhere((element) => element == index);
+                              editList
+                                  .removeWhere((element) => element == index);
                             } else {
                               editList.add(index);
                             }
@@ -155,7 +157,8 @@ class _BarcodeHistoryPageState extends State<BarcodeHistoryPage> with TickerProv
                               ? () {
                                   setState(() {
                                     if (editList.contains(index)) {
-                                      editList.removeWhere((element) => element == index);
+                                      editList.removeWhere(
+                                          (element) => element == index);
                                     } else {
                                       editList.add(index);
                                     }
@@ -165,13 +168,8 @@ class _BarcodeHistoryPageState extends State<BarcodeHistoryPage> with TickerProv
                                   Navigator.of(context).push(
                                     MaterialPageRoute(
                                       builder: (context) => ScannedPage(
-                                        result: Barcode(
-                                          histories[index].content,
-                                          BarcodeTypesExtension.fromString(
-                                              histories[index].qrcodeType),
-                                          [],
-                                        ),
                                         type: type,
+                                        historyModel: histories[index],
                                       ),
                                     ),
                                   );
@@ -189,7 +187,8 @@ class _BarcodeHistoryPageState extends State<BarcodeHistoryPage> with TickerProv
                                 Expanded(
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         histories[index].content + '\n123',
@@ -201,7 +200,9 @@ class _BarcodeHistoryPageState extends State<BarcodeHistoryPage> with TickerProv
                                         ),
                                       ),
                                       Text(
-                                        type.name + ' · ' + histories[index].qrcodeType,
+                                        type.name +
+                                            ' · ' +
+                                            histories[index].qrcodeType,
                                         style: const TextStyle(
                                           color: Colors.grey,
                                           fontSize: 12,
@@ -211,7 +212,8 @@ class _BarcodeHistoryPageState extends State<BarcodeHistoryPage> with TickerProv
                                   ),
                                 ),
                                 Column(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   crossAxisAlignment: CrossAxisAlignment.end,
                                   children: [
                                     IconButton(
@@ -221,8 +223,10 @@ class _BarcodeHistoryPageState extends State<BarcodeHistoryPage> with TickerProv
                                         } else {
                                           histories[index].favorite = true;
                                         }
-                                        await HistoryDB.updateData(histories[index]);
-                                        histories = await HistoryDB.displayAllData();
+                                        await HistoryDB.updateData(
+                                            histories[index]);
+                                        histories =
+                                            await HistoryDB.displayAllData();
                                         setState(() {});
                                       },
                                       icon: Icon(

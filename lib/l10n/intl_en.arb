@@ -23,5 +23,13 @@
   "saveError": "Save failed",
   "saveSuccess": "Save successfully",
   "history": "History",
-  "chooseAll": "Choose All"
+  "chooseAll": "Choose All",
+  "buildQrcode": "Build QRCode",
+  "setting": "Setting",
+  "info": "Information",
+  "pro": "Upgrade Pro",
+  "total": "Total",
+  "data": "Data",
+  "complete": "Complete",
+  "youHaveNotScan": "You haven't scanned any codes"
 }

@@ -1,18 +1,16 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:qrcode/generated/l10n.dart';
 import 'package:qrcode/model/qrcode_data_type.dart';
 import 'package:qrcode/screen/scanned/scanned_page.dart';
+import 'package:qrcode/sql/history_model.dart';
 import 'package:qrcode/utils/judge_qrcode_data_type.dart';
 
 class BarcodeListPage extends StatefulWidget {
-  final List<Barcode> barcodes;
-
+  final List<HistoryModel> histories;
 
   const BarcodeListPage({
     Key? key,
-    required this.barcodes,
+     required this.histories,
   }) : super(key: key);
 
   @override
@@ -63,12 +61,12 @@ class _BarcodeListPageState extends State<BarcodeListPage> {
             Row(
               children: [
                 Checkbox(
-                  value: editList.length == widget.barcodes.length,
+                  value: editList.length == widget.histories.length,
                   onChanged: (value) {
                     setState(() {
-                      if (editList.length != widget.barcodes.length) {
+                      if (editList.length != widget.histories.length) {
                         editList.clear();
-                        for (int i = 0; i < widget.barcodes.length; i++) {
+                        for (int i = 0; i < widget.histories.length; i++) {
                           editList.add(i);
                         }
                       } else {
@@ -82,10 +80,10 @@ class _BarcodeListPageState extends State<BarcodeListPage> {
           Expanded(
             child: ListView.separated(
               shrinkWrap: true,
-              itemCount: widget.barcodes.length,
+              itemCount: widget.histories.length,
               itemBuilder: (context, index) {
                 QRCodeDataType type =
-                    JudgeQrcodeDataType().judgeType(widget.barcodes[index].code ?? '');
+                    JudgeQrcodeDataType().judgeType(widget.histories[index].content);
 
                 return Row(
                   children: [
@@ -124,8 +122,8 @@ class _BarcodeListPageState extends State<BarcodeListPage> {
                                   Navigator.of(context).push(
                                     MaterialPageRoute(
                                       builder: (context) => ScannedPage(
-                                        result: widget.barcodes[index],
                                         type: type,
+                                        historyModel: widget.histories[index],
                                       ),
                                     ),
                                   );
@@ -144,7 +142,7 @@ class _BarcodeListPageState extends State<BarcodeListPage> {
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        widget.barcodes[index].code ?? '',
+                                        widget.histories[index].content,
                                         overflow: TextOverflow.ellipsis,
                                         maxLines: 3,
                                         style: const TextStyle(
@@ -153,7 +151,7 @@ class _BarcodeListPageState extends State<BarcodeListPage> {
                                         ),
                                       ),
                                       Text(
-                                        type.name + ' · ' + widget.barcodes[index].format.name,
+                                        type.name + ' · ' + widget.histories[index].qrcodeType,
                                         style: const TextStyle(color: Colors.grey),
                                       ),
                                     ],
