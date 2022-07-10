@@ -143,11 +143,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   @override
   void reassemble() {
     super.reassemble();
-    if (Platform.isAndroid) {
-      controller!.pauseCamera();
-    } else if (Platform.isIOS) {
-      controller!.resumeCamera();
-    }
+    controller!.resumeCamera();
   }
 
   @override
@@ -157,9 +153,6 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            SizedBox(
-              height: MediaQuery.of(context).padding.top,
-            ),
             Expanded(
               flex: 5,
               child: Stack(
@@ -185,8 +178,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                           qrWidth / 2 +
                           8,
                       bottom: MediaQuery.of(context).size.height / 2 -
-                          qrHeight / 2 -
-                          MediaQuery.of(context).padding.top / 2 +
+                          qrHeight / 2 +
                           8,
                       child: GestureDetector(
                         onPanUpdate: (dragDetail) {
@@ -221,109 +213,133 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                           ),
                         ),
                       )),
-                  Row(
-                    children: [
-                      Builder(
-                        builder: (context) {
-                          return IconButton(
-                            onPressed: () {
-                              Scaffold.of(context).openDrawer();
-                            },
-                            icon: const Icon(
-                              Icons.menu,
-                              color: Colors.white,
-                            ),
-                          );
-                        },
-                      ),
-                      const Spacer(),
-                      IconButton(
-                          onPressed: () async {
-                            final image = await ImagePicker()
-                                .pickImage(source: ImageSource.gallery);
-
-                            if (image != null) {
-                              final croppedFile =
-                                  await ImageCropper().cropImage(
-                                sourcePath: image.path,
-                                uiSettings: [
-                                  AndroidUiSettings(
-                                    toolbarTitle: S.of(context).choose,
-                                    toolbarColor: Colors.black,
-                                    toolbarWidgetColor: Colors.white,
-                                    lockAspectRatio: false,
-                                  )
-                                ],
-                              );
-                              if (croppedFile == null) return;
-                              List<dynamsoft_barcode.BarcodeResult> results =
-                                  await _barcodeReader
-                                      .decodeFile(croppedFile.path);
-                              List<Barcode> barcodeList =
-                                  _resultTransfer(results);
-                              final list = <HistoryModel>[];
-                              for (final element in barcodeList) {
-                                final QRCodeDataType type =
-                                JudgeQrcodeDataType()
-                                    .judgeType(element.code ?? '');
-                                final model = HistoryModel(
-                                  createDate: DateTime.now(),
-                                  qrcodeType: element.format.formatName,
-                                  contentType: type.name,
-                                  content: element.code ?? '',
-                                  favorite: false,
-                                );
-                                list.add(model);
-                                HistoryDB.insertData(
-                                  model,
-                                );
-                              }
-                              Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      BarcodeListPage(histories: list,),
+                  Positioned(
+                      top: MediaQuery.of(context).padding.top,
+                      left: 0,
+                      right: 0,
+                      child: Row(
+                        children: [
+                          Builder(
+                            builder: (context) {
+                              return IconButton(
+                                onPressed: () {
+                                  Scaffold.of(context).openDrawer();
+                                },
+                                icon: const Icon(
+                                  Icons.menu,
+                                  color: Colors.white,
                                 ),
                               );
-                            }
-                          },
-                          icon: const Icon(
-                            Icons.image_outlined,
-                            color: Colors.white,
-                          )),
-                      IconButton(
-                          onPressed: () async {
-                            controller!.flipCamera();
-                          },
-                          icon: const Icon(
-                            Icons.autorenew,
-                            color: Colors.white,
-                          )),
-                      IconButton(
-                        onPressed: () async {
-                          controller!.toggleFlash();
-                          bool? flash = await controller!.getFlashStatus();
-                          if (flash ?? false) {
-                            setState(() {
-                              flashOn = true;
-                            });
-                          } else {
-                            setState(() {
-                              flashOn = false;
-                            });
-                          }
-                        },
-                        icon: flashOn
-                            ? const Icon(
-                                Icons.flash_on,
-                                color: Colors.yellow,
-                              )
-                            : const Icon(
-                                Icons.flash_off,
+                            },
+                          ),
+                          const Spacer(),
+                          IconButton(
+                              onPressed: () async {
+                                setState(() {
+                                  controller?.pauseCamera();
+                                  haveResult = true;
+                                });
+                                final image = await ImagePicker()
+                                    .pickImage(source: ImageSource.gallery);
+
+                                if (image != null) {
+                                  final croppedFile =
+                                      await ImageCropper().cropImage(
+                                    sourcePath: image.path,
+                                    uiSettings: [
+                                      AndroidUiSettings(
+                                        toolbarTitle: S.of(context).choose,
+                                        toolbarColor: Colors.black,
+                                        toolbarWidgetColor: Colors.white,
+                                        lockAspectRatio: false,
+                                      )
+                                    ],
+                                  );
+                                  if (croppedFile == null) {
+                                    setState(() {
+                                      controller?.resumeCamera();
+                                      haveResult = false;
+                                    });
+                                    return;
+                                  }
+
+                                  List<dynamsoft_barcode.BarcodeResult>
+                                      results = await _barcodeReader
+                                          .decodeFile(croppedFile.path);
+                                  List<Barcode> barcodeList =
+                                      _resultTransfer(results);
+                                  final list = <HistoryModel>[];
+                                  for (final element in barcodeList) {
+                                    final QRCodeDataType type =
+                                        JudgeQrcodeDataType()
+                                            .judgeType(element.code ?? '');
+                                    final model = HistoryModel(
+                                      createDate: DateTime.now(),
+                                      qrcodeType: element.format.formatName,
+                                      contentType: type.name,
+                                      content: element.code ?? '',
+                                      favorite: false,
+                                    );
+
+                                    final id = await HistoryDB.insertData(
+                                      model,
+                                    );
+                                    model.id = id;
+                                    list.add(model);
+                                  }
+                                  list.sort((a, b) =>
+                                      b.createDate.compareTo(a.createDate));
+                                  await Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (context) => BarcodeListPage(
+                                        histories: list,
+                                      ),
+                                    ),
+                                  );
+                                  setState(() {
+                                    controller?.resumeCamera();
+                                    haveResult = false;
+                                  });
+                                }
+                              },
+                              icon: const Icon(
+                                Icons.image_outlined,
                                 color: Colors.white,
-                              ),
-                      ),
-                    ],
-                  ),
+                              )),
+                          IconButton(
+                              onPressed: () async {
+                                controller!.flipCamera();
+                              },
+                              icon: const Icon(
+                                Icons.autorenew,
+                                color: Colors.white,
+                              )),
+                          IconButton(
+                            onPressed: () async {
+                              controller!.toggleFlash();
+                              bool? flash = await controller!.getFlashStatus();
+                              if (flash ?? false) {
+                                setState(() {
+                                  flashOn = true;
+                                });
+                              } else {
+                                setState(() {
+                                  flashOn = false;
+                                });
+                              }
+                            },
+                            icon: flashOn
+                                ? const Icon(
+                                    Icons.flash_on,
+                                    color: Colors.yellow,
+                                  )
+                                : const Icon(
+                                    Icons.flash_off,
+                                    color: Colors.white,
+                                  ),
+                          ),
+                        ],
+                      )),
                   Positioned(
                     right: 16,
                     bottom: 16,
@@ -405,15 +421,18 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                                 ),
                               ),
                               TextButton(
-                                onPressed: () {
+                                onPressed: () async {
                                   if (multiScanList.isEmpty) {
                                     Fluttertoast.showToast(
                                         msg: S.of(context).youHaveNotScan);
                                     return;
                                   }
+                                  setState(() {
+                                    controller?.pauseCamera();
+                                    haveResult = true;
+                                  });
                                   final list = <HistoryModel>[];
                                   for (var element in multiScanList) {
-
                                     final QRCodeDataType type =
                                         JudgeQrcodeDataType()
                                             .judgeType(element.code ?? '');
@@ -424,18 +443,24 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                                       content: element.code ?? '',
                                       favorite: false,
                                     );
-                                    list.add(model);
-                                    HistoryDB.insertData(
+                                    final id = await HistoryDB.insertData(
                                       model,
                                     );
+                                    model.id = id;
+                                    list.add(model);
                                   }
-                                  Navigator.of(context).push(
+                                  list.sort((a, b) =>
+                                      b.createDate.compareTo(a.createDate));
+                                  await Navigator.of(context).push(
                                     MaterialPageRoute(
-                                      builder: (context) =>
-                                          BarcodeListPage(histories: list,),
+                                      builder: (context) => BarcodeListPage(
+                                        histories: list,
+                                      ),
                                     ),
                                   );
                                   setState(() {
+                                    controller?.resumeCamera();
+                                    haveResult = false;
                                     multiScanList.clear();
                                   });
                                 },
@@ -453,6 +478,11 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
           ],
         ),
       ),
+      onDrawerChanged: (isOpened) {
+        setState(() {
+          haveResult = isOpened;
+        });
+      },
       drawer: Drawer(
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.only(
@@ -473,15 +503,17 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                     title: S.of(context).buildQrcode,
                   ),
                   drawerTitle(
-                    onTap: () {
+                    onTap: () async {
+                      controller?.pauseCamera();
                       Navigator.pop(context);
-                      Navigator.of(context).push(
+                      await Navigator.of(context).push(
                         MaterialPageRoute(
                           builder: (context) {
                             return const BarcodeHistoryPage();
                           },
                         ),
                       );
+                      controller?.resumeCamera();
                     },
                     iconData: Icons.history,
                     title: S.of(context).history,
@@ -566,6 +598,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   void _onQRViewCreated(QRViewController controller) {
     this.controller = controller;
     controller.scannedDataStream.listen((scanData) async {
+      if (haveResult) return;
       if (multiMode) {
         if (multiScanList
                 .indexWhere((element) => element.code == scanData.code) ==
@@ -577,7 +610,6 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
         }
         return;
       }
-      if (haveResult) return;
 
       Vibrate.vibrate();
 
@@ -585,6 +617,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
           JudgeQrcodeDataType().judgeType(scanData.code ?? '');
 
       setState(() {
+        controller.pauseCamera();
         haveResult = true;
       });
       final HistoryModel model = HistoryModel(
@@ -594,24 +627,21 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
         content: scanData.code ?? '',
         favorite: false,
       );
-      HistoryDB.insertData(
-        HistoryModel(
-          createDate: DateTime.now(),
-          qrcodeType: scanData.format.formatName,
-          contentType: type.name,
-          content: scanData.code ?? '',
-          favorite: false,
-        ),
+      final id = await HistoryDB.insertData(
+        model,
       );
+      model.id = id;
       await Navigator.of(context).push(
         MaterialPageRoute(
           builder: (context) => ScannedPage(
             type: type,
             historyModel: model,
+            onStateChange: () {},
           ),
         ),
       );
       setState(() {
+        controller.resumeCamera();
         haveResult = false;
       });
     });

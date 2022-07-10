@@ -32,6 +32,7 @@ class _BarcodeHistoryPageState extends State<BarcodeHistoryPage>
     super.initState();
     Future.microtask(() async {
       histories = await HistoryDB.displayAllData();
+      histories.sort((a, b) => b.createDate.compareTo(a.createDate));
       setState(() {});
     });
     expandController = AnimationController(
@@ -170,6 +171,11 @@ class _BarcodeHistoryPageState extends State<BarcodeHistoryPage>
                                       builder: (context) => ScannedPage(
                                         type: type,
                                         historyModel: histories[index],
+                                        onStateChange: () async {
+                                          histories =
+                                              await HistoryDB.displayAllData();
+                                          setState(() {});
+                                        },
                                       ),
                                     ),
                                   );

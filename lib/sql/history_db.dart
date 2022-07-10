@@ -106,13 +106,12 @@ class HistoryDB {
     });
   }
 
-  static Future<bool> insertData(HistoryModel historyModel) async {
+  static Future<int?> insertData(HistoryModel historyModel) async {
     final Database? db = await getDataBase();
     try {
-      await db!.insert(tableName, historyModel.toMap());
-      return true;
+      return await db!.insert(tableName, historyModel.toMap());
     } catch (_) {
-      return false;
+      return null;
     }
   }
 

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:qrcode/generated/l10n.dart';
 import 'package:qrcode/model/qrcode_data_type.dart';
 import 'package:qrcode/screen/scanned/scanned_page.dart';
+import 'package:qrcode/sql/history_db.dart';
 import 'package:qrcode/sql/history_model.dart';
 import 'package:qrcode/utils/judge_qrcode_data_type.dart';
 
@@ -10,7 +12,7 @@ class BarcodeListPage extends StatefulWidget {
 
   const BarcodeListPage({
     Key? key,
-     required this.histories,
+    required this.histories,
   }) : super(key: key);
 
   @override
@@ -18,10 +20,6 @@ class BarcodeListPage extends StatefulWidget {
 }
 
 class _BarcodeListPageState extends State<BarcodeListPage> {
-  bool editMode = false;
-
-  List<int> editList = [];
-
   @override
   void initState() {
     super.initState();
@@ -32,103 +30,42 @@ class _BarcodeListPageState extends State<BarcodeListPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(S.of(context).result),
-        actions: [
-          if (editMode)
-            IconButton(
-              onPressed: () {},
-              icon: const Icon(Icons.delete_outline),
-            ),
-          IconButton(
-            onPressed: () {
-              if (editMode) {
-                setState(() {
-                  editMode = false;
-                  editList.clear();
-                });
-              } else {
-                setState(() {
-                  editMode = true;
-                });
-              }
-            },
-            icon: Icon(editMode ? Icons.done : Icons.mode_edit_outlined),
-          )
-        ],
       ),
       body: Column(
         children: [
-          if (editMode)
-            Row(
-              children: [
-                Checkbox(
-                  value: editList.length == widget.histories.length,
-                  onChanged: (value) {
-                    setState(() {
-                      if (editList.length != widget.histories.length) {
-                        editList.clear();
-                        for (int i = 0; i < widget.histories.length; i++) {
-                          editList.add(i);
-                        }
-                      } else {
-                        editList.clear();
-                      }
-                    });
-                  },
-                ),
-              ],
-            ),
           Expanded(
             child: ListView.separated(
               shrinkWrap: true,
               itemCount: widget.histories.length,
               itemBuilder: (context, index) {
-                QRCodeDataType type =
-                    JudgeQrcodeDataType().judgeType(widget.histories[index].content);
+                QRCodeDataType type = JudgeQrcodeDataType()
+                    .judgeType(widget.histories[index].content);
 
                 return Row(
                   children: [
-                    if (editMode)
-                      Checkbox(
-                        value: editList.contains(index),
-                        onChanged: (value) {
-                          setState(() {
-                            if (editList.contains(index)) {
-                              editList.removeWhere((element) => element == index);
-                            } else {
-                              editList.add(index);
-                            }
-                          });
-                        },
-                      ),
                     Expanded(
                       child: Card(
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(15.0),
                         ),
                         color: const Color(0xffedf3ff),
-                        elevation: editMode ? 2 : 0,
+                        elevation: 0,
                         child: InkWell(
-                          onTap: editMode
-                              ? () {
-                                  setState(() {
-                                    if (editList.contains(index)) {
-                                      editList.removeWhere((element) => element == index);
-                                    } else {
-                                      editList.add(index);
-                                    }
-                                  });
-                                }
-                              : () {
-                                  Navigator.of(context).push(
-                                    MaterialPageRoute(
-                                      builder: (context) => ScannedPage(
-                                        type: type,
-                                        historyModel: widget.histories[index],
-                                      ),
-                                    ),
-                                  );
-                                },
-                          child: Padding(
+                          onTap: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) => ScannedPage(
+                                  type: type,
+                                  historyModel: widget.histories[index],
+                                  onStateChange: () {
+                                    setState(() {});
+                                  },
+                                ),
+                              ),
+                            );
+                          },
+                          child: Container(
+                            height: 110,
                             padding: const EdgeInsets.all(8),
                             child: Row(
                               children: [
@@ -139,10 +76,12 @@ class _BarcodeListPageState extends State<BarcodeListPage> {
                                 const SizedBox(width: 8),
                                 Expanded(
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment:
+                                    CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        widget.histories[index].content,
+                                        widget.histories[index].content + '\n123',
                                         overflow: TextOverflow.ellipsis,
                                         maxLines: 3,
                                         style: const TextStyle(
@@ -151,11 +90,52 @@ class _BarcodeListPageState extends State<BarcodeListPage> {
                                         ),
                                       ),
                                       Text(
-                                        type.name + ' · ' + widget.histories[index].qrcodeType,
-                                        style: const TextStyle(color: Colors.grey),
+                                        type.name +
+                                            ' · ' +
+                                            widget.histories[index].qrcodeType,
+                                        style: const TextStyle(
+                                          color: Colors.grey,
+                                          fontSize: 12,
+                                        ),
                                       ),
                                     ],
                                   ),
+                                ),
+                                Column(
+                                  mainAxisAlignment:
+                                  MainAxisAlignment.spaceBetween,
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: [
+                                    IconButton(
+                                      onPressed: () async {
+                                        if (widget.histories[index].favorite) {
+                                          widget.histories[index].favorite = false;
+                                        } else {
+                                          widget.histories[index].favorite = true;
+                                        }
+                                        await HistoryDB.updateData(
+                                            widget.histories[index]);
+                                        setState(() {});
+                                      },
+                                      icon: Icon(
+                                        widget.histories[index].favorite
+                                            ? Icons.star
+                                            : Icons.star_border_outlined,
+                                        color: widget.histories[index].favorite
+                                            ? Colors.amberAccent
+                                            : Colors.grey,
+                                      ),
+                                    ),
+                                    Text(
+                                      DateFormat('yyyy/MM/dd \n HH:mm')
+                                          .format(widget.histories[index].createDate),
+                                      textAlign: TextAlign.end,
+                                      style: const TextStyle(
+                                        fontSize: 12,
+                                        color: Colors.grey,
+                                      ),
+                                    )
+                                  ],
                                 ),
                               ],
                             ),

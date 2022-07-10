@@ -11,6 +11,7 @@ import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:qrcode/generated/l10n.dart';
 import 'package:qrcode/model/qrcode_data_type.dart';
 import 'package:qrcode/provider/qrcode_provider.dart';
+import 'package:qrcode/sql/history_db.dart';
 import 'package:qrcode/sql/history_model.dart';
 import 'package:qrcode/utils/random_string.dart';
 import 'package:screenshot/screenshot.dart';
@@ -19,10 +20,12 @@ import 'package:share_plus/share_plus.dart';
 class ScannedPage extends StatefulWidget {
   final QRCodeDataType type;
   final HistoryModel historyModel;
+  final VoidCallback onStateChange;
 
   const ScannedPage({
     Key? key,
-    required this.type, required this.historyModel,
+    required this.type,
+    required this.historyModel, required this.onStateChange,
   }) : super(key: key);
 
   @override
@@ -43,8 +46,10 @@ class _ScannedPageState extends State<ScannedPage> {
       qrcodeProvider.setInfoList(
         context,
         type: widget.type,
-        result: Barcode(widget.historyModel.content, BarcodeTypesExtension.fromString(
-            widget.historyModel.qrcodeType), []),
+        result: Barcode(
+            widget.historyModel.content,
+            BarcodeTypesExtension.fromString(widget.historyModel.qrcodeType),
+            []),
       );
     });
 
@@ -58,7 +63,27 @@ class _ScannedPageState extends State<ScannedPage> {
       appBar: AppBar(
         actions: [
           IconButton(
-              onPressed: () {}, icon: const Icon(Icons.star_border_outlined))
+            onPressed: () async {
+              if (widget.historyModel.favorite) {
+                widget.historyModel.favorite = false;
+              } else {
+                widget.historyModel.favorite = true;
+              }
+              await HistoryDB.updateData(widget.historyModel);
+              print(await HistoryDB
+              .displayAllData());
+              setState((){});
+              widget.onStateChange.call();
+            },
+            icon:Icon(
+              widget.historyModel.favorite
+                  ? Icons.star
+                  : Icons.star_border_outlined,
+              color: widget.historyModel.favorite
+                  ? Colors.amberAccent
+                  : Colors.grey,
+            ),
+          ),
         ],
       ),
       body: Column(
@@ -165,8 +190,8 @@ class _ScannedPageState extends State<ScannedPage> {
                               Screenshot(
                                   child: Builder(
                                     builder: (context) {
-                                      final type =
-                                          getType(BarcodeTypesExtension.fromString(
+                                      final type = getType(
+                                          BarcodeTypesExtension.fromString(
                                               widget.historyModel.qrcodeType));
                                       return Container(
                                         padding: const EdgeInsets.all(16),
