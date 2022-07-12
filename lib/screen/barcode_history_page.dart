@@ -65,6 +65,7 @@ class _BarcodeHistoryPageState extends State<BarcodeHistoryPage>
                         }
                       }
                       histories = await HistoryDB.displayAllData();
+                      histories.sort((a, b) => b.createDate.compareTo(a.createDate));
                       editList.clear();
                       setState(() {});
                     },
@@ -174,6 +175,7 @@ class _BarcodeHistoryPageState extends State<BarcodeHistoryPage>
                                         onStateChange: () async {
                                           histories =
                                               await HistoryDB.displayAllData();
+                                          histories.sort((a, b) => b.createDate.compareTo(a.createDate));
                                           setState(() {});
                                         },
                                       ),
@@ -233,6 +235,7 @@ class _BarcodeHistoryPageState extends State<BarcodeHistoryPage>
                                             histories[index]);
                                         histories =
                                             await HistoryDB.displayAllData();
+                                        histories.sort((a, b) => b.createDate.compareTo(a.createDate));
                                         setState(() {});
                                       },
                                       icon: Icon(
