@@ -31,5 +31,8 @@
   "total": "Total",
   "data": "Data",
   "complete": "Complete",
-  "youHaveNotScan": "You haven't scanned any codes"
+  "youHaveNotScan": "You haven't scanned any codes",
+  "build":"build",
+  "chooseType": "Choose Type",
+  "content": "Content"
 }

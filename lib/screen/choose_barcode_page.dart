@@ -1,16 +1,17 @@
 import 'package:barcode_widget/barcode_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:qrcode/generated/l10n.dart';
+import 'package:qrcode/screen/create_barcode_page.dart';
 import 'package:qrcode/utils/utils.dart';
 
-class CreateQrcodePage extends StatefulWidget {
-  const CreateQrcodePage({Key? key}) : super(key: key);
+class ChooseBarcodePage extends StatefulWidget {
+  const ChooseBarcodePage({Key? key}) : super(key: key);
 
   @override
-  State<CreateQrcodePage> createState() => _CreateQrcodePageState();
+  State<ChooseBarcodePage> createState() => _ChooseBarcodePageState();
 }
 
-class _CreateQrcodePageState extends State<CreateQrcodePage> {
+class _ChooseBarcodePageState extends State<ChooseBarcodePage> {
   final typeList = <BarcodeType>[
     BarcodeType.QrCode,
     BarcodeType.Code128,
@@ -33,17 +34,33 @@ class _CreateQrcodePageState extends State<CreateQrcodePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(S.of(context).buildQrcode),
+        title: Text(S.of(context).build),
       ),
-      body: ListView.separated(
-        itemCount: typeList.length,
-        itemBuilder: (context, index) {
-          final type = typeList[index];
-          return createQrcodeTitle(type);
-        },
-        separatorBuilder: (context, index) {
-          return const Divider();
-        },
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(8),
+              child: Text(
+                S.of(context).chooseType,
+                style: const TextStyle(color: Colors.grey),
+              ),
+            ),
+            ListView.separated(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: typeList.length,
+              itemBuilder: (context, index) {
+                final type = typeList[index];
+                return createQrcodeTitle(type);
+              },
+              separatorBuilder: (context, index) {
+                return const Divider();
+              },
+            )
+          ],
+        ),
       ),
     );
   }
@@ -56,7 +73,13 @@ class _CreateQrcodePageState extends State<CreateQrcodePage> {
       color: const Color(0xffedf3ff),
       elevation: 0,
       child: InkWell(
-        onTap: () {},
+        onTap: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => const CreateBarcodePage(isQrcode: true),
+            ),
+          );
+        },
         child: Stack(
           children: [
             Padding(
@@ -90,7 +113,6 @@ class _CreateQrcodePageState extends State<CreateQrcodePage> {
                       Utils.getBarcodeIcon(type),
                     ),
                   ),
-
                   const SizedBox(width: 16),
                 ],
               ),

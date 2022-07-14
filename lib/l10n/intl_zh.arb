@@ -31,5 +31,8 @@
   "total": "總共",
   "data": "資料",
   "complete": "完成",
-  "youHaveNotScan": "您尚未掃描任何code"
+  "youHaveNotScan": "您尚未掃描任何code",
+  "build":"建立",
+  "chooseType": "選擇類型",
+  "content": "內容"
 }
