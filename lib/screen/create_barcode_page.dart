@@ -32,10 +32,47 @@ class _CreateBarcodePageState extends State<CreateBarcodePage> {
   ];
 
   TextEditingController textController = TextEditingController();
+  ///url
+  TextEditingController urlController = TextEditingController();
+  ///email
+  TextEditingController emailController = TextEditingController();
+  TextEditingController emailSubjectController = TextEditingController();
+  TextEditingController ccController = TextEditingController();
+  TextEditingController bccController = TextEditingController();
+  TextEditingController emailBodyController = TextEditingController();
+  ///phone
+  TextEditingController phoneController = TextEditingController();
+  ///sms
+  TextEditingController smsPhoneController = TextEditingController();
+  TextEditingController smsBodyController = TextEditingController();
+  ///geo
+  TextEditingController geoNameController = TextEditingController();
+  TextEditingController geoAddressController = TextEditingController();
+  TextEditingController geoLatController = TextEditingController();
+  TextEditingController geoLonController = TextEditingController();
 
   @override
   void dispose() {
     textController.dispose();
+    ///url
+    urlController.dispose();
+    ///email
+    emailController.dispose();
+    emailSubjectController.dispose();
+    ccController.dispose();
+    bccController.dispose();
+    emailBodyController.dispose();
+    ///phone
+    phoneController.dispose();
+    ///sms
+    smsPhoneController.dispose();
+    smsBodyController.dispose();
+    ///geo
+    geoNameController.dispose();
+    geoAddressController.dispose();
+    geoLatController.dispose();
+    geoLonController.dispose();
+
     super.dispose();
   }
 
@@ -91,14 +128,142 @@ class _CreateBarcodePageState extends State<CreateBarcodePage> {
                   style: const TextStyle(color: Colors.grey),
                 ),
               ),
-              CustomTextField(
-                controller: textController,
-                label: 'text',
-              )
+              qrcodeWidget()
             ],
           ),
         ),
       ),
     );
+  }
+
+  Widget qrcodeWidget() {
+    switch (QRCodeDataType.values[dropDownValue]) {
+      case QRCodeDataType.text:
+        return Column(
+          children: [
+            CustomTextField(
+              controller: textController,
+              label: 'text',
+            ),
+          ],
+        );
+      case QRCodeDataType.url:
+        return Column(
+          children: [
+            CustomTextField(
+              controller: urlController,
+              label: 'url',
+            ),
+          ],
+        );
+      case QRCodeDataType.mail:
+        return Column(
+          children: [
+            CustomTextField(
+              controller: emailController,
+              label: 'email',
+            ),
+            CustomTextField(
+              controller: emailController,
+              label: 'subject',
+            ),
+            CustomTextField(
+              controller: emailController,
+              label: 'cc',
+            ),
+            CustomTextField(
+              controller: emailController,
+              label: 'bcc',
+            ),
+            CustomTextField(
+              controller: emailController,
+              label: 'body',
+            ),
+          ],
+        );
+      case QRCodeDataType.phone:
+        return Column(
+          children: [
+            CustomTextField(
+              controller: phoneController,
+              label: 'phone',
+            ),
+          ],
+        );
+      case QRCodeDataType.sms:
+        return Column(
+          children: [
+            CustomTextField(
+              controller: smsPhoneController,
+              label: 'smsPhone',
+            ),
+            CustomTextField(
+              controller: smsBodyController,
+              label: 'smsBody',
+            ),
+          ],
+        );
+      case QRCodeDataType.geo:
+        return Column(
+          children: [
+            CustomTextField(
+              controller: geoNameController,
+              label: 'geoName',
+            ),
+            CustomTextField(
+              controller: geoAddressController,
+              label: 'geoAddress',
+            ),
+            CustomTextField(
+              controller: geoLatController,
+              label: 'geoLat',
+            ),
+            CustomTextField(
+              controller: geoLonController,
+              label: 'geoLon',
+            ),
+          ],
+        );
+      case QRCodeDataType.wifi:
+        // TODO: Handle this case.
+        return Column(
+          children: [
+            CustomTextField(
+              controller: phoneController,
+              label: 'phone',
+            ),
+          ],
+        );
+      case QRCodeDataType.contact:
+        // TODO: Handle this case.
+        return Column(
+          children: [
+            CustomTextField(
+              controller: phoneController,
+              label: 'phone',
+            ),
+          ],
+        );
+      case QRCodeDataType.bookmark:
+        // TODO: Handle this case.
+        return Column(
+          children: [
+            CustomTextField(
+              controller: phoneController,
+              label: 'phone',
+            ),
+          ],
+        );
+      case QRCodeDataType.calendar:
+        // TODO: Handle this case.
+        return Column(
+          children: [
+            CustomTextField(
+              controller: phoneController,
+              label: 'phone',
+            ),
+          ],
+        );
+    }
   }
 }
