@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_contacts/contact.dart';
 import 'package:qrcode/generated/l10n.dart';
 import 'package:qrcode/model/qrcode_data_type.dart';
+import 'package:qrcode/screen/widget/custom_dropdown_menu.dart';
 import 'package:qrcode/screen/widget/custom_text_field.dart';
+
+List<String> wifiType = ['WPA/WPA2 PSK', 'WEP', 'nopass'];
 
 class CreateBarcodePage extends StatefulWidget {
   final bool isQrcode;
@@ -31,47 +35,80 @@ class _CreateBarcodePageState extends State<CreateBarcodePage> {
           ))
   ];
 
+  int wifiTypeValue = 0;
+  List<DropdownMenuItem<int>> wifiTypeList = [
+    for (int i = 0; i < wifiType.length; i++)
+      DropdownMenuItem<int>(
+          value: i,
+          child: Row(
+            children: [Text(wifiType[i])],
+          ))
+  ];
+
   TextEditingController textController = TextEditingController();
+
   ///url
   TextEditingController urlController = TextEditingController();
+
   ///email
   TextEditingController emailController = TextEditingController();
   TextEditingController emailSubjectController = TextEditingController();
   TextEditingController ccController = TextEditingController();
   TextEditingController bccController = TextEditingController();
   TextEditingController emailBodyController = TextEditingController();
+
   ///phone
   TextEditingController phoneController = TextEditingController();
+
   ///sms
   TextEditingController smsPhoneController = TextEditingController();
   TextEditingController smsBodyController = TextEditingController();
+
   ///geo
   TextEditingController geoNameController = TextEditingController();
   TextEditingController geoAddressController = TextEditingController();
   TextEditingController geoLatController = TextEditingController();
   TextEditingController geoLonController = TextEditingController();
 
+  ///wifi
+  TextEditingController wifiNameController = TextEditingController();
+  TextEditingController wifiPasswordController = TextEditingController();
+
+  ///contact
+  TextEditingController displayNameController = TextEditingController();
+  TextEditingController firstNameController = TextEditingController();
+  TextEditingController lastNameController = TextEditingController();
+
   @override
   void dispose() {
     textController.dispose();
+
     ///url
     urlController.dispose();
+
     ///email
     emailController.dispose();
     emailSubjectController.dispose();
     ccController.dispose();
     bccController.dispose();
     emailBodyController.dispose();
+
     ///phone
     phoneController.dispose();
+
     ///sms
     smsPhoneController.dispose();
     smsBodyController.dispose();
+
     ///geo
     geoNameController.dispose();
     geoAddressController.dispose();
     geoLatController.dispose();
     geoLonController.dispose();
+
+    ///wifi
+    wifiNameController.dispose();
+    wifiPasswordController.dispose();
 
     super.dispose();
   }
@@ -227,21 +264,57 @@ class _CreateBarcodePageState extends State<CreateBarcodePage> {
       case QRCodeDataType.wifi:
         // TODO: Handle this case.
         return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 8),
+              child: Text('type'),
+            ),
+            CustomDropDownMenu(
+                expand: false,
+                items: wifiType,
+                onChange: (value) {
+                  setState(
+                    () {
+                      wifiTypeValue = value!;
+                    },
+                  );
+                },
+                value: wifiTypeValue),
             CustomTextField(
-              controller: phoneController,
-              label: 'phone',
+              controller: wifiNameController,
+              label: 'name',
+            ),
+            CustomTextField(
+              controller: wifiPasswordController,
+              label: 'password',
             ),
           ],
         );
       case QRCodeDataType.contact:
-        // TODO: Handle this case.
+        Contact();
         return Column(
           children: [
             CustomTextField(
-              controller: phoneController,
-              label: 'phone',
+              controller: displayNameController,
+              label: 'displayName',
             ),
+            Row(
+              children: [
+                Expanded(
+                  child: CustomTextField(
+                    controller: firstNameController,
+                    label: 'firstName',
+                  ),
+                ),
+                Expanded(
+                  child: CustomTextField(
+                    controller: lastNameController,
+                    label: 'lastName',
+                  ),
+                ),
+              ],
+            )
           ],
         );
       case QRCodeDataType.bookmark:

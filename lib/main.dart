@@ -1,13 +1,10 @@
-import 'dart:io';
-import 'dart:math';
-
-import 'package:floating_action_bubble/floating_action_bubble.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_barcode_sdk/dynamsoft_barcode.dart'
     as dynamsoft_barcode;
 import 'package:flutter_barcode_sdk/flutter_barcode_sdk.dart'
     as flutter_barcode_sdk;
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_switch/flutter_switch.dart';
 import 'package:flutter_vibrate/flutter_vibrate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_cropper/image_cropper.dart';
@@ -18,6 +15,7 @@ import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:qrcode/generated/l10n.dart';
 import 'package:qrcode/model/qrcode_data_type.dart';
 import 'package:qrcode/provider/qrcode_provider.dart';
+import 'package:qrcode/res/app_colors.dart';
 import 'package:qrcode/screen/barcode_history_page.dart';
 import 'package:qrcode/screen/barcode_list_page.dart';
 import 'package:qrcode/screen/choose_barcode_page.dart';
@@ -57,9 +55,13 @@ class _MyAppState extends State<MyApp> {
         navigatorKey: MyApp.navigatorKey,
         theme: ThemeData(
           primarySwatch: Colors.blue,
-          pageTransitionsTheme: const PageTransitionsTheme(builders: {
-            TargetPlatform.android: CupertinoPageTransitionsBuilder(),
-          }),
+          pageTransitionsTheme: const PageTransitionsTheme(
+            builders: {
+              TargetPlatform.android: CupertinoPageTransitionsBuilder(),
+            },
+          ),
+          appBarTheme: const AppBarTheme(elevation: 0,color: Colors.black87),
+
         ),
         localizationsDelegates: const [
           S.delegate,
@@ -369,23 +371,45 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                                 color: Colors.orangeAccent,
                               ))
                         ]),
-                        Switch(
-                          value: multiMode,
-                          trackColor: MaterialStateProperty.all(Colors.grey),
-                          onChanged: (value) {
-                            setState(() {
-                              multiMode = value;
-                            });
-                            if (value) {
-                              expandController.forward();
-                            } else {
+                        const SizedBox(height: 16),
+                        FlutterSwitch(
+                            value: multiMode,
+                            width: 55,
+                            height: 25,
+                            valueFontSize: 12,
+                            padding: 3,
+                            activeColor: Colors.teal,
+                            showOnOff: true,
+                            onToggle: (value) {
                               setState(() {
-                                multiScanList.clear();
+                                multiMode = value;
                               });
-                              expandController.reverse();
-                            }
-                          },
-                        )
+                              if (value) {
+                                expandController.forward();
+                              } else {
+                                setState(() {
+                                  multiScanList.clear();
+                                });
+                                expandController.reverse();
+                              }
+                            }),
+                        // Switch(
+                        //   value: multiMode,
+                        //   trackColor: MaterialStateProperty.all(Colors.grey),
+                        //   onChanged: (value) {
+                        //     setState(() {
+                        //       multiMode = value;
+                        //     });
+                        //     if (value) {
+                        //       expandController.forward();
+                        //     } else {
+                        //       setState(() {
+                        //         multiScanList.clear();
+                        //       });
+                        //       expandController.reverse();
+                        //     }
+                        //   },
+                        // )
                       ],
                     ),
                   ),
