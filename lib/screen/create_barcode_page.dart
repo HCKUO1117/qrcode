@@ -1,18 +1,24 @@
+import 'package:barcode/barcode.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_contacts/contact.dart';
+import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:qrcode/generated/l10n.dart';
 import 'package:qrcode/model/qrcode_data_type.dart';
 import 'package:qrcode/screen/widget/custom_dropdown_menu.dart';
 import 'package:qrcode/screen/widget/custom_text_field.dart';
+import 'package:qrcode/screen/widget/fake_text_field.dart';
+import 'package:qrcode/sql/history_model.dart';
+import 'package:qrcode/utils/utils.dart';
+
+import 'barcode_createed_page.dart';
 
 List<String> wifiType = ['WPA/WPA2 PSK', 'WEP', 'nopass'];
 
 class CreateBarcodePage extends StatefulWidget {
-  final bool isQrcode;
+  final BarcodeType type;
 
   const CreateBarcodePage({
     Key? key,
-    required this.isQrcode,
+    required this.type,
   }) : super(key: key);
 
   @override
@@ -25,25 +31,18 @@ class _CreateBarcodePageState extends State<CreateBarcodePage> {
   List<DropdownMenuItem<int>> dropDownList = [
     for (int i = 0; i < QRCodeDataType.values.length; i++)
       DropdownMenuItem<int>(
-          value: i,
-          child: Row(
-            children: [
-              Icon(QRCodeDataType.values[i].icon),
-              const SizedBox(width: 16),
-              Text(QRCodeDataType.values[i].name)
-            ],
-          ))
+        value: i,
+        child: Row(
+          children: [
+            Icon(QRCodeDataType.values[i].icon),
+            const SizedBox(width: 16),
+            Text(QRCodeDataType.values[i].name)
+          ],
+        ),
+      ),
   ];
 
   int wifiTypeValue = 0;
-  List<DropdownMenuItem<int>> wifiTypeList = [
-    for (int i = 0; i < wifiType.length; i++)
-      DropdownMenuItem<int>(
-          value: i,
-          child: Row(
-            children: [Text(wifiType[i])],
-          ))
-  ];
 
   TextEditingController textController = TextEditingController();
 
@@ -78,6 +77,62 @@ class _CreateBarcodePageState extends State<CreateBarcodePage> {
   TextEditingController displayNameController = TextEditingController();
   TextEditingController firstNameController = TextEditingController();
   TextEditingController lastNameController = TextEditingController();
+  TextEditingController companyNameController = TextEditingController();
+  TextEditingController companyDepartmentController = TextEditingController();
+  TextEditingController companyTitleController = TextEditingController();
+
+  int email1 = 0;
+  TextEditingController contactEmail1Controller = TextEditingController();
+  int email2 = 0;
+  TextEditingController contactEmail2Controller = TextEditingController();
+
+  TextEditingController websiteController = TextEditingController();
+
+  int phone1 = 0;
+  TextEditingController contactPhone1Controller = TextEditingController();
+  int phone2 = 0;
+  TextEditingController contactPhone2Controller = TextEditingController();
+  int phone3 = 0;
+  TextEditingController contactPhone3Controller = TextEditingController();
+
+  int address1 = 0;
+  TextEditingController contactAddress1Controller = TextEditingController();
+  int address2 = 0;
+  TextEditingController contactAddress2Controller = TextEditingController();
+
+  TextEditingController contactNoteController = TextEditingController();
+
+  ///bookmark
+  TextEditingController bookmarkTitleController = TextEditingController();
+  TextEditingController bookmarkUrlController = TextEditingController();
+
+  ///calendar
+  TextEditingController calendarTitleController = TextEditingController();
+  TextEditingController calendarAddressController = TextEditingController();
+  TextEditingController calendarNoteController = TextEditingController();
+
+  bool allDay = false;
+
+  DateTime? startTime;
+  DateTime? endTime;
+
+  @override
+  void initState() {
+    if (widget.type != BarcodeType.QrCode) {
+      dropDownList = [
+        DropdownMenuItem<int>(
+            value: 0,
+            child: Row(
+              children: [
+                Icon(QRCodeDataType.values[0].icon),
+                const SizedBox(width: 16),
+                Text(QRCodeDataType.values[0].name)
+              ],
+            ))
+      ];
+    }
+    super.initState();
+  }
 
   @override
   void dispose() {
@@ -110,6 +165,32 @@ class _CreateBarcodePageState extends State<CreateBarcodePage> {
     wifiNameController.dispose();
     wifiPasswordController.dispose();
 
+    ///contact
+    displayNameController.dispose();
+    firstNameController.dispose();
+    lastNameController.dispose();
+    companyNameController.dispose();
+    companyDepartmentController.dispose();
+    companyTitleController.dispose();
+    contactEmail1Controller.dispose();
+    contactEmail2Controller.dispose();
+    websiteController.dispose();
+    contactPhone1Controller.dispose();
+    contactPhone2Controller.dispose();
+    contactPhone3Controller.dispose();
+    contactAddress1Controller.dispose();
+    contactAddress2Controller.dispose();
+    contactNoteController.dispose();
+
+    ///bookmark
+    bookmarkTitleController.dispose();
+    bookmarkUrlController.dispose();
+
+    ///calendar
+    calendarTitleController.dispose();
+    calendarAddressController.dispose();
+    calendarNoteController.dispose();
+
     super.dispose();
   }
 
@@ -121,7 +202,7 @@ class _CreateBarcodePageState extends State<CreateBarcodePage> {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: Text(S.of(context).build),
+          title: Text(S.of(context).build + ' - ${widget.type.name}'),
         ),
         body: SingleChildScrollView(
           child: Column(
@@ -165,9 +246,42 @@ class _CreateBarcodePageState extends State<CreateBarcodePage> {
                   style: const TextStyle(color: Colors.grey),
                 ),
               ),
-              qrcodeWidget()
+              qrcodeWidget(),
+              const SizedBox(
+                height: 200,
+              )
             ],
           ),
+        ),
+        bottomNavigationBar: InkWell(
+          child: Container(
+            color: Colors.teal,
+            width: double.maxFinite,
+            height: 50,
+            child: Center(
+              child: Text(
+                S.of(context).build,
+                style: const TextStyle(color: Colors.white),
+              ),
+            ),
+          ),
+          onTap: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => BarcodeCreatedPage(
+                  type: QRCodeDataType.values[dropDownValue],
+                  historyModel: HistoryModel(
+                      createDate: DateTime.now(),
+                      qrcodeType: widget.type.name,
+                      contentType: QRCodeDataType.values[dropDownValue].name,
+                      content: convertToQrcodeString(),
+                      favorite: false),
+                  onStateChange: () {},
+                  barcodeType: widget.type,
+                ),
+              ),
+            );
+          },
         ),
       ),
     );
@@ -201,19 +315,19 @@ class _CreateBarcodePageState extends State<CreateBarcodePage> {
               label: 'email',
             ),
             CustomTextField(
-              controller: emailController,
+              controller: emailSubjectController,
               label: 'subject',
             ),
             CustomTextField(
-              controller: emailController,
+              controller: ccController,
               label: 'cc',
             ),
             CustomTextField(
-              controller: emailController,
+              controller: bccController,
               label: 'bcc',
             ),
             CustomTextField(
-              controller: emailController,
+              controller: emailBodyController,
               label: 'body',
             ),
           ],
@@ -247,10 +361,10 @@ class _CreateBarcodePageState extends State<CreateBarcodePage> {
               controller: geoNameController,
               label: 'geoName',
             ),
-            CustomTextField(
-              controller: geoAddressController,
-              label: 'geoAddress',
-            ),
+            // CustomTextField(
+            //   controller: geoAddressController,
+            //   label: 'geoAddress',
+            // ),
             CustomTextField(
               controller: geoLatController,
               label: 'geoLat',
@@ -262,11 +376,10 @@ class _CreateBarcodePageState extends State<CreateBarcodePage> {
           ],
         );
       case QRCodeDataType.wifi:
-        // TODO: Handle this case.
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Padding(
+            const Padding(
               padding: EdgeInsets.symmetric(horizontal: 8),
               child: Text('type'),
             ),
@@ -295,6 +408,10 @@ class _CreateBarcodePageState extends State<CreateBarcodePage> {
         Contact();
         return Column(
           children: [
+            const Text(
+              'personal',
+              style: TextStyle(color: Colors.grey),
+            ),
             CustomTextField(
               controller: displayNameController,
               label: 'displayName',
@@ -314,16 +431,227 @@ class _CreateBarcodePageState extends State<CreateBarcodePage> {
                   ),
                 ),
               ],
-            )
+            ),
+            const Text(
+              'company',
+              style: TextStyle(color: Colors.grey),
+            ),
+            CustomTextField(
+              controller: companyNameController,
+              label: 'companyName',
+            ),
+            Row(
+              children: [
+                Expanded(
+                  child: CustomTextField(
+                    controller: companyDepartmentController,
+                    label: 'companyDepartment',
+                  ),
+                ),
+                Expanded(
+                  child: CustomTextField(
+                    controller: companyTitleController,
+                    label: 'companyTitle',
+                  ),
+                ),
+              ],
+            ),
+            const Text(
+              'email',
+              style: TextStyle(color: Colors.grey),
+            ),
+            Row(
+              children: [
+                CustomDropDownMenu(
+                  items: Utils.emailTypeToList(EmailLabel.values),
+                  expand: false,
+                  onChange: (v) {
+                    setState(() {
+                      email1 = v!;
+                    });
+                  },
+                  value: email1,
+                ),
+                Expanded(
+                  child: CustomTextField(
+                    controller: contactEmail1Controller,
+                    label: 'companyTitle',
+                  ),
+                ),
+              ],
+            ),
+            Row(
+              children: [
+                CustomDropDownMenu(
+                  items: Utils.emailTypeToList(EmailLabel.values),
+                  expand: false,
+                  onChange: (v) {
+                    setState(() {
+                      email2 = v!;
+                    });
+                  },
+                  value: email2,
+                ),
+                Expanded(
+                  child: CustomTextField(
+                    controller: contactEmail2Controller,
+                    label: 'companyTitle',
+                  ),
+                ),
+              ],
+            ),
+            const Text(
+              'website',
+              style: TextStyle(color: Colors.grey),
+            ),
+            Row(
+              children: [
+                CustomDropDownMenu(
+                  items: Utils.websiteTypeToList(WebsiteLabel.values),
+                  expand: false,
+                  onChange: (v) {
+                    setState(() {
+                      email2 = v!;
+                    });
+                  },
+                  value: email2,
+                ),
+                Expanded(
+                  child: CustomTextField(
+                    controller: websiteController,
+                    label: 'website',
+                  ),
+                ),
+              ],
+            ),
+            const Text(
+              'phone',
+              style: TextStyle(color: Colors.grey),
+            ),
+            Row(
+              children: [
+                CustomDropDownMenu(
+                  items: Utils.phoneTypeToList(PhoneLabel.values),
+                  expand: false,
+                  onChange: (v) {
+                    setState(() {
+                      phone1 = v!;
+                    });
+                  },
+                  value: phone1,
+                ),
+                Expanded(
+                  child: CustomTextField(
+                    controller: contactPhone1Controller,
+                    label: 'phone',
+                  ),
+                ),
+              ],
+            ),
+            Row(
+              children: [
+                CustomDropDownMenu(
+                  items: Utils.phoneTypeToList(PhoneLabel.values),
+                  expand: false,
+                  onChange: (v) {
+                    setState(() {
+                      phone2 = v!;
+                    });
+                  },
+                  value: phone2,
+                ),
+                Expanded(
+                  child: CustomTextField(
+                    controller: contactPhone2Controller,
+                    label: 'phone',
+                  ),
+                ),
+              ],
+            ),
+            Row(
+              children: [
+                CustomDropDownMenu(
+                  items: Utils.phoneTypeToList(PhoneLabel.values),
+                  expand: false,
+                  onChange: (v) {
+                    setState(() {
+                      phone3 = v!;
+                    });
+                  },
+                  value: phone3,
+                ),
+                Expanded(
+                  child: CustomTextField(
+                    controller: contactPhone3Controller,
+                    label: 'phone',
+                  ),
+                ),
+              ],
+            ),
+            const Text(
+              'address',
+              style: TextStyle(color: Colors.grey),
+            ),
+            Row(
+              children: [
+                CustomDropDownMenu(
+                  items: Utils.addressTypeToList(AddressLabel.values),
+                  expand: false,
+                  onChange: (v) {
+                    setState(() {
+                      address1 = v!;
+                    });
+                  },
+                  value: address1,
+                ),
+                Expanded(
+                  child: CustomTextField(
+                    controller: contactAddress1Controller,
+                    label: 'address',
+                  ),
+                ),
+              ],
+            ),
+            Row(
+              children: [
+                CustomDropDownMenu(
+                  items: Utils.addressTypeToList(AddressLabel.values),
+                  expand: false,
+                  onChange: (v) {
+                    setState(() {
+                      address2 = v!;
+                    });
+                  },
+                  value: address2,
+                ),
+                Expanded(
+                  child: CustomTextField(
+                    controller: contactAddress2Controller,
+                    label: 'address',
+                  ),
+                ),
+              ],
+            ),
+            const Text(
+              'note',
+              style: TextStyle(color: Colors.grey),
+            ),
+            CustomTextField(
+              controller: contactNoteController,
+              label: 'note',
+            ),
           ],
         );
       case QRCodeDataType.bookmark:
-        // TODO: Handle this case.
         return Column(
           children: [
             CustomTextField(
-              controller: phoneController,
-              label: 'phone',
+              controller: bookmarkTitleController,
+              label: 'title',
+            ),
+            CustomTextField(
+              controller: bookmarkUrlController,
+              label: 'url',
             ),
           ],
         );
@@ -332,11 +660,132 @@ class _CreateBarcodePageState extends State<CreateBarcodePage> {
         return Column(
           children: [
             CustomTextField(
-              controller: phoneController,
-              label: 'phone',
+              controller: calendarTitleController,
+              label: 'title',
+            ),
+            InkWell(
+              onTap: () {
+                setState(() {
+                  allDay = !allDay;
+                });
+              },
+              child: Row(
+                children: [
+                  Checkbox(
+                    value: allDay,
+                    onChanged: (v) {
+                      setState(() {
+                        allDay = v!;
+                      });
+                    },
+                  ),
+                  const SizedBox(width: 8),
+                  const Text('allday'),
+                ],
+              ),
+            ),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              alignment: Alignment.centerLeft,
+              child: Text('start : '),
+            ),
+            FakeTextField(
+              haveValue: false,
+              onTap: () {
+                print(123);
+              },
+            ),
+            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              alignment: Alignment.centerLeft,
+              child: Text('end : '),
+            ),
+            FakeTextField(
+              haveValue: false,
+              onTap: () {
+                print(123);
+              },
+            ),
+            const SizedBox(height: 24),
+            CustomTextField(
+              controller: calendarAddressController,
+              label: 'address',
+            ),
+            CustomTextField(
+              controller: calendarNoteController,
+              label: 'note',
             ),
           ],
         );
     }
+  }
+
+  String convertToQrcodeString() {
+    switch (QRCodeDataType.values[dropDownValue]) {
+      case QRCodeDataType.text:
+        return textController.text;
+      case QRCodeDataType.url:
+        return urlController.text;
+      case QRCodeDataType.mail:
+        StringBuffer result = StringBuffer();
+        result.write('mailto:');
+        result.write(emailController.text);
+        result.write('?subject=');
+        result.write(emailSubjectController.text);
+        result.write('&cc=');
+        result.write(ccController.text);
+        result.write('&bcc=');
+        result.write(bccController.text);
+        result.write('&body=');
+        result.write(emailBodyController.text);
+
+        return result.toString();
+      case QRCodeDataType.phone:
+        StringBuffer result = StringBuffer();
+        result.write('TEL:');
+        result.write(phoneController.text);
+
+        return result.toString();
+      case QRCodeDataType.sms:
+        StringBuffer result = StringBuffer();
+        result.write('SMS:');
+        result.write(smsPhoneController.text);
+        result.write(':');
+        result.write(smsBodyController.text);
+
+        return result.toString();
+      case QRCodeDataType.geo:
+        StringBuffer result = StringBuffer();
+        result.write('GEO:');
+        result.write(geoLatController.text);
+        result.write(',');
+        result.write(geoLonController.text);
+        result.write('?q=');
+        result.write(geoNameController.text);
+
+        return result.toString();
+      case QRCodeDataType.wifi:
+        StringBuffer result = StringBuffer();
+        result.write('WIFI:\nT:');
+        result.write(wifiTypeValue == 0 ? 'WPA' : wifiType[wifiTypeValue]);
+        result.write(';\nS:');
+        result.write(wifiNameController.text);
+        result.write(';\nP:');
+        result.write(wifiPasswordController.text);
+        result.write(';\n;');
+
+        return result.toString();
+      case QRCodeDataType.contact:
+        // TODO: Handle this case.
+        break;
+      case QRCodeDataType.bookmark:
+        // TODO: Handle this case.
+        break;
+      case QRCodeDataType.calendar:
+        // TODO: Handle this case.
+        break;
+    }
+    return '';
   }
 }

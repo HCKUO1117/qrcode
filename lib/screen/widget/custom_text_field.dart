@@ -18,7 +18,32 @@ class CustomTextField extends StatelessWidget {
         controller: controller,
         maxLines: null,
         decoration: InputDecoration(
+          filled: true,
+          fillColor: Colors.white,
+          contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+          focusedBorder: const OutlineInputBorder(
+            borderSide: BorderSide(
+              color: Colors.grey,
+              width: 0.5,
+            ),
+          ),
+          floatingLabelBehavior: FloatingLabelBehavior.auto,
+          enabledBorder: const OutlineInputBorder(
+            borderSide: BorderSide(
+              color: Colors.grey,
+              width: 0.5,
+            ),
+          ),
           labelText: label,
+          border: InputBorder.none,
+          floatingLabelStyle: const TextStyle(
+            fontSize: 18.0,
+            color: Colors.grey,
+          ),
+          alignLabelWithHint: true,
+          labelStyle: const TextStyle(
+            color: Colors.black26,
+          ),
         ),
       ),
     );

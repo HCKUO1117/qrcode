@@ -40,16 +40,18 @@ class _CustomDropDownMenuState extends State<CustomDropDownMenu> {
   @override
   Widget build(BuildContext context) {
     return Container(
+      margin: const EdgeInsets.symmetric(
+        horizontal: 8,),
       padding: const EdgeInsets.symmetric(
         horizontal: 8,
-        vertical: 4,
+        // vertical: 4,
       ),
-      // decoration: BoxDecoration(
-      //   border: Border.all(color: Colors.grey),
-      //   borderRadius: BorderRadius.circular(10),
-      // ),
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.grey),
+        borderRadius: BorderRadius.circular(10),
+      ),
       child: DropdownButton<int>(
-        // underline: const SizedBox(),
+        underline: const SizedBox(),
         value: value,
         items: items,
         isExpanded: widget.expand,

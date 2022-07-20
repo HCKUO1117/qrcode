@@ -1,8 +1,9 @@
 import 'package:barcode_widget/barcode_widget.dart';
+import 'package:flutter_contacts/flutter_contacts.dart';
 
-class Utils{
-  static String getBarcodeIcon(BarcodeType type){
-    switch(type){
+class Utils {
+  static String getBarcodeIcon(BarcodeType type) {
+    switch (type) {
       case BarcodeType.CodeITF16:
         return 'assets/barcode/ITF 16.png';
       case BarcodeType.CodeITF14:
@@ -48,8 +49,8 @@ class Utils{
     }
   }
 
-  static String getBarcodeIntro(BarcodeType type){
-    switch(type){
+  static String getBarcodeIntro(BarcodeType type) {
+    switch (type) {
       case BarcodeType.CodeITF16:
         return 'assets/barcode/ITF 16.png';
       case BarcodeType.CodeITF14:
@@ -95,8 +96,8 @@ class Utils{
     }
   }
 
-  static bool getBarcodePro(BarcodeType type){
-    switch(type){
+  static bool getBarcodePro(BarcodeType type) {
+    switch (type) {
       case BarcodeType.CodeITF16:
       case BarcodeType.CodeITF14:
       case BarcodeType.CodeEAN8:
@@ -121,5 +122,21 @@ class Utils{
       case BarcodeType.CodeEAN13:
         return false;
     }
+  }
+
+  static List<String> emailTypeToList(List<EmailLabel> list) {
+    return [for (final element in list) element.name];
+  }
+
+  static List<String> websiteTypeToList(List<WebsiteLabel> list) {
+    return [for (final element in list) element.name];
+  }
+
+  static List<String> phoneTypeToList(List<PhoneLabel> list) {
+    return [for (final element in list) element.name];
+  }
+
+  static List<String> addressTypeToList(List<AddressLabel> list) {
+    return [for (final element in list) element.name];
   }
 }

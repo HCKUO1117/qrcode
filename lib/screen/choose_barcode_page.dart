@@ -76,7 +76,9 @@ class _ChooseBarcodePageState extends State<ChooseBarcodePage> {
         onTap: () {
           Navigator.of(context).push(
             MaterialPageRoute(
-              builder: (context) => const CreateBarcodePage(isQrcode: true),
+              builder: (context) => CreateBarcodePage(
+                type: type,
+              ),
             ),
           );
         },

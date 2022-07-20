@@ -81,7 +81,7 @@ class _BarcodeListPageState extends State<BarcodeListPage> {
                                     CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        widget.histories[index].content + '\n123',
+                                        widget.histories[index].content,
                                         overflow: TextOverflow.ellipsis,
                                         maxLines: 3,
                                         style: const TextStyle(

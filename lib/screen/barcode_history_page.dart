@@ -199,7 +199,7 @@ class _BarcodeHistoryPageState extends State<BarcodeHistoryPage>
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        histories[index].content + '\n123',
+                                        histories[index].content,
                                         overflow: TextOverflow.ellipsis,
                                         maxLines: 3,
                                         style: const TextStyle(
