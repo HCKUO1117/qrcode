@@ -1,15 +1,18 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:intl/intl.dart';
 
 class FakeTextField extends StatelessWidget {
   final bool haveValue;
   final VoidCallback onTap;
+  final String value;
 
   const FakeTextField({
     Key? key,
     required this.haveValue,
     required this.onTap,
+    required this.value,
   }) : super(key: key);
 
   @override
@@ -34,7 +37,7 @@ class FakeTextField extends StatelessWidget {
           borderRadius: BorderRadius.circular(5),
         ),
         child: Text(
-          '123',
+          value,
           style: TextStyle(color: haveValue ? null : Colors.black26),
         ),
       ),

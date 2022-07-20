@@ -1,6 +1,7 @@
 import 'package:barcode/barcode.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
+import 'package:intl/intl.dart';
 import 'package:qrcode/generated/l10n.dart';
 import 'package:qrcode/model/qrcode_data_type.dart';
 import 'package:qrcode/screen/widget/custom_dropdown_menu.dart';
@@ -86,6 +87,7 @@ class _CreateBarcodePageState extends State<CreateBarcodePage> {
   int email2 = 0;
   TextEditingController contactEmail2Controller = TextEditingController();
 
+  int website = 0;
   TextEditingController websiteController = TextEditingController();
 
   int phone1 = 0;
@@ -96,9 +98,17 @@ class _CreateBarcodePageState extends State<CreateBarcodePage> {
   TextEditingController contactPhone3Controller = TextEditingController();
 
   int address1 = 0;
-  TextEditingController contactAddress1Controller = TextEditingController();
+  TextEditingController contactStreet1Controller = TextEditingController();
+  TextEditingController contactCity1Controller = TextEditingController();
+  TextEditingController contactState1Controller = TextEditingController();
+  TextEditingController contactPostal1Controller = TextEditingController();
+  TextEditingController contactCounty1Controller = TextEditingController();
   int address2 = 0;
-  TextEditingController contactAddress2Controller = TextEditingController();
+  TextEditingController contactStreet2Controller = TextEditingController();
+  TextEditingController contactCity2Controller = TextEditingController();
+  TextEditingController contactState2Controller = TextEditingController();
+  TextEditingController contactPostal2Controller = TextEditingController();
+  TextEditingController contactCounty2Controller = TextEditingController();
 
   TextEditingController contactNoteController = TextEditingController();
 
@@ -178,8 +188,16 @@ class _CreateBarcodePageState extends State<CreateBarcodePage> {
     contactPhone1Controller.dispose();
     contactPhone2Controller.dispose();
     contactPhone3Controller.dispose();
-    contactAddress1Controller.dispose();
-    contactAddress2Controller.dispose();
+    contactStreet1Controller.dispose();
+    contactCity1Controller.dispose();
+    contactState1Controller.dispose();
+    contactPostal1Controller.dispose();
+    contactCity1Controller.dispose();
+    contactStreet2Controller.dispose();
+    contactCity2Controller.dispose();
+    contactState2Controller.dispose();
+    contactPostal2Controller.dispose();
+    contactCity2Controller.dispose();
     contactNoteController.dispose();
 
     ///bookmark
@@ -475,7 +493,7 @@ class _CreateBarcodePageState extends State<CreateBarcodePage> {
                 Expanded(
                   child: CustomTextField(
                     controller: contactEmail1Controller,
-                    label: 'companyTitle',
+                    label: 'Email',
                   ),
                 ),
               ],
@@ -495,7 +513,7 @@ class _CreateBarcodePageState extends State<CreateBarcodePage> {
                 Expanded(
                   child: CustomTextField(
                     controller: contactEmail2Controller,
-                    label: 'companyTitle',
+                    label: 'Email',
                   ),
                 ),
               ],
@@ -511,10 +529,10 @@ class _CreateBarcodePageState extends State<CreateBarcodePage> {
                   expand: false,
                   onChange: (v) {
                     setState(() {
-                      email2 = v!;
+                      website = v!;
                     });
                   },
-                  value: email2,
+                  value: website,
                 ),
                 Expanded(
                   child: CustomTextField(
@@ -606,8 +624,40 @@ class _CreateBarcodePageState extends State<CreateBarcodePage> {
                 ),
                 Expanded(
                   child: CustomTextField(
-                    controller: contactAddress1Controller,
-                    label: 'address',
+                    controller: contactStreet1Controller,
+                    label: 'Street',
+                  ),
+                ),
+              ],
+            ),
+            Row(
+              children: [
+                Expanded(
+                  child: CustomTextField(
+                    controller: contactCity1Controller,
+                    label: 'city',
+                  ),
+                ),
+                Expanded(
+                  child: CustomTextField(
+                    controller: contactState1Controller,
+                    label: 'state',
+                  ),
+                ),
+              ],
+            ),
+            Row(
+              children: [
+                Expanded(
+                  child: CustomTextField(
+                    controller: contactPostal1Controller,
+                    label: 'postal',
+                  ),
+                ),
+                Expanded(
+                  child: CustomTextField(
+                    controller: contactCounty1Controller,
+                    label: 'country',
                   ),
                 ),
               ],
@@ -626,8 +676,40 @@ class _CreateBarcodePageState extends State<CreateBarcodePage> {
                 ),
                 Expanded(
                   child: CustomTextField(
-                    controller: contactAddress2Controller,
+                    controller: contactStreet2Controller,
                     label: 'address',
+                  ),
+                ),
+              ],
+            ),
+            Row(
+              children: [
+                Expanded(
+                  child: CustomTextField(
+                    controller: contactCity2Controller,
+                    label: 'city',
+                  ),
+                ),
+                Expanded(
+                  child: CustomTextField(
+                    controller: contactState2Controller,
+                    label: 'state',
+                  ),
+                ),
+              ],
+            ),
+            Row(
+              children: [
+                Expanded(
+                  child: CustomTextField(
+                    controller: contactPostal2Controller,
+                    label: 'postal',
+                  ),
+                ),
+                Expanded(
+                  child: CustomTextField(
+                    controller: contactCounty2Controller,
+                    label: 'country',
                   ),
                 ),
               ],
@@ -690,9 +772,24 @@ class _CreateBarcodePageState extends State<CreateBarcodePage> {
               child: Text('start : '),
             ),
             FakeTextField(
-              haveValue: false,
-              onTap: () {
-                print(123);
+              haveValue: startTime != null,
+              value: startTime != null ? (allDay ? DateFormat('yyyy-MM-dd').format(startTime!) : DateFormat('yyyy-MM-dd HH:mm').format(startTime!)) : 'choose',
+              onTap: () async {
+                DateTime? date = await showDatePicker(
+                    context: context,
+                    initialDate: DateTime.now(),
+                    firstDate: DateTime(DateTime.now().year - 100),
+                    lastDate: DateTime(DateTime.now().year + 100));
+                startTime = date;
+                if(!allDay && startTime != null){
+                  TimeOfDay? time = await showTimePicker(context: context, initialTime: TimeOfDay.now());
+                  if(time != null){
+                    startTime = DateTime(startTime!.year,startTime!.month,startTime!.day,time.hour,time.minute);
+                  }else{
+                    startTime = null;
+                  }
+                }
+                setState(() {});
               },
             ),
             const SizedBox(height: 16),
@@ -702,9 +799,24 @@ class _CreateBarcodePageState extends State<CreateBarcodePage> {
               child: Text('end : '),
             ),
             FakeTextField(
-              haveValue: false,
-              onTap: () {
-                print(123);
+              haveValue: endTime != null,
+              value: endTime != null ? (allDay ? DateFormat('yyyy-MM-dd').format(endTime!) : DateFormat('yyyy-MM-dd HH:mm').format(endTime!)) : 'choose',
+              onTap: () async {
+                DateTime? date = await showDatePicker(
+                    context: context,
+                    initialDate: DateTime.now(),
+                    firstDate: DateTime(DateTime.now().year - 100),
+                    lastDate: DateTime(DateTime.now().year + 100));
+                endTime = date;
+                if(!allDay && endTime != null){
+                  TimeOfDay? time = await showTimePicker(context: context, initialTime: TimeOfDay.now());
+                  if(time != null){
+                    endTime = DateTime(endTime!.year,endTime!.month,endTime!.day,time.hour,time.minute);
+                  }else{
+                    endTime = null;
+                  }
+                }
+                setState(() {});
               },
             ),
             const SizedBox(height: 24),
@@ -777,14 +889,117 @@ class _CreateBarcodePageState extends State<CreateBarcodePage> {
 
         return result.toString();
       case QRCodeDataType.contact:
-        // TODO: Handle this case.
-        break;
+        final Contact contact = Contact();
+        contact.displayName = displayNameController.text;
+        contact.name.first = firstNameController.text;
+        contact.name.last = lastNameController.text;
+        if (companyNameController.text.isNotEmpty ||
+            companyDepartmentController.text.isNotEmpty ||
+            companyTitleController.text.isNotEmpty) {
+          contact.organizations.add(
+            Organization(
+                company: companyNameController.text,
+                department: companyDepartmentController.text,
+                title: companyTitleController.text),
+          );
+        }
+
+        contact.emails.addAll([
+          if (contactEmail1Controller.text.isNotEmpty)
+            Email(contactEmail1Controller.text,
+                label: EmailLabel.values[email1]),
+          if (contactEmail2Controller.text.isNotEmpty)
+            Email(contactEmail2Controller.text,
+                label: EmailLabel.values[email2]),
+        ]);
+        if (websiteController.text.isNotEmpty) {
+          contact.websites.add(Website(websiteController.text,
+              label: WebsiteLabel.values[website]));
+        }
+
+        contact.phones.addAll([
+          if (contactPhone1Controller.text.isNotEmpty)
+            Phone(contactPhone1Controller.text,
+                label: PhoneLabel.values[phone1]),
+          if (contactPhone2Controller.text.isNotEmpty)
+            Phone(contactPhone2Controller.text,
+                label: PhoneLabel.values[phone2]),
+          if (contactPhone3Controller.text.isNotEmpty)
+            Phone(contactPhone3Controller.text,
+                label: PhoneLabel.values[phone3]),
+        ]);
+        contact.addresses.addAll([
+          if (contactStreet1Controller.text.isNotEmpty ||
+              contactCity1Controller.text.isNotEmpty ||
+              contactState1Controller.text.isNotEmpty ||
+              contactPostal1Controller.text.isNotEmpty ||
+              contactCounty1Controller.text.isNotEmpty)
+            Address('',
+                street: contactStreet1Controller.text,
+                city: contactCity1Controller.text,
+                state: contactState1Controller.text,
+                postalCode: contactPostal1Controller.text,
+                country: contactCounty1Controller.text,
+                label: AddressLabel.values[address1]),
+          if (contactStreet2Controller.text.isNotEmpty ||
+              contactCity2Controller.text.isNotEmpty ||
+              contactState2Controller.text.isNotEmpty ||
+              contactPostal2Controller.text.isNotEmpty ||
+              contactCounty2Controller.text.isNotEmpty)
+            Address('',
+                street: contactStreet2Controller.text,
+                city: contactCity2Controller.text,
+                state: contactState2Controller.text,
+                postalCode: contactPostal2Controller.text,
+                country: contactCounty2Controller.text,
+                label: AddressLabel.values[address1]),
+        ]);
+
+        if (contactNoteController.text.isNotEmpty) {
+          contact.notes.add(Note(contactNoteController.text));
+        }
+
+        return contact.toVCard();
       case QRCodeDataType.bookmark:
-        // TODO: Handle this case.
-        break;
+        StringBuffer result = StringBuffer();
+        result.write('MEBKM:\nTITLE:');
+        result.write(bookmarkTitleController.text);
+        result.write(';\nURL:');
+        result.write(bookmarkUrlController.text);
+        result.write(';\n;');
+
+        return result.toString();
       case QRCodeDataType.calendar:
-        // TODO: Handle this case.
-        break;
+        StringBuffer result = StringBuffer();
+        result.write('BEGIN:VEVENT\nSUMMARY:');
+        result.write(calendarTitleController.text);
+
+        if (allDay) {
+          if (startTime != null) {
+            result.write('\nDTSTART;VALUE=DATE:');
+            result.write(DateFormat('yyyyMMdd').format(startTime!));
+          }
+          if (endTime != null) {
+            result.write('\nDTEND;VALUE=DATE:');
+            result.write(DateFormat('yyyyMMdd').format(endTime!));
+          }
+        } else {
+          if (startTime != null) {
+            result.write('\nDTSTART;VALUE=DATE:');
+            result.write(DateFormat('yyyyMMddTHHmmss').format(startTime!));
+          }
+          if (endTime != null) {
+            result.write('\nDTEND;VALUE=DATE:');
+            result.write(DateFormat('yyyyMMddTHHmmss').format(endTime!));
+          }
+        }
+        result.write('\nLOCATION:');
+        result.write(calendarAddressController.text);
+        result.write('\nDESCRIPTION:');
+        result.write(calendarNoteController.text);
+        result.write('\nEND:VEVENT');
+
+        return result.toString();
     }
     return '';
   }
