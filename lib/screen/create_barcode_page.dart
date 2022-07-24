@@ -29,19 +29,7 @@ class CreateBarcodePage extends StatefulWidget {
 class _CreateBarcodePageState extends State<CreateBarcodePage> {
   int dropDownValue = 0;
 
-  List<DropdownMenuItem<int>> dropDownList = [
-    for (int i = 0; i < QRCodeDataType.values.length; i++)
-      DropdownMenuItem<int>(
-        value: i,
-        child: Row(
-          children: [
-            Icon(QRCodeDataType.values[i].icon),
-            const SizedBox(width: 16),
-            Text(QRCodeDataType.values[i].name)
-          ],
-        ),
-      ),
-  ];
+  List<DropdownMenuItem<int>> dropDownList = [];
 
   int wifiTypeValue = 0;
 
@@ -128,19 +116,36 @@ class _CreateBarcodePageState extends State<CreateBarcodePage> {
 
   @override
   void initState() {
-    if (widget.type != BarcodeType.QrCode) {
-      dropDownList = [
-        DropdownMenuItem<int>(
-            value: 0,
-            child: Row(
-              children: [
-                Icon(QRCodeDataType.values[0].icon),
-                const SizedBox(width: 16),
-                Text(QRCodeDataType.values[0].name)
-              ],
-            ))
-      ];
-    }
+    Future.delayed(Duration.zero, () {
+      if (widget.type != BarcodeType.QrCode) {
+        dropDownList = [
+          DropdownMenuItem<int>(
+              value: 0,
+              child: Row(
+                children: [
+                  Icon(QRCodeDataType.values[0].icon),
+                  const SizedBox(width: 16),
+                  Text(QRCodeDataType.values[0].getText(context))
+                ],
+              ))
+        ];
+      } else {
+        dropDownList = [
+          for (int i = 0; i < QRCodeDataType.values.length; i++)
+            DropdownMenuItem<int>(
+              value: i,
+              child: Row(
+                children: [
+                  Icon(QRCodeDataType.values[i].icon),
+                  const SizedBox(width: 16),
+                  Text(QRCodeDataType.values[i].getText(context))
+                ],
+              ),
+            ),
+        ];
+      }
+      setState(() {});
+    });
     super.initState();
   }
 
@@ -312,7 +317,7 @@ class _CreateBarcodePageState extends State<CreateBarcodePage> {
           children: [
             CustomTextField(
               controller: textController,
-              label: 'text',
+              label: S.of(context).text,
             ),
           ],
         );
@@ -321,7 +326,7 @@ class _CreateBarcodePageState extends State<CreateBarcodePage> {
           children: [
             CustomTextField(
               controller: urlController,
-              label: 'url',
+              label: S.of(context).url,
             ),
           ],
         );
@@ -330,23 +335,26 @@ class _CreateBarcodePageState extends State<CreateBarcodePage> {
           children: [
             CustomTextField(
               controller: emailController,
-              label: 'email',
+              label: S.of(context).email,
+              type: TextInputType.emailAddress,
             ),
             CustomTextField(
               controller: emailSubjectController,
-              label: 'subject',
+              label: S.of(context).subject,
             ),
             CustomTextField(
               controller: ccController,
               label: 'cc',
+              type: TextInputType.emailAddress,
             ),
             CustomTextField(
               controller: bccController,
               label: 'bcc',
+              type: TextInputType.emailAddress,
             ),
             CustomTextField(
               controller: emailBodyController,
-              label: 'body',
+              label: S.of(context).content,
             ),
           ],
         );
@@ -355,7 +363,8 @@ class _CreateBarcodePageState extends State<CreateBarcodePage> {
           children: [
             CustomTextField(
               controller: phoneController,
-              label: 'phone',
+              label: S.of(context).phone,
+              type: TextInputType.phone,
             ),
           ],
         );
@@ -364,11 +373,12 @@ class _CreateBarcodePageState extends State<CreateBarcodePage> {
           children: [
             CustomTextField(
               controller: smsPhoneController,
-              label: 'smsPhone',
+              label: S.of(context).phone,
+              type: TextInputType.phone,
             ),
             CustomTextField(
               controller: smsBodyController,
-              label: 'smsBody',
+              label: S.of(context).content,
             ),
           ],
         );
@@ -377,7 +387,7 @@ class _CreateBarcodePageState extends State<CreateBarcodePage> {
           children: [
             CustomTextField(
               controller: geoNameController,
-              label: 'geoName',
+              label: S.of(context).name,
             ),
             // CustomTextField(
             //   controller: geoAddressController,
@@ -385,11 +395,13 @@ class _CreateBarcodePageState extends State<CreateBarcodePage> {
             // ),
             CustomTextField(
               controller: geoLatController,
-              label: 'geoLat',
+              label: S.of(context).geoLat + '(-90~90)',
+              type: TextInputType.number,
             ),
             CustomTextField(
               controller: geoLonController,
-              label: 'geoLon',
+              label: S.of(context).geoLon + '(-180~180)',
+              type: TextInputType.number,
             ),
           ],
         );
@@ -397,28 +409,33 @@ class _CreateBarcodePageState extends State<CreateBarcodePage> {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 8),
-              child: Text('type'),
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 8,
+                vertical: 8,
+              ),
+              child: Text(S.of(context).type),
             ),
             CustomDropDownMenu(
-                expand: false,
-                items: wifiType,
-                onChange: (value) {
-                  setState(
-                    () {
-                      wifiTypeValue = value!;
-                    },
-                  );
-                },
-                value: wifiTypeValue),
+              expand: false,
+              items: wifiType,
+              onChange: (value) {
+                setState(
+                  () {
+                    wifiTypeValue = value!;
+                  },
+                );
+              },
+              value: wifiTypeValue,
+            ),
+            const SizedBox(height: 8),
             CustomTextField(
               controller: wifiNameController,
-              label: 'name',
+              label: S.of(context).name,
             ),
             CustomTextField(
               controller: wifiPasswordController,
-              label: 'password',
+              label: S.of(context).password,
             ),
           ],
         );
@@ -426,57 +443,57 @@ class _CreateBarcodePageState extends State<CreateBarcodePage> {
         Contact();
         return Column(
           children: [
-            const Text(
-              'personal',
-              style: TextStyle(color: Colors.grey),
+            Text(
+              S.of(context).personalInfo,
+              style: const TextStyle(color: Colors.grey),
             ),
             CustomTextField(
               controller: displayNameController,
-              label: 'displayName',
+              label: S.of(context).displayName,
             ),
             Row(
               children: [
                 Expanded(
                   child: CustomTextField(
                     controller: firstNameController,
-                    label: 'firstName',
+                    label: S.of(context).firstName,
                   ),
                 ),
                 Expanded(
                   child: CustomTextField(
                     controller: lastNameController,
-                    label: 'lastName',
+                    label: S.of(context).lastName,
                   ),
                 ),
               ],
             ),
-            const Text(
-              'company',
-              style: TextStyle(color: Colors.grey),
+            Text(
+              S.of(context).organization,
+              style: const TextStyle(color: Colors.grey),
             ),
             CustomTextField(
               controller: companyNameController,
-              label: 'companyName',
+              label: S.of(context).organizationName,
             ),
             Row(
               children: [
                 Expanded(
                   child: CustomTextField(
                     controller: companyDepartmentController,
-                    label: 'companyDepartment',
+                    label: S.of(context).organizationDepartment,
                   ),
                 ),
                 Expanded(
                   child: CustomTextField(
                     controller: companyTitleController,
-                    label: 'companyTitle',
+                    label: S.of(context).organizationTitle,
                   ),
                 ),
               ],
             ),
-            const Text(
-              'email',
-              style: TextStyle(color: Colors.grey),
+            Text(
+              S.of(context).email,
+              style: const TextStyle(color: Colors.grey),
             ),
             Row(
               children: [
@@ -493,7 +510,8 @@ class _CreateBarcodePageState extends State<CreateBarcodePage> {
                 Expanded(
                   child: CustomTextField(
                     controller: contactEmail1Controller,
-                    label: 'Email',
+                    label: S.of(context).email,
+                    type: TextInputType.emailAddress,
                   ),
                 ),
               ],
@@ -513,14 +531,15 @@ class _CreateBarcodePageState extends State<CreateBarcodePage> {
                 Expanded(
                   child: CustomTextField(
                     controller: contactEmail2Controller,
-                    label: 'Email',
+                    label: S.of(context).email,
+                    type: TextInputType.emailAddress,
                   ),
                 ),
               ],
             ),
-            const Text(
-              'website',
-              style: TextStyle(color: Colors.grey),
+            Text(
+              S.of(context).website,
+              style: const TextStyle(color: Colors.grey),
             ),
             Row(
               children: [
@@ -537,14 +556,14 @@ class _CreateBarcodePageState extends State<CreateBarcodePage> {
                 Expanded(
                   child: CustomTextField(
                     controller: websiteController,
-                    label: 'website',
+                    label: S.of(context).website,
                   ),
                 ),
               ],
             ),
-            const Text(
-              'phone',
-              style: TextStyle(color: Colors.grey),
+            Text(
+              S.of(context).phone,
+              style: const TextStyle(color: Colors.grey),
             ),
             Row(
               children: [
@@ -561,7 +580,8 @@ class _CreateBarcodePageState extends State<CreateBarcodePage> {
                 Expanded(
                   child: CustomTextField(
                     controller: contactPhone1Controller,
-                    label: 'phone',
+                    label: S.of(context).phone,
+                    type: TextInputType.phone,
                   ),
                 ),
               ],
@@ -581,7 +601,8 @@ class _CreateBarcodePageState extends State<CreateBarcodePage> {
                 Expanded(
                   child: CustomTextField(
                     controller: contactPhone2Controller,
-                    label: 'phone',
+                    label: S.of(context).phone,
+                    type: TextInputType.phone,
                   ),
                 ),
               ],
@@ -601,14 +622,15 @@ class _CreateBarcodePageState extends State<CreateBarcodePage> {
                 Expanded(
                   child: CustomTextField(
                     controller: contactPhone3Controller,
-                    label: 'phone',
+                    label: S.of(context).phone,
+                    type: TextInputType.phone,
                   ),
                 ),
               ],
             ),
-            const Text(
-              'address',
-              style: TextStyle(color: Colors.grey),
+            Text(
+              S.of(context).address,
+              style: const TextStyle(color: Colors.grey),
             ),
             Row(
               children: [
@@ -625,7 +647,7 @@ class _CreateBarcodePageState extends State<CreateBarcodePage> {
                 Expanded(
                   child: CustomTextField(
                     controller: contactStreet1Controller,
-                    label: 'Street',
+                    label: S.of(context).street,
                   ),
                 ),
               ],
@@ -635,13 +657,13 @@ class _CreateBarcodePageState extends State<CreateBarcodePage> {
                 Expanded(
                   child: CustomTextField(
                     controller: contactCity1Controller,
-                    label: 'city',
+                    label: S.of(context).city,
                   ),
                 ),
                 Expanded(
                   child: CustomTextField(
                     controller: contactState1Controller,
-                    label: 'state',
+                    label: S.of(context).state,
                   ),
                 ),
               ],
@@ -651,13 +673,14 @@ class _CreateBarcodePageState extends State<CreateBarcodePage> {
                 Expanded(
                   child: CustomTextField(
                     controller: contactPostal1Controller,
-                    label: 'postal',
+                    label: S.of(context).postal,
+                    type: TextInputType.number,
                   ),
                 ),
                 Expanded(
                   child: CustomTextField(
                     controller: contactCounty1Controller,
-                    label: 'country',
+                    label: S.of(context).country,
                   ),
                 ),
               ],
@@ -677,7 +700,7 @@ class _CreateBarcodePageState extends State<CreateBarcodePage> {
                 Expanded(
                   child: CustomTextField(
                     controller: contactStreet2Controller,
-                    label: 'address',
+                    label: S.of(context).street,
                   ),
                 ),
               ],
@@ -687,13 +710,13 @@ class _CreateBarcodePageState extends State<CreateBarcodePage> {
                 Expanded(
                   child: CustomTextField(
                     controller: contactCity2Controller,
-                    label: 'city',
+                    label: S.of(context).city,
                   ),
                 ),
                 Expanded(
                   child: CustomTextField(
                     controller: contactState2Controller,
-                    label: 'state',
+                    label: S.of(context).state,
                   ),
                 ),
               ],
@@ -703,24 +726,25 @@ class _CreateBarcodePageState extends State<CreateBarcodePage> {
                 Expanded(
                   child: CustomTextField(
                     controller: contactPostal2Controller,
-                    label: 'postal',
+                    label: S.of(context).postal,
+                    type: TextInputType.number,
                   ),
                 ),
                 Expanded(
                   child: CustomTextField(
                     controller: contactCounty2Controller,
-                    label: 'country',
+                    label: S.of(context).country,
                   ),
                 ),
               ],
             ),
-            const Text(
-              'note',
-              style: TextStyle(color: Colors.grey),
+            Text(
+              S.of(context).note,
+              style: const TextStyle(color: Colors.grey),
             ),
             CustomTextField(
               controller: contactNoteController,
-              label: 'note',
+              label: S.of(context).note,
             ),
           ],
         );
@@ -729,11 +753,11 @@ class _CreateBarcodePageState extends State<CreateBarcodePage> {
           children: [
             CustomTextField(
               controller: bookmarkTitleController,
-              label: 'title',
+              label: S.of(context).name,
             ),
             CustomTextField(
               controller: bookmarkUrlController,
-              label: 'url',
+              label: S.of(context).url,
             ),
           ],
         );
@@ -743,7 +767,7 @@ class _CreateBarcodePageState extends State<CreateBarcodePage> {
           children: [
             CustomTextField(
               controller: calendarTitleController,
-              label: 'title',
+              label: S.of(context).name,
             ),
             InkWell(
               onTap: () {
@@ -762,18 +786,22 @@ class _CreateBarcodePageState extends State<CreateBarcodePage> {
                     },
                   ),
                   const SizedBox(width: 8),
-                  const Text('allday'),
+                  Text(S.of(context).allDay),
                 ],
               ),
             ),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8),
               alignment: Alignment.centerLeft,
-              child: Text('start : '),
+              child: Text('${S.of(context).start} : '),
             ),
             FakeTextField(
               haveValue: startTime != null,
-              value: startTime != null ? (allDay ? DateFormat('yyyy-MM-dd').format(startTime!) : DateFormat('yyyy-MM-dd HH:mm').format(startTime!)) : 'choose',
+              value: startTime != null
+                  ? (allDay
+                      ? DateFormat('yyyy-MM-dd').format(startTime!)
+                      : DateFormat('yyyy-MM-dd HH:mm').format(startTime!))
+                  : S.of(context).choose,
               onTap: () async {
                 DateTime? date = await showDatePicker(
                     context: context,
@@ -781,11 +809,13 @@ class _CreateBarcodePageState extends State<CreateBarcodePage> {
                     firstDate: DateTime(DateTime.now().year - 100),
                     lastDate: DateTime(DateTime.now().year + 100));
                 startTime = date;
-                if(!allDay && startTime != null){
-                  TimeOfDay? time = await showTimePicker(context: context, initialTime: TimeOfDay.now());
-                  if(time != null){
-                    startTime = DateTime(startTime!.year,startTime!.month,startTime!.day,time.hour,time.minute);
-                  }else{
+                if (!allDay && startTime != null) {
+                  TimeOfDay? time = await showTimePicker(
+                      context: context, initialTime: TimeOfDay.now());
+                  if (time != null) {
+                    startTime = DateTime(startTime!.year, startTime!.month,
+                        startTime!.day, time.hour, time.minute);
+                  } else {
                     startTime = null;
                   }
                 }
@@ -796,11 +826,15 @@ class _CreateBarcodePageState extends State<CreateBarcodePage> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8),
               alignment: Alignment.centerLeft,
-              child: Text('end : '),
+              child: Text('${S.of(context).end} : '),
             ),
             FakeTextField(
               haveValue: endTime != null,
-              value: endTime != null ? (allDay ? DateFormat('yyyy-MM-dd').format(endTime!) : DateFormat('yyyy-MM-dd HH:mm').format(endTime!)) : 'choose',
+              value: endTime != null
+                  ? (allDay
+                      ? DateFormat('yyyy-MM-dd').format(endTime!)
+                      : DateFormat('yyyy-MM-dd HH:mm').format(endTime!))
+                  : S.of(context).choose,
               onTap: () async {
                 DateTime? date = await showDatePicker(
                     context: context,
@@ -808,11 +842,13 @@ class _CreateBarcodePageState extends State<CreateBarcodePage> {
                     firstDate: DateTime(DateTime.now().year - 100),
                     lastDate: DateTime(DateTime.now().year + 100));
                 endTime = date;
-                if(!allDay && endTime != null){
-                  TimeOfDay? time = await showTimePicker(context: context, initialTime: TimeOfDay.now());
-                  if(time != null){
-                    endTime = DateTime(endTime!.year,endTime!.month,endTime!.day,time.hour,time.minute);
-                  }else{
+                if (!allDay && endTime != null) {
+                  TimeOfDay? time = await showTimePicker(
+                      context: context, initialTime: TimeOfDay.now());
+                  if (time != null) {
+                    endTime = DateTime(endTime!.year, endTime!.month,
+                        endTime!.day, time.hour, time.minute);
+                  } else {
                     endTime = null;
                   }
                 }
@@ -822,11 +858,11 @@ class _CreateBarcodePageState extends State<CreateBarcodePage> {
             const SizedBox(height: 24),
             CustomTextField(
               controller: calendarAddressController,
-              label: 'address',
+              label: S.of(context).address,
             ),
             CustomTextField(
               controller: calendarNoteController,
-              label: 'note',
+              label: S.of(context).note,
             ),
           ],
         );
