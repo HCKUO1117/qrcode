@@ -1,12 +1,10 @@
 import 'dart:io';
 
 import 'package:barcode/barcode.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:qrcode/generated/l10n.dart';
 import 'package:qrcode/model/qrcode_data_type.dart';
 import 'package:qrcode/sql/history_model.dart';
@@ -25,7 +23,8 @@ class BarcodeCreatedPage extends StatefulWidget {
     Key? key,
     required this.type,
     required this.historyModel,
-    required this.onStateChange, required this.barcodeType,
+    required this.onStateChange,
+    required this.barcodeType,
   }) : super(key: key);
 
   @override
@@ -59,14 +58,19 @@ class _BarcodeCreatedPageState extends State<BarcodeCreatedPage> {
                     Screenshot(
                         child: Builder(
                           builder: (context) {
-                            final type = getType(
-                                widget.barcodeType);
+                            final type = getType(widget.barcodeType);
                             return Container(
                               padding: const EdgeInsets.all(16),
                               color: Colors.white,
                               child: barcode_widget.BarcodeWidget(
                                 data: widget.historyModel.content,
                                 barcode: type,
+                                errorBuilder: (context, e) {
+                                  return Text(
+                                    e,
+                                    style: const TextStyle(color: Colors.red),
+                                  );
+                                },
                               ),
                             );
                           },
@@ -145,8 +149,7 @@ class _BarcodeCreatedPageState extends State<BarcodeCreatedPage> {
   }
 
   barcode_widget.Barcode getType(barcode_widget.BarcodeType type) {
-    switch(type){
-
+    switch (type) {
       case BarcodeType.CodeITF16:
         return barcode_widget.Barcode.itf16();
       case BarcodeType.CodeITF14:

@@ -67,5 +67,8 @@
   "note": "備註",
   "allDay": "整天",
   "start": "開始",
-  "end": "結束"
+  "end": "結束",
+  "wrongFormat": "格式錯誤",
+  "wrongLength": "長度不符",
+  "wrongChar": "不支援的字元"
 }

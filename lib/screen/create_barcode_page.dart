@@ -1,6 +1,7 @@
 import 'package:barcode/barcode.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 import 'package:qrcode/generated/l10n.dart';
 import 'package:qrcode/model/qrcode_data_type.dart';
@@ -9,6 +10,7 @@ import 'package:qrcode/screen/widget/custom_text_field.dart';
 import 'package:qrcode/screen/widget/fake_text_field.dart';
 import 'package:qrcode/sql/history_model.dart';
 import 'package:qrcode/utils/utils.dart';
+import 'package:barcode_widget/barcode_widget.dart' as barcode_widget;
 
 import 'barcode_createed_page.dart';
 
@@ -110,6 +112,8 @@ class _CreateBarcodePageState extends State<CreateBarcodePage> {
   TextEditingController calendarNoteController = TextEditingController();
 
   bool allDay = false;
+
+  String? errorText;
 
   DateTime? startTime;
   DateTime? endTime;
@@ -289,6 +293,9 @@ class _CreateBarcodePageState extends State<CreateBarcodePage> {
             ),
           ),
           onTap: () {
+            if (!Utils.correctFormat(textController.text, widget.type).correct) {
+              Fluttertoast.showToast(msg: S.of(context).wrongFormat);
+            }
             Navigator.of(context).push(
               MaterialPageRoute(
                 builder: (context) => BarcodeCreatedPage(
@@ -318,6 +325,27 @@ class _CreateBarcodePageState extends State<CreateBarcodePage> {
             CustomTextField(
               controller: textController,
               label: S.of(context).text,
+              length: Utils.getFormatLength(widget.type),
+              type: Utils.getFormatKeyBoardType(widget.type),
+              onChange: (text) {
+                final result = Utils.correctFormat(textController.text, widget.type);
+                if (result.correct) {
+                  setState(() {
+                    errorText = null;
+                  });
+                } else {
+                  if (result.errorChar == 'length') {
+                    setState(() {
+                      errorText = S.of(context).wrongLength;
+                    });
+                  } else {
+                    setState(() {
+                      errorText = S.of(context).wrongChar + ' : ${result.errorChar}';
+                    });
+                  }
+                }
+              },
+              errorText: errorText,
             ),
           ],
         );
@@ -810,11 +838,11 @@ class _CreateBarcodePageState extends State<CreateBarcodePage> {
                     lastDate: DateTime(DateTime.now().year + 100));
                 startTime = date;
                 if (!allDay && startTime != null) {
-                  TimeOfDay? time = await showTimePicker(
-                      context: context, initialTime: TimeOfDay.now());
+                  TimeOfDay? time =
+                      await showTimePicker(context: context, initialTime: TimeOfDay.now());
                   if (time != null) {
-                    startTime = DateTime(startTime!.year, startTime!.month,
-                        startTime!.day, time.hour, time.minute);
+                    startTime = DateTime(
+                        startTime!.year, startTime!.month, startTime!.day, time.hour, time.minute);
                   } else {
                     startTime = null;
                   }
@@ -843,11 +871,11 @@ class _CreateBarcodePageState extends State<CreateBarcodePage> {
                     lastDate: DateTime(DateTime.now().year + 100));
                 endTime = date;
                 if (!allDay && endTime != null) {
-                  TimeOfDay? time = await showTimePicker(
-                      context: context, initialTime: TimeOfDay.now());
+                  TimeOfDay? time =
+                      await showTimePicker(context: context, initialTime: TimeOfDay.now());
                   if (time != null) {
-                    endTime = DateTime(endTime!.year, endTime!.month,
-                        endTime!.day, time.hour, time.minute);
+                    endTime = DateTime(
+                        endTime!.year, endTime!.month, endTime!.day, time.hour, time.minute);
                   } else {
                     endTime = null;
                   }
@@ -942,27 +970,22 @@ class _CreateBarcodePageState extends State<CreateBarcodePage> {
 
         contact.emails.addAll([
           if (contactEmail1Controller.text.isNotEmpty)
-            Email(contactEmail1Controller.text,
-                label: EmailLabel.values[email1]),
+            Email(contactEmail1Controller.text, label: EmailLabel.values[email1]),
           if (contactEmail2Controller.text.isNotEmpty)
-            Email(contactEmail2Controller.text,
-                label: EmailLabel.values[email2]),
+            Email(contactEmail2Controller.text, label: EmailLabel.values[email2]),
         ]);
         if (websiteController.text.isNotEmpty) {
-          contact.websites.add(Website(websiteController.text,
-              label: WebsiteLabel.values[website]));
+          contact.websites
+              .add(Website(websiteController.text, label: WebsiteLabel.values[website]));
         }
 
         contact.phones.addAll([
           if (contactPhone1Controller.text.isNotEmpty)
-            Phone(contactPhone1Controller.text,
-                label: PhoneLabel.values[phone1]),
+            Phone(contactPhone1Controller.text, label: PhoneLabel.values[phone1]),
           if (contactPhone2Controller.text.isNotEmpty)
-            Phone(contactPhone2Controller.text,
-                label: PhoneLabel.values[phone2]),
+            Phone(contactPhone2Controller.text, label: PhoneLabel.values[phone2]),
           if (contactPhone3Controller.text.isNotEmpty)
-            Phone(contactPhone3Controller.text,
-                label: PhoneLabel.values[phone3]),
+            Phone(contactPhone3Controller.text, label: PhoneLabel.values[phone3]),
         ]);
         contact.addresses.addAll([
           if (contactStreet1Controller.text.isNotEmpty ||
@@ -1038,5 +1061,52 @@ class _CreateBarcodePageState extends State<CreateBarcodePage> {
         return result.toString();
     }
     return '';
+  }
+
+  barcode_widget.Barcode getType(barcode_widget.BarcodeType type) {
+    switch (type) {
+      case BarcodeType.CodeITF16:
+        return barcode_widget.Barcode.itf16();
+      case BarcodeType.CodeITF14:
+        return barcode_widget.Barcode.itf14();
+      case BarcodeType.CodeEAN13:
+        return barcode_widget.Barcode.ean13();
+      case BarcodeType.CodeEAN8:
+        return barcode_widget.Barcode.ean8();
+      case BarcodeType.CodeEAN5:
+        return barcode_widget.Barcode.ean5();
+      case BarcodeType.CodeEAN2:
+        return barcode_widget.Barcode.ean2();
+      case BarcodeType.CodeISBN:
+        return barcode_widget.Barcode.isbn();
+      case BarcodeType.Code39:
+        return barcode_widget.Barcode.code39();
+      case BarcodeType.Code93:
+        return barcode_widget.Barcode.code93();
+      case BarcodeType.CodeUPCA:
+        return barcode_widget.Barcode.upcA();
+      case BarcodeType.CodeUPCE:
+        return barcode_widget.Barcode.upcE();
+      case BarcodeType.Code128:
+        return barcode_widget.Barcode.code128();
+      case BarcodeType.GS128:
+        return barcode_widget.Barcode.gs128();
+      case BarcodeType.Telepen:
+        return barcode_widget.Barcode.telepen();
+      case BarcodeType.QrCode:
+        return barcode_widget.Barcode.qrCode();
+      case BarcodeType.Codabar:
+        return barcode_widget.Barcode.codabar();
+      case BarcodeType.PDF417:
+        return barcode_widget.Barcode.pdf417();
+      case BarcodeType.DataMatrix:
+        return barcode_widget.Barcode.dataMatrix();
+      case BarcodeType.Aztec:
+        return barcode_widget.Barcode.aztec();
+      case BarcodeType.Rm4scc:
+        return barcode_widget.Barcode.rm4scc();
+      case BarcodeType.Itf:
+        return barcode_widget.Barcode.itf();
+    }
   }
 }

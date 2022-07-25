@@ -4,11 +4,18 @@ class CustomTextField extends StatelessWidget {
   final TextEditingController controller;
   final String label;
   final TextInputType? type;
+  final int? length;
+  final Function(String?)? onChange;
+  final String? errorText;
 
   const CustomTextField({
     Key? key,
     required this.controller,
-    required this.label, this.type,
+    required this.label,
+    this.type,
+    this.length,
+    this.onChange,
+    this.errorText,
   }) : super(key: key);
 
   @override
@@ -19,9 +26,12 @@ class CustomTextField extends StatelessWidget {
         controller: controller,
         maxLines: null,
         keyboardType: type,
+        maxLength: length,
+        onChanged: onChange,
         decoration: InputDecoration(
           filled: true,
           fillColor: Colors.white,
+          errorText: errorText,
           contentPadding: const EdgeInsets.symmetric(horizontal: 16),
           focusedBorder: const OutlineInputBorder(
             borderSide: BorderSide(

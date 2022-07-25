@@ -67,5 +67,8 @@
   "note": "Note",
   "allDay": "All Day",
   "start": "Start",
-  "end": "end"
+  "end": "end",
+  "wrongFormat": "Format error",
+  "wrongLength": "Length does not match",
+  "wrongChar": "Unsupported character"
 }
