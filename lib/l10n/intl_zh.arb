@@ -70,5 +70,6 @@
   "end": "結束",
   "wrongFormat": "格式錯誤",
   "wrongLength": "長度不符",
-  "wrongChar": "不支援的字元"
+  "wrongChar": "不支援的字元",
+  "allowedChar": "允許的字元"
 }

@@ -347,6 +347,15 @@ class _CreateBarcodePageState extends State<CreateBarcodePage> {
               },
               errorText: errorText,
             ),
+            const SizedBox(height: 50),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              alignment: Alignment.centerLeft,
+              child: Text(
+                S.of(context).allowedChar + ' : ' + Utils.allowChar(widget.type),
+                style: const TextStyle(color: Colors.grey),
+              ),
+            ),
           ],
         );
       case QRCodeDataType.url:

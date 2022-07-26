@@ -70,5 +70,6 @@
   "end": "end",
   "wrongFormat": "Format error",
   "wrongLength": "Length does not match",
-  "wrongChar": "Unsupported character"
+  "wrongChar": "Unsupported character",
+  "allowedChar": "Allowed Char"
 }

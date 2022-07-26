@@ -100,7 +100,12 @@ class _ChooseBarcodePageState extends State<ChooseBarcodePage> {
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        const Text('info'),
+                        Text(
+                          S.of(context).allowedChar + ' : ' + Utils.allowChar(type),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(color: Colors.grey),
+                        ),
                       ],
                     ),
                   ),

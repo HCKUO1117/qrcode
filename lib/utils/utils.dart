@@ -255,6 +255,53 @@ class Utils {
     }
   }
 
+  static String allowChar(BarcodeType type) {
+    switch (type) {
+      case BarcodeType.CodeITF16:
+        return '0123456789';
+      case BarcodeType.CodeITF14:
+        return '0123456789';
+      case BarcodeType.CodeEAN13:
+        return '0123456789';
+      case BarcodeType.CodeEAN8:
+        return '0123456789';
+      case BarcodeType.CodeEAN5:
+        return '0123456789';
+      case BarcodeType.CodeEAN2:
+        return '0123456789';
+      case BarcodeType.CodeISBN:
+        return '0123456789';
+      case BarcodeType.Code39:
+        return '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ-.\$/+% ';
+      case BarcodeType.Code93:
+        return '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ-.\$/+% ';
+      case BarcodeType.CodeUPCA:
+        return '0123456789';
+      case BarcodeType.CodeUPCE:
+        return '0123456789';
+      case BarcodeType.Code128:
+        return '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz !"#\$%&\'()*+,-./:;<=>?@[\\]^_`{|}~—';
+      case BarcodeType.GS128:
+        return '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz !"#\$%&\'()*+,-./:;<=>?@[\\]^_`{|}~—';
+      case BarcodeType.Telepen:
+        return '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz !"#\$%&\'()*+,-./:;<=>?@[\\]^_`{|}~—';
+      case BarcodeType.QrCode:
+        return 'all';
+      case BarcodeType.Codabar:
+        return '0123456789-.\$/+:';
+      case BarcodeType.PDF417:
+        return 'all';
+      case BarcodeType.DataMatrix:
+        return 'all';
+      case BarcodeType.Aztec:
+        return 'all';
+      case BarcodeType.Rm4scc:
+        return '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+      case BarcodeType.Itf:
+        return '0123456789';
+    }
+  }
+
   static int? getFormatLength(BarcodeType type) {
     switch (type) {
       case BarcodeType.CodeITF16:
