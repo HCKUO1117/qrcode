@@ -4,6 +4,55 @@ import 'package:qrcode/generated/l10n.dart';
 import 'package:qrcode/screen/create_barcode_page.dart';
 import 'package:qrcode/utils/utils.dart';
 
+extension _BarcodeTypeEx on BarcodeType{
+  String get title{
+    switch(this){
+      case BarcodeType.CodeITF16:
+        return 'ITF 16';
+      case BarcodeType.CodeITF14:
+        return 'ITF 14';
+      case BarcodeType.CodeEAN13:
+        return 'EAN 13';
+      case BarcodeType.CodeEAN8:
+        return 'EAN 8';
+      case BarcodeType.CodeEAN5:
+        return 'EAN 5';
+      case BarcodeType.CodeEAN2:
+        return 'EAN 2';
+      case BarcodeType.CodeISBN:
+        return 'ISBN';
+      case BarcodeType.Code39:
+        return 'CODE 39';
+      case BarcodeType.Code93:
+        return 'CODE 93';
+      case BarcodeType.CodeUPCA:
+        return 'UPC-A';
+      case BarcodeType.CodeUPCE:
+        return 'UPC-E';
+      case BarcodeType.Code128:
+        return 'CODE 128';
+      case BarcodeType.GS128:
+        return 'GS1 128';
+      case BarcodeType.Telepen:
+        return name;
+      case BarcodeType.QrCode:
+        return 'QR Code';
+      case BarcodeType.Codabar:
+        return 'CODABAR';
+      case BarcodeType.PDF417:
+        return 'PDF 417';
+      case BarcodeType.DataMatrix:
+        return 'Data Matrix';
+      case BarcodeType.Aztec:
+        return 'Aztec';
+      case BarcodeType.Rm4scc:
+        return 'RM4SCC';
+      case BarcodeType.Itf:
+        return 'ITF';
+    }
+  }
+}
+
 class ChooseBarcodePage extends StatefulWidget {
   const ChooseBarcodePage({Key? key}) : super(key: key);
 
@@ -94,18 +143,18 @@ class _ChooseBarcodePageState extends State<ChooseBarcodePage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          type.name,
+                          type.title,
                           style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        Text(
-                          S.of(context).allowedChar + ' : ' + Utils.allowChar(type),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(color: Colors.grey),
-                        ),
+                        // Text(
+                        //   S.of(context).allowedChar + ' : ' + Utils.allowChar(type),
+                        //   maxLines: 1,
+                        //   overflow: TextOverflow.ellipsis,
+                        //   style: const TextStyle(color: Colors.grey),
+                        // ),
                       ],
                     ),
                   ),

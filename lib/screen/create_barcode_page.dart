@@ -295,6 +295,7 @@ class _CreateBarcodePageState extends State<CreateBarcodePage> {
           onTap: () {
             if (!Utils.correctFormat(textController.text, widget.type).correct) {
               Fluttertoast.showToast(msg: S.of(context).wrongFormat);
+              return;
             }
             Navigator.of(context).push(
               MaterialPageRoute(
