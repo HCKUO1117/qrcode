@@ -8,6 +8,7 @@ import 'package:qrcode/model/qrcode_data_type.dart';
 import 'package:qrcode/screen/widget/custom_dropdown_menu.dart';
 import 'package:qrcode/screen/widget/custom_text_field.dart';
 import 'package:qrcode/screen/widget/fake_text_field.dart';
+import 'package:qrcode/screen/widget/my_banner_ad.dart';
 import 'package:qrcode/sql/history_model.dart';
 import 'package:qrcode/utils/utils.dart';
 import 'package:barcode_widget/barcode_widget.dart' as barcode_widget;
@@ -275,8 +276,12 @@ class _CreateBarcodePageState extends State<CreateBarcodePage> {
               ),
               qrcodeWidget(),
               const SizedBox(
-                height: 200,
-              )
+                height: 50,
+              ),
+              const AdBanner(large: true,),
+              const SizedBox(
+                height: 50,
+              ),
             ],
           ),
         ),

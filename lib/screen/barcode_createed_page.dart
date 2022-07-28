@@ -7,6 +7,7 @@ import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:qrcode/generated/l10n.dart';
 import 'package:qrcode/model/qrcode_data_type.dart';
+import 'package:qrcode/screen/widget/my_banner_ad.dart';
 import 'package:qrcode/sql/history_model.dart';
 import 'package:qrcode/utils/random_string.dart';
 import 'package:screenshot/screenshot.dart';
@@ -78,6 +79,10 @@ class _BarcodeCreatedPageState extends State<BarcodeCreatedPage> {
                         controller: screenshotController),
                     const SizedBox(height: 16),
                     SelectableText(widget.historyModel.content),
+                    const SizedBox(
+                      height: 50,
+                    ),
+                    const AdBanner(large: true,),
                   ],
                 ),
               ),

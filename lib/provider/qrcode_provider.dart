@@ -18,6 +18,8 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_email_sender/flutter_email_sender.dart' as email_sender;
 import 'package:add_2_calendar/add_2_calendar.dart' as add_2_calendar;
 
+import '../screen/widget/my_banner_ad.dart';
+
 class QRCodeProvider extends ChangeNotifier {
   Widget mainAction = const SizedBox();
   List<Widget> actionList = [];
@@ -1010,6 +1012,8 @@ class QRCodeProvider extends ChangeNotifier {
         }
         break;
     }
+    infoList.add(const SizedBox(height: 50,));
+    infoList.add(const AdBanner(large: true,));
     notifyListeners();
   }
 

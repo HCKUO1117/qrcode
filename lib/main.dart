@@ -5,6 +5,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_switch/flutter_switch.dart';
 import 'package:flutter_vibrate/flutter_vibrate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -18,13 +19,14 @@ import 'package:qrcode/screen/barcode_history_page.dart';
 import 'package:qrcode/screen/barcode_list_page.dart';
 import 'package:qrcode/screen/choose_barcode_page.dart';
 import 'package:qrcode/screen/scanned/scanned_page.dart';
+import 'package:qrcode/screen/widget/my_banner_ad.dart';
 import 'package:qrcode/sql/history_db.dart';
 import 'package:qrcode/sql/history_model.dart';
 import 'package:qrcode/utils/judge_qrcode_data_type.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
+  MobileAds.instance.initialize();
   runApp(const MyApp());
 }
 
@@ -177,7 +179,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                     ),
                   Positioned(
                       right: MediaQuery.of(context).size.width / 2 - qrWidth / 2 + 8,
-                      bottom: MediaQuery.of(context).size.height / 2 - qrHeight / 2 + 8,
+                      bottom: MediaQuery.of(context).size.height / 2 - qrHeight / 2 + 8 -25,
                       child: GestureDetector(
                         onPanUpdate: (dragDetail) {
                           if (dragDetail.globalPosition.dx * 2 -
@@ -185,21 +187,21 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                               100) {
                             setState(() {
                               qrWidth = dragDetail.globalPosition.dx * 2 -
-                                  MediaQuery.of(context).size.width;
+                                  MediaQuery.of(context).size.width ;
                             });
                           }
                           if (dragDetail.globalPosition.dy * 2 -
                                       MediaQuery.of(context).size.height >=
-                                  100 &&
+                                  100- 50 &&
                               dragDetail.globalPosition.dy * 2 -
                                       MediaQuery.of(context).size.height <=
                                   MediaQuery.of(context).size.height -
                                       MediaQuery.of(context).padding.top -
                                       MediaQuery.of(context).padding.bottom -
-                                      180) {
+                                      180- 50) {
                             setState(() {
                               qrHeight = dragDetail.globalPosition.dy * 2 -
-                                  MediaQuery.of(context).size.height;
+                                  MediaQuery.of(context).size.height + 50;
                             });
                           }
                         },
@@ -488,6 +490,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                 ],
               ),
             ),
+            const AdBanner(large: false,),
           ],
         ),
       ),
