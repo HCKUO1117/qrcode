@@ -7,13 +7,16 @@ import 'package:icalendar_parser/icalendar_parser.dart';
 import 'package:intl/intl.dart';
 import 'package:open_settings/open_settings.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
+import 'package:qrcode/constants/constants.dart';
 import 'package:qrcode/generated/l10n.dart';
 import 'package:qrcode/model/action_type.dart';
 import 'package:qrcode/model/data_models.dart';
 import 'package:qrcode/model/qrcode_data_type.dart';
+import 'package:qrcode/screen/widget/safety_check_dialog.dart';
 import 'package:qrcode/utils/add_contact.dart';
 import 'package:qrcode/utils/dialog.dart';
 import 'package:qrcode/utils/get_content.dart';
+import 'package:qrcode/utils/preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_email_sender/flutter_email_sender.dart' as email_sender;
 import 'package:add_2_calendar/add_2_calendar.dart' as add_2_calendar;
@@ -144,8 +147,7 @@ class QRCodeProvider extends ChangeNotifier {
             content: urlModel.url,
             actionIcon: Icons.search,
             action: () {
-              launch(
-                  context, 'https://www.google.com/search?q=${urlModel.url}');
+              launch(context, 'https://www.google.com/search?q=${urlModel.url}');
             },
           ),
         ];
@@ -300,8 +302,7 @@ class QRCodeProvider extends ChangeNotifier {
             content: geoModel.name,
             actionIcon: Icons.search,
             action: () {
-              launch(
-                  context, 'https://www.google.com/search?q=${geoModel.name}');
+              launch(context, 'https://www.google.com/search?q=${geoModel.name}');
             },
           ),
         ];
@@ -319,8 +320,7 @@ class QRCodeProvider extends ChangeNotifier {
               context,
               type: ActionType.openMapByName,
               onTap: () async {
-                launch(context,
-                    'https://www.google.com/maps/search/?api=1&query=${geoModel.name}');
+                launch(context, 'https://www.google.com/maps/search/?api=1&query=${geoModel.name}');
               },
             ),
         ];
@@ -358,11 +358,8 @@ class QRCodeProvider extends ChangeNotifier {
             onTap: () async {
               Clipboard.setData(ClipboardData(text: wifiModel.password));
               Fluttertoast.showToast(
-                msg: S.of(context).copied +
-                    ' WIFI:' +
-                    wifiModel.name +
-                    ' ' +
-                    S.of(context).password,
+                msg:
+                    S.of(context).copied + ' WIFI:' + wifiModel.name + ' ' + S.of(context).password,
                 toastLength: Toast.LENGTH_LONG,
               );
               OpenSettings.openWIFISetting();
@@ -440,8 +437,7 @@ class QRCodeProvider extends ChangeNotifier {
                         context,
                         icon: Icons.label_outline,
                         title: null,
-                        content:
-                            '${_phoneLabelToString[contact.phones[index].label]}',
+                        content: '${_phoneLabelToString[contact.phones[index].label]}',
                         havePadding: false,
                       ),
                       _contentTitle(
@@ -451,8 +447,7 @@ class QRCodeProvider extends ChangeNotifier {
                         content: contact.phones[index].number,
                         actionIcon: Icons.phone_outlined,
                         action: () {
-                          launch(
-                              context, 'tel:${contact.phones[index].number}');
+                          launch(context, 'tel:${contact.phones[index].number}');
                         },
                       ),
                     ],
@@ -480,8 +475,7 @@ class QRCodeProvider extends ChangeNotifier {
                         context,
                         icon: Icons.label_outline,
                         title: null,
-                        content:
-                            '${_emailLabelToString[contact.emails[index].label]}',
+                        content: '${_emailLabelToString[contact.emails[index].label]}',
                         havePadding: false,
                       ),
                       _contentTitle(
@@ -491,8 +485,7 @@ class QRCodeProvider extends ChangeNotifier {
                         content: contact.emails[index].address,
                         actionIcon: Icons.email_outlined,
                         action: () {
-                          launch(context,
-                              'mailto:${contact.emails[index].address}');
+                          launch(context, 'mailto:${contact.emails[index].address}');
                         },
                       ),
                     ],
@@ -529,8 +522,7 @@ class QRCodeProvider extends ChangeNotifier {
                         context,
                         icon: Icons.label_outline,
                         title: null,
-                        content:
-                            '${_addressLabelToString[contact.addresses[index].label]}',
+                        content: '${_addressLabelToString[contact.addresses[index].label]}',
                         havePadding: false,
                       ),
                       _contentTitle(
@@ -626,8 +618,7 @@ class QRCodeProvider extends ChangeNotifier {
                         context,
                         icon: Icons.label_outline,
                         title: null,
-                        content:
-                            '${_websiteLabelToString[contact.websites[index].label]}',
+                        content: '${_websiteLabelToString[contact.websites[index].label]}',
                         havePadding: false,
                       ),
                       _contentTitle(
@@ -664,8 +655,7 @@ class QRCodeProvider extends ChangeNotifier {
                         context,
                         icon: Icons.label_outline,
                         title: null,
-                        content:
-                            '${_socialMediaLabelToString[contact.socialMedias[index].label]}',
+                        content: '${_socialMediaLabelToString[contact.socialMedias[index].label]}',
                         havePadding: false,
                       ),
                       _contentTitle(
@@ -698,8 +688,7 @@ class QRCodeProvider extends ChangeNotifier {
                         context,
                         icon: Icons.label_outline,
                         title: null,
-                        content:
-                            '${_eventLabelToString[contact.events[index].label]}',
+                        content: '${_eventLabelToString[contact.events[index].label]}',
                         havePadding: false,
                       ),
                       _contentTitle(context,
@@ -822,13 +811,11 @@ class QRCodeProvider extends ChangeNotifier {
         ];
         break;
       case QRCodeDataType.calendar:
-        String code =
-            'BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//hacksw/handcal//NONSGML v1.0//EN\n' +
-                (result.code ?? '');
+        String code = 'BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//hacksw/handcal//NONSGML v1.0//EN\n' +
+            (result.code ?? '');
         code = code + '\n' + 'END:VCALENDAR';
         final iCalendar = ICalendar.fromString(code);
-        int index =
-            iCalendar.data.indexWhere((element) => element['type'] == 'VEVENT');
+        int index = iCalendar.data.indexWhere((element) => element['type'] == 'VEVENT');
         //TODO 動作
         if (index == -1) {
           infoList = [
@@ -858,18 +845,15 @@ class QRCodeProvider extends ChangeNotifier {
           String end = '';
           String timeStamp = '';
           if (iCalendar.data[index]['dtstart'] != null) {
-            final time = DateTime.parse(
-                (iCalendar.data[index]['dtstart'] as IcsDateTime).dt);
+            final time = DateTime.parse((iCalendar.data[index]['dtstart'] as IcsDateTime).dt);
             start = dateTimeFormat.format(time);
           }
           if (iCalendar.data[index]['dtend'] != null) {
-            final time = DateTime.parse(
-                (iCalendar.data[index]['dtend'] as IcsDateTime).dt);
+            final time = DateTime.parse((iCalendar.data[index]['dtend'] as IcsDateTime).dt);
             end = dateTimeFormat.format(time);
           }
           if (iCalendar.data[index]['dtstamp'] != null) {
-            final time = DateTime.parse(
-                (iCalendar.data[index]['dtstamp'] as IcsDateTime).dt);
+            final time = DateTime.parse((iCalendar.data[index]['dtstamp'] as IcsDateTime).dt);
             timeStamp = dateTimeFormat.format(time);
           }
 
@@ -953,8 +937,7 @@ class QRCodeProvider extends ChangeNotifier {
                     _contentTitle(context,
                         icon: Icons.label_outline,
                         title: null,
-                        content:
-                            iCalendar.data[index]['organizer']['name'] ?? '',
+                        content: iCalendar.data[index]['organizer']['name'] ?? '',
                         havePadding: false,
                         actionIcon: Icons.search, action: () {
                       launch(context,
@@ -963,11 +946,9 @@ class QRCodeProvider extends ChangeNotifier {
                     _contentTitle(context,
                         icon: Icons.email_outlined,
                         title: null,
-                        content:
-                            iCalendar.data[index]['organizer']['mail'] ?? '',
+                        content: iCalendar.data[index]['organizer']['mail'] ?? '',
                         actionIcon: Icons.email_outlined, action: () {
-                      launch(context,
-                          'mailto:${iCalendar.data[index]['organizer']['mail'] ?? ''}');
+                      launch(context, 'mailto:${iCalendar.data[index]['organizer']['mail'] ?? ''}');
                     }),
                   ],
                 ),
@@ -979,14 +960,10 @@ class QRCodeProvider extends ChangeNotifier {
               context,
               type: ActionType.saveCalendar,
               onTap: () {
-                final allDay = (iCalendar.data[index]['dtstart'] as IcsDateTime)
-                            .dt
-                            .length ==
-                        8 &&
-                    (iCalendar.data[index]['dtend'] as IcsDateTime).dt.length ==
-                        8;
-                DateTime endDate = DateTime.parse(
-                    (iCalendar.data[index]['dtend'] as IcsDateTime).dt);
+                final allDay = (iCalendar.data[index]['dtstart'] as IcsDateTime).dt.length == 8 &&
+                    (iCalendar.data[index]['dtend'] as IcsDateTime).dt.length == 8;
+                DateTime endDate =
+                    DateTime.parse((iCalendar.data[index]['dtend'] as IcsDateTime).dt);
                 if (allDay) {
                   endDate = endDate.add(const Duration(days: 1));
                 }
@@ -994,8 +971,7 @@ class QRCodeProvider extends ChangeNotifier {
                   title: iCalendar.data[index]['summary'] ?? '',
                   description: iCalendar.data[index]['description'] ?? '',
                   location: iCalendar.data[index]['location'] ?? '',
-                  startDate: DateTime.parse(
-                      (iCalendar.data[index]['dtstart'] as IcsDateTime).dt),
+                  startDate: DateTime.parse((iCalendar.data[index]['dtstart'] as IcsDateTime).dt),
                   endDate: endDate,
                   // iosParams: add_2_calendar.IOSParams(
                   //   reminder: Duration(/* Ex. hours:1 */),
@@ -1012,8 +988,12 @@ class QRCodeProvider extends ChangeNotifier {
         }
         break;
     }
-    infoList.add(const SizedBox(height: 50,));
-    infoList.add(const AdBanner(large: true,));
+    infoList.add(const SizedBox(
+      height: 50,
+    ));
+    infoList.add(const AdBanner(
+      large: true,
+    ));
     notifyListeners();
   }
 
@@ -1334,8 +1314,7 @@ class QRCodeProvider extends ChangeNotifier {
               content,
               style: TextStyle(
                 color: canTap && allowTap ? Colors.blue : null,
-                decoration:
-                    canTap && allowTap ? TextDecoration.underline : null,
+                decoration: canTap && allowTap ? TextDecoration.underline : null,
               ),
               strutStyle: const StrutStyle(
                 forceStrutHeight: true,
@@ -1363,8 +1342,7 @@ class QRCodeProvider extends ChangeNotifier {
     );
   }
 
-  Widget _contentTitleWithChild(
-      {required IconData icon, required Widget child}) {
+  Widget _contentTitleWithChild({required IconData icon, required Widget child}) {
     return Padding(
       padding: const EdgeInsets.symmetric(
         vertical: 4,
@@ -1394,9 +1372,7 @@ class QRCodeProvider extends ChangeNotifier {
         if (version == '4.0') {
           location = element.substring('GEO:geo:'.length, element.length);
         } else {
-          location = element
-              .substring('GEO:'.length, element.length)
-              .replaceAll(';', ',');
+          location = element.substring('GEO:'.length, element.length).replaceAll(';', ',');
         }
       }
     }
@@ -1407,10 +1383,19 @@ class QRCodeProvider extends ChangeNotifier {
     return location;
   }
 
-  void launch(BuildContext context, String url) {
+  bool notShowUrlSafety = false;
+
+  Future<void> launch(BuildContext context, String url) async {
     try {
-      launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication)
-          .onError((error, stackTrace) {
+      if (!Preferences.getBool(Constants.notShowUrlSafety, false)) {
+        bool? show =
+            await showDialog(context: context, builder: (context) => SafetyCheckDialog(url: url));
+        if (show != true) {
+          return;
+        }
+      }
+
+      launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication).onError((error, stackTrace) {
         ShowDialog.show(
           context,
           content: '${S.of(context).canNotOpen}\n$url',
@@ -1426,8 +1411,7 @@ class QRCodeProvider extends ChangeNotifier {
   }
 
   void _sendSMS(String message, List<String> recipents) async {
-    String _result = await sendSMS(message: message, recipients: recipents)
-        .catchError((onError) {
+    String _result = await sendSMS(message: message, recipients: recipents).catchError((onError) {
       print(onError);
     });
     print(_result);

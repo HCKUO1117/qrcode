@@ -71,5 +71,12 @@
   "wrongFormat": "Format error",
   "wrongLength": "Length does not match",
   "wrongChar": "Unsupported character",
-  "allowedChar": "Allowed Char"
+  "allowedChar": "Allowed Char",
+  "proHint": "Remove ads, unlock features",
+  "toGooglePlay": "To Google Play",
+  "notify": "Reminder",
+  "notShowAgain": "Don't show again",
+  "soonOpen": "soon to open",
+  "cancel": "Cancel",
+  "safetyNotify": "Before opening the link, please confirm whether it is a trusted link"
 }

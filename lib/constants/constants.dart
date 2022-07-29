@@ -18,4 +18,7 @@ class Constants{
 
   static const String bannerId = 'ca-app-pub-9063356592993842/6729044708';
   static const String rewardId = 'ca-app-pub-9063356592993842/6366288173';
+
+  ///string
+  static const String notShowUrlSafety = 'notShowUrlSafety';
 }

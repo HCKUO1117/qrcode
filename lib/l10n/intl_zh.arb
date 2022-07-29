@@ -71,5 +71,12 @@
   "wrongFormat": "格式錯誤",
   "wrongLength": "長度不符",
   "wrongChar": "不支援的字元",
-  "allowedChar": "允許的字元"
+  "allowedChar": "允許的字元",
+  "proHint": "移除廣告、解鎖功能",
+  "toGooglePlay": "前往Google商店",
+  "notify": "提醒",
+  "notShowAgain": "不再顯示",
+  "soonOpen": "即將開啟",
+  "cancel": "取消",
+  "safetyNotify": "開啟連結前，請先確認是否為信任的連結"
 }
