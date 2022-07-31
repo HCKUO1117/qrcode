@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:qrcode/constants/constants.dart';
+import 'package:qrcode/utils/preferences.dart';
 
 class AdBanner extends StatefulWidget {
   final bool large;
@@ -48,6 +49,9 @@ class _AdBannerState extends State<AdBanner> {
   }
 
   Future<void> _loadAd() async {
+    if(Preferences.getBool(Constants.pro, false)){
+      return;
+    }
     if (widget.large) {
       myBanner = BannerAd(
         adUnitId: Constants.testingMode ? Constants.testBannerId : Constants.bannerId,

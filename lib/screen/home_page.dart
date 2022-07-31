@@ -1,23 +1,30 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_barcode_sdk/dynamsoft_barcode.dart' as dynamsoft_barcode;
-import 'package:flutter_barcode_sdk/flutter_barcode_sdk.dart' as flutter_barcode_sdk;
+import 'package:flutter_barcode_sdk/dynamsoft_barcode.dart'
+    as dynamsoft_barcode;
+import 'package:flutter_barcode_sdk/flutter_barcode_sdk.dart'
+    as flutter_barcode_sdk;
 import 'package:flutter_switch/flutter_switch.dart';
 import 'package:flutter_vibrate/flutter_vibrate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:provider/provider.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
+import 'package:qrcode/constants/constants.dart';
 import 'package:qrcode/generated/l10n.dart';
 import 'package:qrcode/model/qrcode_data_type.dart';
+import 'package:qrcode/provider/iap.dart';
 import 'package:qrcode/screen/barcode_history_page.dart';
 import 'package:qrcode/screen/barcode_list_page.dart';
 import 'package:qrcode/screen/choose_barcode_page.dart';
 import 'package:qrcode/screen/scanned/scanned_page.dart';
+import 'package:qrcode/screen/setting/setting_page.dart';
 import 'package:qrcode/screen/widget/my_banner_ad.dart';
 import 'package:qrcode/sql/history_db.dart';
 import 'package:qrcode/sql/history_model.dart';
 import 'package:qrcode/utils/judge_qrcode_data_type.dart';
+import 'package:qrcode/utils/preferences.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({Key? key}) : super(key: key);
@@ -68,8 +75,8 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
       await _barcodeReader.init();
       setState(() {});
     });
-    expandController =
-        AnimationController(vsync: this, duration: const Duration(milliseconds: 200));
+    expandController = AnimationController(
+        vsync: this, duration: const Duration(milliseconds: 200));
     animation = CurvedAnimation(
       parent: expandController,
       curve: Curves.fastOutSlowIn,
@@ -79,8 +86,8 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
       duration: const Duration(milliseconds: 200),
     );
 
-    final curvedAnimation =
-        CurvedAnimation(curve: Curves.easeInOut, parent: bubbleAnimationController);
+    final curvedAnimation = CurvedAnimation(
+        curve: Curves.easeInOut, parent: bubbleAnimationController);
     bubbleAnimation = Tween<double>(begin: 0, end: 1).animate(curvedAnimation);
   }
 
@@ -120,8 +127,13 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                       ),
                     ),
                   Positioned(
-                      right: MediaQuery.of(context).size.width / 2 - qrWidth / 2 + 8,
-                      bottom: MediaQuery.of(context).size.height / 2 - qrHeight / 2 + 8 - 25,
+                      right: MediaQuery.of(context).size.width / 2 -
+                          qrWidth / 2 +
+                          8,
+                      bottom: MediaQuery.of(context).size.height / 2 -
+                          qrHeight / 2 +
+                          8 -
+                          25,
                       child: GestureDetector(
                         onPanUpdate: (dragDetail) {
                           if (dragDetail.globalPosition.dx * 2 -
@@ -183,11 +195,12 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                                   controller?.stopCamera();
                                   haveResult = true;
                                 });
-                                final image =
-                                    await ImagePicker().pickImage(source: ImageSource.gallery);
+                                final image = await ImagePicker()
+                                    .pickImage(source: ImageSource.gallery);
 
                                 if (image != null) {
-                                  final croppedFile = await ImageCropper().cropImage(
+                                  final croppedFile =
+                                      await ImageCropper().cropImage(
                                     sourcePath: image.path,
                                     uiSettings: [
                                       AndroidUiSettings(
@@ -206,13 +219,16 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                                     return;
                                   }
 
-                                  List<dynamsoft_barcode.BarcodeResult> results =
-                                      await _barcodeReader.decodeFile(croppedFile.path);
-                                  List<Barcode> barcodeList = _resultTransfer(results);
+                                  List<dynamsoft_barcode.BarcodeResult>
+                                      results = await _barcodeReader
+                                          .decodeFile(croppedFile.path);
+                                  List<Barcode> barcodeList =
+                                      _resultTransfer(results);
                                   final list = <HistoryModel>[];
                                   for (final element in barcodeList) {
                                     final QRCodeDataType type =
-                                        JudgeQrcodeDataType().judgeType(element.code ?? '');
+                                        JudgeQrcodeDataType()
+                                            .judgeType(element.code ?? '');
                                     final model = HistoryModel(
                                       createDate: DateTime.now(),
                                       qrcodeType: element.format.formatName,
@@ -227,7 +243,8 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                                     model.id = id;
                                     list.add(model);
                                   }
-                                  list.sort((a, b) => b.createDate.compareTo(a.createDate));
+                                  list.sort((a, b) =>
+                                      b.createDate.compareTo(a.createDate));
                                   _pushPage(
                                     BarcodeListPage(
                                       histories: list,
@@ -349,8 +366,8 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                   Positioned(
                     bottom: 16,
                     child: ConstrainedBox(
-                      constraints:
-                          BoxConstraints(maxWidth: MediaQuery.of(context).size.width - 100),
+                      constraints: BoxConstraints(
+                          maxWidth: MediaQuery.of(context).size.width - 100),
                       child: SizeTransition(
                         axis: Axis.horizontal,
                         sizeFactor: animation,
@@ -369,7 +386,8 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text(S.of(context).total + ' : ${multiScanList.length}'),
+                                    Text(S.of(context).total +
+                                        ' : ${multiScanList.length}'),
                                     Text(
                                       S.of(context).data +
                                           ' : ' +
@@ -385,7 +403,8 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                               TextButton(
                                 onPressed: () async {
                                   if (multiScanList.isEmpty) {
-                                    Fluttertoast.showToast(msg: S.of(context).youHaveNotScan);
+                                    Fluttertoast.showToast(
+                                        msg: S.of(context).youHaveNotScan);
                                     return;
                                   }
                                   setState(() {
@@ -395,7 +414,8 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                                   final list = <HistoryModel>[];
                                   for (var element in multiScanList) {
                                     final QRCodeDataType type =
-                                        JudgeQrcodeDataType().judgeType(element.code ?? '');
+                                        JudgeQrcodeDataType()
+                                            .judgeType(element.code ?? '');
                                     final model = HistoryModel(
                                       createDate: DateTime.now(),
                                       qrcodeType: element.format.formatName,
@@ -409,7 +429,8 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                                     model.id = id;
                                     list.add(model);
                                   }
-                                  list.sort((a, b) => b.createDate.compareTo(a.createDate));
+                                  list.sort((a, b) =>
+                                      b.createDate.compareTo(a.createDate));
                                   await Navigator.of(context).push(
                                     MaterialPageRoute(
                                       builder: (context) => BarcodeListPage(
@@ -447,8 +468,8 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
       },
       drawer: Drawer(
         shape: const RoundedRectangleBorder(
-          borderRadius:
-              BorderRadius.only(topRight: Radius.circular(20), bottomRight: Radius.circular(20)),
+          borderRadius: BorderRadius.only(
+              topRight: Radius.circular(20), bottomRight: Radius.circular(20)),
         ),
         child: Column(
           children: [
@@ -458,7 +479,16 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                   DrawerHeader(
                     decoration: const BoxDecoration(color: Colors.blueGrey),
                     child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        Text(
+                          Preferences.getBool(Constants.pro, false)
+                              ? S.of(context).proUser
+                              : S.of(context).normalUser,
+                          style: const TextStyle(
+                            color: Colors.white,
+                          ),
+                        ),
                         const Spacer(),
                         Row(
                           children: [
@@ -496,7 +526,12 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                     title: S.of(context).history,
                   ),
                   drawerTitle(
-                    onTap: () {},
+                    onTap: () {
+                      controller?.stopCamera();
+                      Navigator.pop(context);
+                      _pushPage(const SettingPage());
+                      controller?.resumeCamera();
+                    },
                     iconData: Icons.settings,
                     title: S.of(context).setting,
                   ),
@@ -506,12 +541,37 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                     title: S.of(context).info,
                   ),
                   drawerTitle(
-                    onTap: () {},
+                    onTap: () async {
+                      if (Preferences.getBool(Constants.pro, false)) {
+                        Fluttertoast.showToast(
+                            msg: S.of(context).purchasedNote);
+                        return;
+                      } else {
+                        context.read<IAP>().subscription();
+                        return;
+                      }
+                      await context.read<IAP>().getPurchases();
+                      if (context.read<IAP>().isSubscription ?? false) {
+                        Fluttertoast.showToast(
+                            msg: S.of(context).purchasedNote);
+                      } else {
+                        context.read<IAP>().subscription();
+                        return;
+                      }
+                    },
                     image: 'assets/icons/pro_logo_icon.png',
                     title: S.of(context).pro,
                     iconColor: Colors.orangeAccent,
                     hint: S.of(context).proHint,
                   ),
+                  drawerTitle(
+                    onTap: () {
+                      context.read<IAP>().restore();
+                    },
+                    title: S.of(context).restore,
+                    hint: S.of(context).restoreNote,
+                    iconData: Icons.restore_outlined,
+                  )
                 ],
               ),
             ),
@@ -608,7 +668,9 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
     controller.scannedDataStream.listen((scanData) async {
       if (haveResult) return;
       if (multiMode) {
-        if (multiScanList.indexWhere((element) => element.code == scanData.code) == -1) {
+        if (multiScanList
+                .indexWhere((element) => element.code == scanData.code) ==
+            -1) {
           Vibrate.vibrate();
           setState(() {
             multiScanList.add(scanData);
@@ -617,9 +679,12 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
         return;
       }
 
-      Vibrate.vibrate();
+      if (Preferences.getBool(Constants.vibrate, true)) {
+        Vibrate.vibrate();
+      }
 
-      final QRCodeDataType type = JudgeQrcodeDataType().judgeType(scanData.code ?? '');
+      final QRCodeDataType type =
+          JudgeQrcodeDataType().judgeType(scanData.code ?? '');
 
       setState(() {
         controller.pauseCamera();

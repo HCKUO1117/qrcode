@@ -805,7 +805,6 @@ class _CreateBarcodePageState extends State<CreateBarcodePage> {
           ],
         );
       case QRCodeDataType.calendar:
-        // TODO: Handle this case.
         return Column(
           children: [
             CustomTextField(

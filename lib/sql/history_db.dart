@@ -5,6 +5,7 @@ import 'package:sqflite/sqflite.dart';
 enum QueryType {
   qrcodeType,
   contentType,
+  collect,
 }
 
 class HistoryDB {
@@ -83,6 +84,10 @@ class HistoryDB {
         break;
       case QueryType.contentType:
         whereString = '$columnContentType = ?';
+        whereArguments = query;
+        break;
+      case QueryType.collect:
+        whereString = '$columnFavorite = ?';
         whereArguments = query;
         break;
     }
