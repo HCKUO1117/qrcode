@@ -13,7 +13,7 @@
   "saveCalendar": "儲存日曆",
   "confirm": "確認",
   "canNotOpen": "無法開啟",
-  "coordinate":"坐標",
+  "coordinate": "坐標",
   "name": "名稱",
   "openWifi": "請先開啟Wifi",
   "copied": "已複製",
@@ -32,7 +32,7 @@
   "data": "資料",
   "complete": "完成",
   "youHaveNotScan": "您尚未掃描任何條碼",
-  "build":"建立",
+  "build": "建立",
   "chooseType": "選擇類型",
   "content": "內容",
   "text": "文字",
@@ -98,9 +98,11 @@
   "send": "送出",
   "enter": "請輸入...",
   "feedback": "意見回饋",
-  "purchasedNote": "您已經購買過，請嘗試重新啟動APP",
-  "normalUser": "一般使用者",
-  "proUser": "專業使用者",
+  "purchasedNote": "您已經購買過，若購買內容未正確執行，請嘗試重新啟動APP",
+  "normalUser": "基礎版",
+  "proUser": "專業版",
   "restore": "恢復購買",
-  "restoreNote": "已經購買過?請點此"
+  "restoreNote": "已經購買過?請點此",
+  "needPro": "若要使用此功能，請升級為專業版。\n\n已經購買過?請點擊恢復購買。",
+  "restoreSuccess": "您已成功恢復購買"
 }

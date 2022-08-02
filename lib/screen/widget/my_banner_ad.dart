@@ -35,6 +35,9 @@ class _AdBannerState extends State<AdBanner> {
     // if(iap.isSubscription == true){
     //   return const SizedBox();
     // }
+    if(Preferences.getBool(Constants.pro, false)){
+      return const SizedBox();
+    }
     if (myBanner == null) {
       return const SizedBox(
         height: 50,

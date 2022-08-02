@@ -23,6 +23,7 @@ import 'package:qrcode/screen/setting/setting_page.dart';
 import 'package:qrcode/screen/widget/my_banner_ad.dart';
 import 'package:qrcode/sql/history_db.dart';
 import 'package:qrcode/sql/history_model.dart';
+import 'package:qrcode/utils/dialog.dart';
 import 'package:qrcode/utils/judge_qrcode_data_type.dart';
 import 'package:qrcode/utils/preferences.dart';
 
@@ -133,7 +134,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                       bottom: MediaQuery.of(context).size.height / 2 -
                           qrHeight / 2 +
                           8 -
-                          25,
+                          (Preferences.getBool(Constants.pro, false) ? 0 : 25),
                       child: GestureDetector(
                         onPanUpdate: (dragDetail) {
                           if (dragDetail.globalPosition.dx * 2 -
@@ -146,18 +147,25 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                           }
                           if (dragDetail.globalPosition.dy * 2 -
                                       MediaQuery.of(context).size.height >=
-                                  100 - 50 &&
+                                  100 -
+                                      (Preferences.getBool(Constants.pro, false)
+                                          ? 0
+                                          : 50) &&
                               dragDetail.globalPosition.dy * 2 -
                                       MediaQuery.of(context).size.height <=
                                   MediaQuery.of(context).size.height -
                                       MediaQuery.of(context).padding.top -
                                       MediaQuery.of(context).padding.bottom -
                                       180 -
-                                      50) {
+                                      (Preferences.getBool(Constants.pro, false)
+                                          ? 0
+                                          : 50)) {
                             setState(() {
                               qrHeight = dragDetail.globalPosition.dy * 2 -
                                   MediaQuery.of(context).size.height +
-                                  50;
+                                  (Preferences.getBool(Constants.pro, false)
+                                      ? 0
+                                      : 50);
                             });
                           }
                         },
@@ -303,15 +311,17 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                     bottom: 16,
                     child: Column(
                       children: [
-                        Stack(children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8),
-                            child: const Icon(
-                              Icons.fast_forward,
-                              color: Colors.white,
+                        Stack(
+                          children: [
+                            Container(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 8),
+                              child: const Icon(
+                                Icons.fast_forward,
+                                color: Colors.white,
+                              ),
                             ),
-                          ),
-                          Positioned(
+                            Positioned(
                               bottom: 0,
                               right: 0,
                               child: Image.asset(
@@ -319,8 +329,10 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                                 height: 10,
                                 width: 10,
                                 color: Colors.orangeAccent,
-                              ))
-                        ]),
+                              ),
+                            ),
+                          ],
+                        ),
                         const SizedBox(height: 16),
                         FlutterSwitch(
                             value: multiMode,
@@ -331,6 +343,11 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                             activeColor: Colors.teal,
                             showOnOff: true,
                             onToggle: (value) {
+                              if (!Preferences.getBool(Constants.pro, false)) {
+                                ShowDialog.show(context,
+                                    content: S.of(context).needPro);
+                                return;
+                              }
                               setState(() {
                                 multiMode = value;
                               });
@@ -455,9 +472,10 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                 ],
               ),
             ),
-            const AdBanner(
-              large: false,
-            ),
+            if (!Preferences.getBool(Constants.pro, false))
+              const AdBanner(
+                large: false,
+              ),
           ],
         ),
       ),
@@ -481,13 +499,25 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          Preferences.getBool(Constants.pro, false)
-                              ? S.of(context).proUser
-                              : S.of(context).normalUser,
-                          style: const TextStyle(
-                            color: Colors.white,
-                          ),
+                        Row(
+                          children: [
+                            if (Preferences.getBool(Constants.pro, false))
+                              Image.asset(
+                                'assets/icons/pro_logo_icon.png',
+                                height: 20,
+                                width: 20,
+                                color: Colors.orangeAccent,
+                              ),
+                            const SizedBox(width: 8),
+                            Text(
+                              Preferences.getBool(Constants.pro, false)
+                                  ? S.of(context).proUser
+                                  : S.of(context).normalUser,
+                              style: const TextStyle(
+                                color: Colors.white,
+                              ),
+                            ),
+                          ],
                         ),
                         const Spacer(),
                         Row(
@@ -547,15 +577,10 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                             msg: S.of(context).purchasedNote);
                         return;
                       } else {
-                        context.read<IAP>().subscription();
-                        return;
-                      }
-                      await context.read<IAP>().getPurchases();
-                      if (context.read<IAP>().isSubscription ?? false) {
-                        Fluttertoast.showToast(
-                            msg: S.of(context).purchasedNote);
-                      } else {
-                        context.read<IAP>().subscription();
+                        await context.read<IAP>().subscription();
+                        setState(() {});
+                        await controller?.stopCamera();
+                        controller?.resumeCamera();
                         return;
                       }
                     },
@@ -563,10 +588,24 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                     title: S.of(context).pro,
                     iconColor: Colors.orangeAccent,
                     hint: S.of(context).proHint,
+                    topHint: context.read<IAP>().price,
                   ),
                   drawerTitle(
-                    onTap: () {
-                      context.read<IAP>().restore();
+                    onTap: () async {
+                      if (Preferences.getBool(Constants.pro, false)) {
+                        Fluttertoast.showToast(
+                            msg: S.of(context).purchasedNote);
+                        return;
+                      }
+                      bool success = await context.read<IAP>().restore();
+
+                      if (success) {
+                        Fluttertoast.showToast(
+                            msg: S.of(context).restoreSuccess);
+                        setState(() {});
+                        await controller?.stopCamera();
+                        controller?.resumeCamera();
+                      }
                     },
                     title: S.of(context).restore,
                     hint: S.of(context).restoreNote,
@@ -602,6 +641,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
     Color? iconColor,
     required String title,
     String? hint,
+    String? topHint,
   }) {
     return InkWell(
       onTap: onTap,
@@ -630,15 +670,31 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                   .subtitle2
                   ?.copyWith(color: Theme.of(context).hintColor),
             ),
-            if (hint != null)
+            if (topHint != null || hint != null)
               Expanded(
-                child: Text(
-                  hint,
-                  textAlign: TextAlign.end,
-                  style: Theme.of(context).textTheme.subtitle2?.copyWith(
-                        color: Colors.grey,
-                        fontSize: 8,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    if (topHint != null)
+                      Text(
+                        topHint,
+                        textAlign: TextAlign.end,
+                        style: Theme.of(context).textTheme.subtitle2?.copyWith(
+                              color: Colors.grey,
+                              fontSize: 8,
+                            ),
                       ),
+                    if (hint != null)
+                      Text(
+                        hint,
+                        textAlign: TextAlign.end,
+                        style: Theme.of(context).textTheme.subtitle2?.copyWith(
+                              color: Colors.grey,
+                              fontSize: 8,
+                            ),
+                      )
+                  ],
                 ),
               ),
           ],

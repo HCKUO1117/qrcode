@@ -98,9 +98,11 @@
   "send": "Send",
   "enter": "Please enter...",
   "feedback": "Feedback",
-  "purchasedNote": "You have already purchased, please try restarting the APP",
-  "normalUser": "Normal User",
-  "proUser": "Pro User",
+  "purchasedNote": "You have already purchased, if the purchased content is not executed correctly, please try to restart the APP",
+  "normalUser": "Basic Edition",
+  "proUser": "Professional Edition",
   "restore": "Restore Purchases",
-  "restoreNote": "Already purchased? Please click here"
+  "restoreNote": "Already purchased? Please click here",
+  "needPro": "To use this feature, please upgrade to the Pro version.\n\nAlready purchased? Please click to restore the purchase.",
+  "restoreSuccess": "You have successfully restored your purchase"
 }

@@ -23,6 +23,7 @@ class IAP extends ChangeNotifier {
   bool _loading = true;
   String? _queryProductError;
   bool? isSubscription;
+  String? price;
 
   Future<void> initIAP() async {
     final Stream<List<PurchaseDetails>> purchaseUpdated =
@@ -128,6 +129,9 @@ class IAP extends ChangeNotifier {
     _consumables = <String>[];
     _purchasePending = false;
     _loading = false;
+    if (_products.isNotEmpty) {
+      price = _products[0].price;
+    }
     notifyListeners();
   }
 
@@ -194,13 +198,14 @@ class IAP extends ChangeNotifier {
             _products.firstWhere((element) => element.id == _kSubscriptionId),
         applicationUserName: null,
       );
-      _inAppPurchase.buyNonConsumable(purchaseParam: purchaseParam);
+      await _inAppPurchase.buyNonConsumable(purchaseParam: purchaseParam);
     }
     notifyListeners();
   }
 
-  Future<void> restore() async {
-    _inAppPurchase.restorePurchases();
+  Future<bool> restore() async {
+    await _inAppPurchase.restorePurchases();
+    return isSubscription ?? false;
   }
 
   void periodCheckSubscription() {

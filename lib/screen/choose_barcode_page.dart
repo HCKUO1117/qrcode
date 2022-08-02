@@ -1,7 +1,10 @@
 import 'package:barcode_widget/barcode_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:qrcode/constants/constants.dart';
 import 'package:qrcode/generated/l10n.dart';
 import 'package:qrcode/screen/create_barcode_page.dart';
+import 'package:qrcode/utils/dialog.dart';
+import 'package:qrcode/utils/preferences.dart';
 import 'package:qrcode/utils/utils.dart';
 
 extension _BarcodeTypeEx on BarcodeType{
@@ -123,6 +126,13 @@ class _ChooseBarcodePageState extends State<ChooseBarcodePage> {
       elevation: 0,
       child: InkWell(
         onTap: () {
+          if (Utils.getBarcodePro(type)){
+            if (!Preferences.getBool(Constants.pro, false)){
+              ShowDialog.show(context, content: S.of(context).needPro);
+              return;
+            }
+          }
+
           Navigator.of(context).push(
             MaterialPageRoute(
               builder: (context) => CreateBarcodePage(
