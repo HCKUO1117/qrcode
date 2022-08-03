@@ -104,5 +104,6 @@
   "restore": "恢復購買",
   "restoreNote": "已經購買過?請點此",
   "needPro": "若要使用此功能，請升級為專業版。\n\n已經購買過?請點擊恢復購買。",
-  "restoreSuccess": "您已成功恢復購買"
+  "restoreSuccess": "您已成功恢復購買",
+  "leaveApp": "是否要離開?"
 }

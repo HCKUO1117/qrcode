@@ -14,10 +14,10 @@ class Constants{
   ///ad
   static const bool testingMode = true;
   static const String testBannerId = 'ca-app-pub-3940256099942544/6300978111';
-  static const String testRewardId = 'ca-app-pub-3940256099942544/5224354917';
+  static const String testInterstitialAdId = 'ca-app-pub-3940256099942544/1033173712';
 
   static const String bannerId = 'ca-app-pub-9063356592993842/6729044708';
-  static const String rewardId = 'ca-app-pub-9063356592993842/6366288173';
+  static const String interstitialAdId = 'ca-app-pub-9063356592993842/5189065466';
 
   ///string
   static const String notShowUrlSafety = 'notShowUrlSafety';
