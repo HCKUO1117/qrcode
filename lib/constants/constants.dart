@@ -21,4 +21,14 @@ class Constants{
 
   ///string
   static const String notShowUrlSafety = 'notShowUrlSafety';
+  static const String vibrate = 'vibrate';
+  static const String pro = 'pro';
+
+  ///feedback
+  static const List<String> feedbackTypes = [
+    'recommendation',
+    'errorReport',
+    'usageProblem',
+    'other',
+  ];
 }

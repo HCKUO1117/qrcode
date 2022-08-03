@@ -19,6 +19,7 @@ class _SafetyCheckDialogState extends State<SafetyCheckDialog> {
   Widget build(BuildContext context) {
     return AlertDialog(
       title: Text(S.of(context).notify),
+      scrollable: true,
       content: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,

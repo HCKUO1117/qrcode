@@ -23,6 +23,7 @@ class MessageLookup extends MessageLookupByLibrary {
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
         "address": MessageLookupByLibrary.simpleMessage("Address"),
+        "all": MessageLookupByLibrary.simpleMessage("All"),
         "allDay": MessageLookupByLibrary.simpleMessage("All Day"),
         "allowedChar": MessageLookupByLibrary.simpleMessage("Allowed Char"),
         "bookmark": MessageLookupByLibrary.simpleMessage("BOOKMARK"),
@@ -36,11 +37,14 @@ class MessageLookup extends MessageLookupByLibrary {
         "chooseAll": MessageLookupByLibrary.simpleMessage("Choose All"),
         "chooseType": MessageLookupByLibrary.simpleMessage("Choose Type"),
         "city": MessageLookupByLibrary.simpleMessage("City"),
+        "collect": MessageLookupByLibrary.simpleMessage("Collect"),
         "complete": MessageLookupByLibrary.simpleMessage("Complete"),
         "confirm": MessageLookupByLibrary.simpleMessage("Confirm"),
         "connectWifi": MessageLookupByLibrary.simpleMessage("Connect Wifi"),
         "contact": MessageLookupByLibrary.simpleMessage("CONTACT"),
         "content": MessageLookupByLibrary.simpleMessage("Content"),
+        "contentEmpty":
+            MessageLookupByLibrary.simpleMessage("Please enter content"),
         "coordinate": MessageLookupByLibrary.simpleMessage("coordinate"),
         "copied": MessageLookupByLibrary.simpleMessage("Copied"),
         "copy": MessageLookupByLibrary.simpleMessage("Copy"),
@@ -49,16 +53,30 @@ class MessageLookup extends MessageLookupByLibrary {
         "displayName": MessageLookupByLibrary.simpleMessage("Name"),
         "email": MessageLookupByLibrary.simpleMessage("EMAIL"),
         "end": MessageLookupByLibrary.simpleMessage("end"),
+        "enter": MessageLookupByLibrary.simpleMessage("Please enter..."),
+        "errorReport": MessageLookupByLibrary.simpleMessage("Error report"),
+        "explainFeedback": MessageLookupByLibrary.simpleMessage(
+            "Please explain your question or feedback"),
+        "feedback": MessageLookupByLibrary.simpleMessage("Feedback"),
+        "feedbackType": MessageLookupByLibrary.simpleMessage(
+            "Please select the type of feedback you want"),
         "firstName": MessageLookupByLibrary.simpleMessage("First Name"),
+        "generalSetting":
+            MessageLookupByLibrary.simpleMessage("General Settings"),
         "geo": MessageLookupByLibrary.simpleMessage("GEO"),
         "geoLat": MessageLookupByLibrary.simpleMessage("Latitude"),
         "geoLon": MessageLookupByLibrary.simpleMessage("Longitude"),
         "history": MessageLookupByLibrary.simpleMessage("History"),
         "info": MessageLookupByLibrary.simpleMessage("Information"),
+        "language": MessageLookupByLibrary.simpleMessage("Language"),
         "lastName": MessageLookupByLibrary.simpleMessage("Last Name"),
         "launch": MessageLookupByLibrary.simpleMessage("Execute"),
         "launchUrl": MessageLookupByLibrary.simpleMessage("Open Link"),
         "name": MessageLookupByLibrary.simpleMessage("name"),
+        "needPro": MessageLookupByLibrary.simpleMessage(
+            "To use this feature, please upgrade to the Pro version.\n\nAlready purchased? Please click to restore the purchase."),
+        "noData": MessageLookupByLibrary.simpleMessage("No records"),
+        "normalUser": MessageLookupByLibrary.simpleMessage("Basic Edition"),
         "notShowAgain":
             MessageLookupByLibrary.simpleMessage("Don\'t show again"),
         "note": MessageLookupByLibrary.simpleMessage("Note"),
@@ -73,6 +91,7 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("Organization Name"),
         "organizationTitle":
             MessageLookupByLibrary.simpleMessage("Organization Title"),
+        "other": MessageLookupByLibrary.simpleMessage("Other..."),
         "password": MessageLookupByLibrary.simpleMessage("password"),
         "personalInfo": MessageLookupByLibrary.simpleMessage("Personal Info"),
         "phone": MessageLookupByLibrary.simpleMessage("PHONE"),
@@ -80,6 +99,16 @@ class MessageLookup extends MessageLookupByLibrary {
         "pro": MessageLookupByLibrary.simpleMessage("Upgrade Pro"),
         "proHint":
             MessageLookupByLibrary.simpleMessage("Remove ads, unlock features"),
+        "proUser": MessageLookupByLibrary.simpleMessage("Professional Edition"),
+        "purchasedNote": MessageLookupByLibrary.simpleMessage(
+            "You have already purchased, if the purchased content is not executed correctly, please try to restart the APP"),
+        "recommendation":
+            MessageLookupByLibrary.simpleMessage("Improvement suggestion"),
+        "restore": MessageLookupByLibrary.simpleMessage("Restore Purchases"),
+        "restoreNote": MessageLookupByLibrary.simpleMessage(
+            "Already purchased? Please click here"),
+        "restoreSuccess": MessageLookupByLibrary.simpleMessage(
+            "You have successfully restored your purchase"),
         "result": MessageLookupByLibrary.simpleMessage("result"),
         "safetyNotify": MessageLookupByLibrary.simpleMessage(
             "Before opening the link, please confirm whether it is a trusted link"),
@@ -90,6 +119,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "saveSuccess":
             MessageLookupByLibrary.simpleMessage("Save successfully"),
         "search": MessageLookupByLibrary.simpleMessage("Search"),
+        "send": MessageLookupByLibrary.simpleMessage("Send"),
         "sendEmail": MessageLookupByLibrary.simpleMessage("Send Email"),
         "sendSMS": MessageLookupByLibrary.simpleMessage("Send SMS"),
         "setting": MessageLookupByLibrary.simpleMessage("Setting"),
@@ -103,7 +133,13 @@ class MessageLookup extends MessageLookupByLibrary {
         "toGooglePlay": MessageLookupByLibrary.simpleMessage("To Google Play"),
         "total": MessageLookupByLibrary.simpleMessage("Total"),
         "type": MessageLookupByLibrary.simpleMessage("Type"),
+        "typeEmpty":
+            MessageLookupByLibrary.simpleMessage("Please enter the type"),
         "url": MessageLookupByLibrary.simpleMessage("URL"),
+        "urlNotify":
+            MessageLookupByLibrary.simpleMessage("Link open notification"),
+        "usageProblem": MessageLookupByLibrary.simpleMessage("Usage problem"),
+        "vibrate": MessageLookupByLibrary.simpleMessage("vibrate"),
         "website": MessageLookupByLibrary.simpleMessage("Website"),
         "wifi": MessageLookupByLibrary.simpleMessage("WIFI"),
         "wrongChar":
@@ -111,6 +147,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "wrongFormat": MessageLookupByLibrary.simpleMessage("Format error"),
         "wrongLength":
             MessageLookupByLibrary.simpleMessage("Length does not match"),
+        "yorContent": MessageLookupByLibrary.simpleMessage("Yor content"),
         "youHaveNotScan": MessageLookupByLibrary.simpleMessage(
             "You haven\'t scanned any barcodes")
       };

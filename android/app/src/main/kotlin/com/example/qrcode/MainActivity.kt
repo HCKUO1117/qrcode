@@ -1,4 +1,4 @@
-package com.example.qrcode
+package com.hc.qrcode
 
 import android.content.*
 import android.net.ConnectivityManager

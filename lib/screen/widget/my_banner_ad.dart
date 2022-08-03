@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:qrcode/constants/constants.dart';
+import 'package:qrcode/utils/preferences.dart';
 
 class AdBanner extends StatefulWidget {
   final bool large;
@@ -34,6 +35,9 @@ class _AdBannerState extends State<AdBanner> {
     // if(iap.isSubscription == true){
     //   return const SizedBox();
     // }
+    if(Preferences.getBool(Constants.pro, false)){
+      return const SizedBox();
+    }
     if (myBanner == null) {
       return const SizedBox(
         height: 50,
@@ -48,6 +52,9 @@ class _AdBannerState extends State<AdBanner> {
   }
 
   Future<void> _loadAd() async {
+    if(Preferences.getBool(Constants.pro, false)){
+      return;
+    }
     if (widget.large) {
       myBanner = BannerAd(
         adUnitId: Constants.testingMode ? Constants.testBannerId : Constants.bannerId,

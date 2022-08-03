@@ -849,6 +849,266 @@ class S {
       args: [],
     );
   }
+
+  /// `Language`
+  String get language {
+    return Intl.message(
+      'Language',
+      name: 'language',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `General Settings`
+  String get generalSetting {
+    return Intl.message(
+      'General Settings',
+      name: 'generalSetting',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `vibrate`
+  String get vibrate {
+    return Intl.message(
+      'vibrate',
+      name: 'vibrate',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Link open notification`
+  String get urlNotify {
+    return Intl.message(
+      'Link open notification',
+      name: 'urlNotify',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `All`
+  String get all {
+    return Intl.message(
+      'All',
+      name: 'all',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Collect`
+  String get collect {
+    return Intl.message(
+      'Collect',
+      name: 'collect',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `No records`
+  String get noData {
+    return Intl.message(
+      'No records',
+      name: 'noData',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Improvement suggestion`
+  String get recommendation {
+    return Intl.message(
+      'Improvement suggestion',
+      name: 'recommendation',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Error report`
+  String get errorReport {
+    return Intl.message(
+      'Error report',
+      name: 'errorReport',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Usage problem`
+  String get usageProblem {
+    return Intl.message(
+      'Usage problem',
+      name: 'usageProblem',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Other...`
+  String get other {
+    return Intl.message(
+      'Other...',
+      name: 'other',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Please select the type of feedback you want`
+  String get feedbackType {
+    return Intl.message(
+      'Please select the type of feedback you want',
+      name: 'feedbackType',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Please explain your question or feedback`
+  String get explainFeedback {
+    return Intl.message(
+      'Please explain your question or feedback',
+      name: 'explainFeedback',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Yor content`
+  String get yorContent {
+    return Intl.message(
+      'Yor content',
+      name: 'yorContent',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Please enter the type`
+  String get typeEmpty {
+    return Intl.message(
+      'Please enter the type',
+      name: 'typeEmpty',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Please enter content`
+  String get contentEmpty {
+    return Intl.message(
+      'Please enter content',
+      name: 'contentEmpty',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Send`
+  String get send {
+    return Intl.message(
+      'Send',
+      name: 'send',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Please enter...`
+  String get enter {
+    return Intl.message(
+      'Please enter...',
+      name: 'enter',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Feedback`
+  String get feedback {
+    return Intl.message(
+      'Feedback',
+      name: 'feedback',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `You have already purchased, if the purchased content is not executed correctly, please try to restart the APP`
+  String get purchasedNote {
+    return Intl.message(
+      'You have already purchased, if the purchased content is not executed correctly, please try to restart the APP',
+      name: 'purchasedNote',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Basic Edition`
+  String get normalUser {
+    return Intl.message(
+      'Basic Edition',
+      name: 'normalUser',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Professional Edition`
+  String get proUser {
+    return Intl.message(
+      'Professional Edition',
+      name: 'proUser',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Restore Purchases`
+  String get restore {
+    return Intl.message(
+      'Restore Purchases',
+      name: 'restore',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Already purchased? Please click here`
+  String get restoreNote {
+    return Intl.message(
+      'Already purchased? Please click here',
+      name: 'restoreNote',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `To use this feature, please upgrade to the Pro version.\n\nAlready purchased? Please click to restore the purchase.`
+  String get needPro {
+    return Intl.message(
+      'To use this feature, please upgrade to the Pro version.\n\nAlready purchased? Please click to restore the purchase.',
+      name: 'needPro',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `You have successfully restored your purchase`
+  String get restoreSuccess {
+    return Intl.message(
+      'You have successfully restored your purchase',
+      name: 'restoreSuccess',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {
