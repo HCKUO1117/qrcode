@@ -68,6 +68,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "lastName": MessageLookupByLibrary.simpleMessage("姓氏"),
         "launch": MessageLookupByLibrary.simpleMessage("執行"),
         "launchUrl": MessageLookupByLibrary.simpleMessage("開啟連結"),
+        "leaveApp": MessageLookupByLibrary.simpleMessage("是否要離開?"),
         "name": MessageLookupByLibrary.simpleMessage("名稱"),
         "needPro": MessageLookupByLibrary.simpleMessage(
             "若要使用此功能，請升級為專業版。\n\n已經購買過?請點擊恢復購買。"),

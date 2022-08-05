@@ -278,7 +278,9 @@ class _CreateBarcodePageState extends State<CreateBarcodePage> {
               const SizedBox(
                 height: 50,
               ),
-              const AdBanner(large: true,),
+              const AdBanner(
+                large: true,
+              ),
               const SizedBox(
                 height: 50,
               ),
@@ -299,6 +301,10 @@ class _CreateBarcodePageState extends State<CreateBarcodePage> {
           ),
           onTap: () {
             if (!Utils.correctFormat(textController.text, widget.type).correct) {
+              Fluttertoast.showToast(msg: S.of(context).wrongFormat);
+              return;
+            }
+            if (convertToQrcodeString().isEmpty) {
               Fluttertoast.showToast(msg: S.of(context).wrongFormat);
               return;
             }
@@ -1074,7 +1080,6 @@ class _CreateBarcodePageState extends State<CreateBarcodePage> {
 
         return result.toString();
     }
-    return '';
   }
 
   barcode_widget.Barcode getType(barcode_widget.BarcodeType type) {

@@ -72,6 +72,8 @@ class MessageLookup extends MessageLookupByLibrary {
         "lastName": MessageLookupByLibrary.simpleMessage("Last Name"),
         "launch": MessageLookupByLibrary.simpleMessage("Execute"),
         "launchUrl": MessageLookupByLibrary.simpleMessage("Open Link"),
+        "leaveApp":
+            MessageLookupByLibrary.simpleMessage("Do you want to leave?"),
         "name": MessageLookupByLibrary.simpleMessage("name"),
         "needPro": MessageLookupByLibrary.simpleMessage(
             "To use this feature, please upgrade to the Pro version.\n\nAlready purchased? Please click to restore the purchase."),

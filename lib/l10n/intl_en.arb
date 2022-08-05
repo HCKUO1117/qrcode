@@ -104,5 +104,6 @@
   "restore": "Restore Purchases",
   "restoreNote": "Already purchased? Please click here",
   "needPro": "To use this feature, please upgrade to the Pro version.\n\nAlready purchased? Please click to restore the purchase.",
-  "restoreSuccess": "You have successfully restored your purchase"
+  "restoreSuccess": "You have successfully restored your purchase",
+  "leaveApp": "Do you want to leave?"
 }

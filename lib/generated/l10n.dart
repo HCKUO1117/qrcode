@@ -1109,6 +1109,16 @@ class S {
       args: [],
     );
   }
+
+  /// `Do you want to leave?`
+  String get leaveApp {
+    return Intl.message(
+      'Do you want to leave?',
+      name: 'leaveApp',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

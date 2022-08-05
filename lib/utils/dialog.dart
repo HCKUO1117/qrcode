@@ -24,7 +24,7 @@ class ShowDialog {
               [
                 TextButton(
                   onPressed: () {
-                    Navigator.pop(context);
+                    Navigator.pop(context,true);
                   },
                   child: Text(
                     S.of(context).confirm,

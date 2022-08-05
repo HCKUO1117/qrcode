@@ -79,7 +79,6 @@ class _SafetyCheckDialogState extends State<SafetyCheckDialog> {
         ),
         TextButton(
           onPressed: () async {
-            print(notShow);
             await Preferences.setBool(Constants.notShowUrlSafety, notShow);
             Navigator.pop(context, true);
           },

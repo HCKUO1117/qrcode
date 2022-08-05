@@ -39,6 +39,12 @@ class CustomTextField extends StatelessWidget {
               width: 0.5,
             ),
           ),
+          focusedErrorBorder: const OutlineInputBorder(
+            borderSide: BorderSide(
+              color: Colors.grey,
+              width: 0.5,
+            ),
+          ),
           floatingLabelBehavior: FloatingLabelBehavior.auto,
           enabledBorder: const OutlineInputBorder(
             borderSide: BorderSide(
@@ -47,7 +53,12 @@ class CustomTextField extends StatelessWidget {
             ),
           ),
           labelText: label,
-          border: InputBorder.none,
+          border: const OutlineInputBorder(
+            borderSide: BorderSide(
+              color: Colors.grey,
+              width: 0.5,
+            ),
+          ),
           floatingLabelStyle: const TextStyle(
             fontSize: 18.0,
             color: Colors.grey,
