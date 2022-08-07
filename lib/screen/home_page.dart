@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_barcode_sdk/dynamsoft_barcode.dart' as dynamsoft_barcode;
-import 'package:flutter_barcode_sdk/flutter_barcode_sdk.dart' as flutter_barcode_sdk;
+import 'package:flutter_barcode_sdk/dynamsoft_barcode.dart'
+    as dynamsoft_barcode;
+import 'package:flutter_barcode_sdk/flutter_barcode_sdk.dart'
+    as flutter_barcode_sdk;
 import 'package:flutter_switch/flutter_switch.dart';
 import 'package:flutter_vibrate/flutter_vibrate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -14,6 +16,7 @@ import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:qrcode/constants/constants.dart';
 import 'package:qrcode/generated/l10n.dart';
 import 'package:qrcode/model/qrcode_data_type.dart';
+import 'package:qrcode/model/version_model.dart';
 import 'package:qrcode/provider/iap.dart';
 import 'package:qrcode/screen/barcode_history_page.dart';
 import 'package:qrcode/screen/barcode_list_page.dart';
@@ -26,6 +29,7 @@ import 'package:qrcode/sql/history_model.dart';
 import 'package:qrcode/utils/dialog.dart';
 import 'package:qrcode/utils/judge_qrcode_data_type.dart';
 import 'package:qrcode/utils/preferences.dart';
+import 'package:qrcode/utils/remote_config.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({Key? key}) : super(key: key);
@@ -50,7 +54,10 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
 
   final _barcodeReader = flutter_barcode_sdk.FlutterBarcodeSdk();
 
+  ///version
   String version = '';
+  String newVersion = '';
+  bool hasNewVersion = false;
 
   bool multiMode = false;
   List<Barcode> multiScanList = [];
@@ -73,6 +80,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
     Future.microtask(() async {
       PackageInfo packageInfo = await PackageInfo.fromPlatform();
       version = packageInfo.version;
+      versionCheck();
       await _barcodeReader.setLicense(
           'DLS2eyJoYW5kc2hha2VDb2RlIjoiMjAwMDAxLTE2NDk4Mjk3OTI2MzUiLCJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSIsInNlc3Npb25QYXNzd29yZCI6IndTcGR6Vm05WDJrcEQ5YUoifQ==');
       await _barcodeReader.init();
@@ -81,8 +89,8 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
 
       await loadAd();
     });
-    expandController =
-        AnimationController(vsync: this, duration: const Duration(milliseconds: 200));
+    expandController = AnimationController(
+        vsync: this, duration: const Duration(milliseconds: 200));
     animation = CurvedAnimation(
       parent: expandController,
       curve: Curves.fastOutSlowIn,
@@ -92,9 +100,10 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
       duration: const Duration(milliseconds: 200),
     );
 
-    final curvedAnimation =
-        CurvedAnimation(curve: Curves.easeInOut, parent: bubbleAnimationController);
+    final curvedAnimation = CurvedAnimation(
+        curve: Curves.easeInOut, parent: bubbleAnimationController);
     bubbleAnimation = Tween<double>(begin: 0, end: 1).animate(curvedAnimation);
+    RemoteConfig().getVersion();
   }
 
   @override
@@ -164,11 +173,15 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                         ),
                       ),
                     Positioned(
-                        right: MediaQuery.of(context).size.width / 2 - qrWidth / 2 + 8,
+                        right: MediaQuery.of(context).size.width / 2 -
+                            qrWidth / 2 +
+                            8,
                         bottom: MediaQuery.of(context).size.height / 2 -
                             qrHeight / 2 +
                             8 -
-                            (Preferences.getBool(Constants.pro, false) ? 0 : 25),
+                            (Preferences.getBool(Constants.pro, false)
+                                ? 0
+                                : 25),
                         child: GestureDetector(
                           onPanUpdate: (dragDetail) {
                             if (dragDetail.globalPosition.dx * 2 -
@@ -181,18 +194,27 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                             }
                             if (dragDetail.globalPosition.dy * 2 -
                                         MediaQuery.of(context).size.height >=
-                                    100 - (Preferences.getBool(Constants.pro, false) ? 0 : 50) &&
+                                    100 -
+                                        (Preferences.getBool(
+                                                Constants.pro, false)
+                                            ? 0
+                                            : 50) &&
                                 dragDetail.globalPosition.dy * 2 -
                                         MediaQuery.of(context).size.height <=
                                     MediaQuery.of(context).size.height -
                                         MediaQuery.of(context).padding.top -
                                         MediaQuery.of(context).padding.bottom -
                                         180 -
-                                        (Preferences.getBool(Constants.pro, false) ? 0 : 50)) {
+                                        (Preferences.getBool(
+                                                Constants.pro, false)
+                                            ? 0
+                                            : 50)) {
                               setState(() {
                                 qrHeight = dragDetail.globalPosition.dy * 2 -
                                     MediaQuery.of(context).size.height +
-                                    (Preferences.getBool(Constants.pro, false) ? 0 : 50);
+                                    (Preferences.getBool(Constants.pro, false)
+                                        ? 0
+                                        : 50);
                               });
                             }
                           },
@@ -230,11 +252,12 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                                     controller?.stopCamera();
                                     haveResult = true;
                                   });
-                                  final image =
-                                      await ImagePicker().pickImage(source: ImageSource.gallery);
+                                  final image = await ImagePicker()
+                                      .pickImage(source: ImageSource.gallery);
 
                                   if (image != null) {
-                                    final croppedFile = await ImageCropper().cropImage(
+                                    final croppedFile =
+                                        await ImageCropper().cropImage(
                                       sourcePath: image.path,
                                       uiSettings: [
                                         AndroidUiSettings(
@@ -253,13 +276,16 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                                       return;
                                     }
 
-                                    List<dynamsoft_barcode.BarcodeResult> results =
-                                        await _barcodeReader.decodeFile(croppedFile.path);
-                                    List<Barcode> barcodeList = _resultTransfer(results);
+                                    List<dynamsoft_barcode.BarcodeResult>
+                                        results = await _barcodeReader
+                                            .decodeFile(croppedFile.path);
+                                    List<Barcode> barcodeList =
+                                        _resultTransfer(results);
                                     final list = <HistoryModel>[];
                                     for (final element in barcodeList) {
                                       final QRCodeDataType type =
-                                          JudgeQrcodeDataType().judgeType(element.code ?? '');
+                                          JudgeQrcodeDataType()
+                                              .judgeType(element.code ?? '');
                                       final model = HistoryModel(
                                         createDate: DateTime.now(),
                                         qrcodeType: element.format.formatName,
@@ -274,7 +300,8 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                                       model.id = id;
                                       list.add(model);
                                     }
-                                    list.sort((a, b) => b.createDate.compareTo(a.createDate));
+                                    list.sort((a, b) =>
+                                        b.createDate.compareTo(a.createDate));
                                     _pushPage(
                                       BarcodeListPage(
                                         histories: list,
@@ -305,7 +332,8 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                             IconButton(
                               onPressed: () async {
                                 controller!.toggleFlash();
-                                bool? flash = await controller!.getFlashStatus();
+                                bool? flash =
+                                    await controller!.getFlashStatus();
                                 if (flash ?? false) {
                                   setState(() {
                                     flashOn = true;
@@ -336,7 +364,8 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                           Stack(
                             children: [
                               Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 8),
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 8),
                                 child: const Icon(
                                   Icons.fast_forward,
                                   color: Colors.white,
@@ -364,8 +393,10 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                               activeColor: Colors.teal,
                               showOnOff: true,
                               onToggle: (value) {
-                                if (!Preferences.getBool(Constants.pro, false)) {
-                                  ShowDialog.show(context, content: S.of(context).needPro);
+                                if (!Preferences.getBool(
+                                    Constants.pro, false)) {
+                                  ShowDialog.show(context,
+                                      content: S.of(context).needPro);
                                   return;
                                 }
                                 setState(() {
@@ -403,8 +434,8 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                     Positioned(
                       bottom: 16,
                       child: ConstrainedBox(
-                        constraints:
-                            BoxConstraints(maxWidth: MediaQuery.of(context).size.width - 100),
+                        constraints: BoxConstraints(
+                            maxWidth: MediaQuery.of(context).size.width - 100),
                         child: SizeTransition(
                           axis: Axis.horizontal,
                           sizeFactor: animation,
@@ -421,9 +452,11 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                               children: [
                                 Expanded(
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
-                                      Text(S.of(context).total + ' : ${multiScanList.length}'),
+                                      Text(S.of(context).total +
+                                          ' : ${multiScanList.length}'),
                                       Text(
                                         S.of(context).data +
                                             ' : ' +
@@ -439,7 +472,8 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                                 TextButton(
                                   onPressed: () async {
                                     if (multiScanList.isEmpty) {
-                                      Fluttertoast.showToast(msg: S.of(context).youHaveNotScan);
+                                      Fluttertoast.showToast(
+                                          msg: S.of(context).youHaveNotScan);
                                       return;
                                     }
                                     setState(() {
@@ -449,7 +483,8 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                                     final list = <HistoryModel>[];
                                     for (var element in multiScanList) {
                                       final QRCodeDataType type =
-                                          JudgeQrcodeDataType().judgeType(element.code ?? '');
+                                          JudgeQrcodeDataType()
+                                              .judgeType(element.code ?? '');
                                       final model = HistoryModel(
                                         createDate: DateTime.now(),
                                         qrcodeType: element.format.formatName,
@@ -463,7 +498,8 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                                       model.id = id;
                                       list.add(model);
                                     }
-                                    list.sort((a, b) => b.createDate.compareTo(a.createDate));
+                                    list.sort((a, b) =>
+                                        b.createDate.compareTo(a.createDate));
                                     await Navigator.of(context).push(
                                       MaterialPageRoute(
                                         builder: (context) => BarcodeListPage(
@@ -502,8 +538,9 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
         },
         drawer: Drawer(
           shape: const RoundedRectangleBorder(
-            borderRadius:
-                BorderRadius.only(topRight: Radius.circular(20), bottomRight: Radius.circular(20)),
+            borderRadius: BorderRadius.only(
+                topRight: Radius.circular(20),
+                bottomRight: Radius.circular(20)),
           ),
           child: Column(
             children: [
@@ -538,9 +575,18 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                           const Spacer(),
                           Row(
                             children: [
+                              if(hasNewVersion)
+                              Text(
+                                  S.of(context).released + ' v' + newVersion,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                ),
+                              ),
                               const Spacer(),
                               GestureDetector(
-                                onTap: () {},
+                                onTap: () {
+                                  //TODO 連至商店
+                                },
                                 child: const Icon(
                                   Icons.shop,
                                   color: Colors.white,
@@ -589,7 +635,8 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                     drawerTitle(
                       onTap: () async {
                         if (Preferences.getBool(Constants.pro, false)) {
-                          Fluttertoast.showToast(msg: S.of(context).purchasedNote);
+                          Fluttertoast.showToast(
+                              msg: S.of(context).purchasedNote);
                           return;
                         } else {
                           await context.read<IAP>().subscription();
@@ -608,13 +655,15 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                     drawerTitle(
                       onTap: () async {
                         if (Preferences.getBool(Constants.pro, false)) {
-                          Fluttertoast.showToast(msg: S.of(context).purchasedNote);
+                          Fluttertoast.showToast(
+                              msg: S.of(context).purchasedNote);
                           return;
                         }
                         bool success = await context.read<IAP>().restore();
 
                         if (success) {
-                          Fluttertoast.showToast(msg: S.of(context).restoreSuccess);
+                          Fluttertoast.showToast(
+                              msg: S.of(context).restoreSuccess);
                           setState(() {});
                           await controller?.stopCamera();
                           controller?.resumeCamera();
@@ -738,7 +787,9 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
     controller.scannedDataStream.listen((scanData) async {
       if (haveResult) return;
       if (multiMode) {
-        if (multiScanList.indexWhere((element) => element.code == scanData.code) == -1) {
+        if (multiScanList
+                .indexWhere((element) => element.code == scanData.code) ==
+            -1) {
           Vibrate.vibrate();
           setState(() {
             multiScanList.add(scanData);
@@ -751,7 +802,8 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
         Vibrate.vibrate();
       }
 
-      final QRCodeDataType type = JudgeQrcodeDataType().judgeType(scanData.code ?? '');
+      final QRCodeDataType type =
+          JudgeQrcodeDataType().judgeType(scanData.code ?? '');
 
       setState(() {
         controller.pauseCamera();
@@ -856,8 +908,9 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
 
   Future<void> loadAd() async {
     await InterstitialAd.load(
-        adUnitId:
-            Constants.testingMode ? Constants.testInterstitialAdId : Constants.interstitialAdId,
+        adUnitId: Constants.testingMode
+            ? Constants.testInterstitialAdId
+            : Constants.interstitialAdId,
         request: const AdRequest(),
         adLoadCallback: InterstitialAdLoadCallback(
           onAdLoaded: (InterstitialAd ad) {
@@ -870,12 +923,13 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
         ));
     if (interstitialAd == null) return;
     interstitialAd!.fullScreenContentCallback = FullScreenContentCallback(
-      onAdShowedFullScreenContent: (InterstitialAd ad) => print('%ad onAdShowedFullScreenContent.'),
+      onAdShowedFullScreenContent: (InterstitialAd ad) =>
+          print('%ad onAdShowedFullScreenContent.'),
       onAdDismissedFullScreenContent: (InterstitialAd ad) {
         print('$ad onAdDismissedFullScreenContent.');
         ad.dispose();
       },
-      onAdWillDismissFullScreenContent: (InterstitialAd ad){
+      onAdWillDismissFullScreenContent: (InterstitialAd ad) {
         ad.dispose();
       },
       onAdFailedToShowFullScreenContent: (InterstitialAd ad, AdError error) {
@@ -884,5 +938,44 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
       },
       onAdImpression: (InterstitialAd ad) => print('$ad impression occurred.'),
     );
+  }
+
+  Future<void> versionCheck() async {
+    VersionModel versionModel = await RemoteConfig().getVersion();
+    newVersion = versionModel.version;
+
+    final List<String> nowVersions = version.split('.');
+    final List<String> newVersions = versionModel.version.split('.');
+
+    if (version.isNotEmpty && newVersion.isNotEmpty) {
+      if (int.parse(newVersions[0]) > int.parse(nowVersions[0])) {
+        hasNewVersion = true;
+      } else {
+        if (int.parse(newVersions[1]) > int.parse(nowVersions[1])) {
+          hasNewVersion = true;
+        } else {
+          if (int.parse(newVersions[2]) > int.parse(nowVersions[2])) {
+            hasNewVersion = true;
+          }
+        }
+      }
+    }
+
+    setState(() {});
+    if (versionModel.force) {
+      ShowDialog.show(
+        context,
+        barrierDismissible: false,
+        content: S.of(context).forceUpdate,
+        actions: [
+          TextButton(
+            onPressed: () {
+              //TODO 連至商店
+            },
+            child: Text(S.of(context).confirm),
+          )
+        ],
+      );
+    }
   }
 }

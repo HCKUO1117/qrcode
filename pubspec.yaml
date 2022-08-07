@@ -68,6 +68,10 @@ dependencies:
   shared_preferences: ^2.0.12
   in_app_purchase: ^3.0.2
   in_app_purchase_android: ^0.2.2+8
+  # firebase
+  firebase_core: ^1.20.0
+  firebase_remote_config: ^2.0.13
+  firebase_analytics: ^9.3.0
 
 dependency_overrides:
   in_app_purchase_android: 0.2.2+8

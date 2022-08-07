@@ -1,9 +1,12 @@
 import 'dart:io';
 
+import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:provider/provider.dart';
+import 'package:qrcode/firebase_options.dart';
 import 'package:qrcode/generated/l10n.dart';
 import 'package:qrcode/provider/iap.dart';
 import 'package:qrcode/provider/qrcode_provider.dart';
@@ -14,6 +17,9 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   MobileAds.instance.initialize();
   Preferences.init();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(const MyApp());
 }
 
@@ -38,6 +44,9 @@ class _MyAppState extends State<MyApp> {
 
   final List<Locale>? systemLocales = WidgetsBinding.instance?.window.locales;
 
+  FirebaseAnalytics analytics = FirebaseAnalytics.instance;
+  late FirebaseAnalyticsObserver observer;
+
   Future<void> setLocale(Locale value) async {
     setState(() {
       _locale = value;
@@ -48,6 +57,7 @@ class _MyAppState extends State<MyApp> {
 
   @override
   void initState() {
+    observer = FirebaseAnalyticsObserver(analytics: analytics);
     Future<void>.microtask(() async {
       iap.initIAP();
       await Preferences.init();

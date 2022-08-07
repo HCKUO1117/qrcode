@@ -58,6 +58,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "feedback": MessageLookupByLibrary.simpleMessage("意見回饋"),
         "feedbackType": MessageLookupByLibrary.simpleMessage("請選擇您要回報的類型"),
         "firstName": MessageLookupByLibrary.simpleMessage("名子"),
+        "forceUpdate": MessageLookupByLibrary.simpleMessage("請更新至最新版本"),
         "generalSetting": MessageLookupByLibrary.simpleMessage("一般設定"),
         "geo": MessageLookupByLibrary.simpleMessage("座標"),
         "geoLat": MessageLookupByLibrary.simpleMessage("緯度"),
@@ -94,6 +95,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "purchasedNote": MessageLookupByLibrary.simpleMessage(
             "您已經購買過，若購買內容未正確執行，請嘗試重新啟動APP"),
         "recommendation": MessageLookupByLibrary.simpleMessage("改善建議"),
+        "released": MessageLookupByLibrary.simpleMessage("有新版本"),
         "restore": MessageLookupByLibrary.simpleMessage("恢復購買"),
         "restoreNote": MessageLookupByLibrary.simpleMessage("已經購買過?請點此"),
         "restoreSuccess": MessageLookupByLibrary.simpleMessage("您已成功恢復購買"),

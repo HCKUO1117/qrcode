@@ -61,6 +61,8 @@ class MessageLookup extends MessageLookupByLibrary {
         "feedbackType": MessageLookupByLibrary.simpleMessage(
             "Please select the type of feedback you want"),
         "firstName": MessageLookupByLibrary.simpleMessage("First Name"),
+        "forceUpdate": MessageLookupByLibrary.simpleMessage(
+            "Please update to the latest version"),
         "generalSetting":
             MessageLookupByLibrary.simpleMessage("General Settings"),
         "geo": MessageLookupByLibrary.simpleMessage("GEO"),
@@ -106,6 +108,7 @@ class MessageLookup extends MessageLookupByLibrary {
             "You have already purchased, if the purchased content is not executed correctly, please try to restart the APP"),
         "recommendation":
             MessageLookupByLibrary.simpleMessage("Improvement suggestion"),
+        "released": MessageLookupByLibrary.simpleMessage("new version"),
         "restore": MessageLookupByLibrary.simpleMessage("Restore Purchases"),
         "restoreNote": MessageLookupByLibrary.simpleMessage(
             "Already purchased? Please click here"),

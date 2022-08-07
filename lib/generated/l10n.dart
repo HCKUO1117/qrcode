@@ -1119,6 +1119,26 @@ class S {
       args: [],
     );
   }
+
+  /// `new version`
+  String get released {
+    return Intl.message(
+      'new version',
+      name: 'released',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Please update to the latest version`
+  String get forceUpdate {
+    return Intl.message(
+      'Please update to the latest version',
+      name: 'forceUpdate',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {
