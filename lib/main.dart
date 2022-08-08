@@ -44,9 +44,6 @@ class _MyAppState extends State<MyApp> {
 
   final List<Locale>? systemLocales = WidgetsBinding.instance?.window.locales;
 
-  FirebaseAnalytics analytics = FirebaseAnalytics.instance;
-  late FirebaseAnalyticsObserver observer;
-
   Future<void> setLocale(Locale value) async {
     setState(() {
       _locale = value;
@@ -57,7 +54,6 @@ class _MyAppState extends State<MyApp> {
 
   @override
   void initState() {
-    observer = FirebaseAnalyticsObserver(analytics: analytics);
     Future<void>.microtask(() async {
       iap.initIAP();
       await Preferences.init();
