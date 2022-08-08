@@ -107,5 +107,9 @@
   "restoreSuccess": "您已成功恢復購買",
   "leaveApp": "是否要離開?",
   "released": "有新版本",
-  "forceUpdate": "請更新至最新版本"
+  "forceUpdate": "請更新至最新版本",
+  "supportType": "支援的類型",
+  "fromPicture": "圖片掃描",
+  "fromCamera": "相機掃描",
+  "generate": "生成"
 }

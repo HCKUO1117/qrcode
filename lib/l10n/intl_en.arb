@@ -107,5 +107,9 @@
   "restoreSuccess": "You have successfully restored your purchase",
   "leaveApp": "Do you want to leave?",
   "released": "new version",
-  "forceUpdate": "Please update to the latest version"
+  "forceUpdate": "Please update to the latest version",
+  "supportType": "Supported Types",
+  "fromPicture": "Picture Scan",
+  "fromCamera": "Camera Scan",
+  "generate": "Generate"
 }

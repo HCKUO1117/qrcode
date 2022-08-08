@@ -63,8 +63,11 @@ class MessageLookup extends MessageLookupByLibrary {
         "firstName": MessageLookupByLibrary.simpleMessage("First Name"),
         "forceUpdate": MessageLookupByLibrary.simpleMessage(
             "Please update to the latest version"),
+        "fromCamera": MessageLookupByLibrary.simpleMessage("Camera Scan"),
+        "fromPicture": MessageLookupByLibrary.simpleMessage("Picture Scan"),
         "generalSetting":
             MessageLookupByLibrary.simpleMessage("General Settings"),
+        "generate": MessageLookupByLibrary.simpleMessage("Generate"),
         "geo": MessageLookupByLibrary.simpleMessage("GEO"),
         "geoLat": MessageLookupByLibrary.simpleMessage("Latitude"),
         "geoLon": MessageLookupByLibrary.simpleMessage("Longitude"),
@@ -134,6 +137,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "state": MessageLookupByLibrary.simpleMessage("State"),
         "street": MessageLookupByLibrary.simpleMessage("Street"),
         "subject": MessageLookupByLibrary.simpleMessage("Subject"),
+        "supportType": MessageLookupByLibrary.simpleMessage("Supported Types"),
         "text": MessageLookupByLibrary.simpleMessage("TEXT"),
         "toGooglePlay": MessageLookupByLibrary.simpleMessage("To Google Play"),
         "total": MessageLookupByLibrary.simpleMessage("Total"),

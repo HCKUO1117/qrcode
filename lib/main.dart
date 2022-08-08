@@ -85,6 +85,7 @@ class _MyAppState extends State<MyApp> {
         ChangeNotifierProvider.value(value: iap),
       ],
       child: MaterialApp(
+        debugShowCheckedModeBanner: false,
         navigatorKey: MyApp.navigatorKey,
         theme: ThemeData(
           primarySwatch: Colors.blue,
@@ -104,6 +105,7 @@ class _MyAppState extends State<MyApp> {
         supportedLocales: const [
           Locale('en', ''),
           Locale('zh', 'TW'),
+          Locale('ar', 'SA'),
         ],
         locale: _locale ?? const Locale('zh', 'TW'),
         home: const MyHomePage(),

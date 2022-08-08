@@ -21,6 +21,7 @@ import 'package:qrcode/provider/iap.dart';
 import 'package:qrcode/screen/barcode_history_page.dart';
 import 'package:qrcode/screen/barcode_list_page.dart';
 import 'package:qrcode/screen/choose_barcode_page.dart';
+import 'package:qrcode/screen/info_page.dart';
 import 'package:qrcode/screen/scanned/scanned_page.dart';
 import 'package:qrcode/screen/setting/setting_page.dart';
 import 'package:qrcode/screen/widget/my_banner_ad.dart';
@@ -628,7 +629,12 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                       title: S.of(context).setting,
                     ),
                     drawerTitle(
-                      onTap: () {},
+                      onTap: () {
+                        controller?.stopCamera();
+                        Navigator.pop(context);
+                        _pushPage(const InfoPage());
+                        controller?.resumeCamera();
+                      },
                       iconData: Icons.info_outline,
                       title: S.of(context).info,
                     ),

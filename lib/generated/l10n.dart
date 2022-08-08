@@ -1139,6 +1139,46 @@ class S {
       args: [],
     );
   }
+
+  /// `Supported Types`
+  String get supportType {
+    return Intl.message(
+      'Supported Types',
+      name: 'supportType',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Picture Scan`
+  String get fromPicture {
+    return Intl.message(
+      'Picture Scan',
+      name: 'fromPicture',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Camera Scan`
+  String get fromCamera {
+    return Intl.message(
+      'Camera Scan',
+      name: 'fromCamera',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Generate`
+  String get generate {
+    return Intl.message(
+      'Generate',
+      name: 'generate',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {
@@ -1147,6 +1187,7 @@ class AppLocalizationDelegate extends LocalizationsDelegate<S> {
   List<Locale> get supportedLocales {
     return const <Locale>[
       Locale.fromSubtags(languageCode: 'en'),
+      Locale.fromSubtags(languageCode: 'ar'),
       Locale.fromSubtags(languageCode: 'zh'),
     ];
   }
