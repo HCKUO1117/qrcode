@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:qrcode/constants/languages.dart';
 import 'package:qrcode/generated/l10n.dart';
 import 'package:qrcode/main.dart';
 import 'package:qrcode/utils/preferences.dart';
+import 'package:scroll_to_index/scroll_to_index.dart';
 
 class LanguagePage extends StatefulWidget {
   const LanguagePage({Key? key}) : super(key: key);
@@ -14,19 +16,19 @@ class LanguagePage extends StatefulWidget {
 class _LanguagePageState extends State<LanguagePage> {
   int currentValue = 0;
 
+  AutoScrollController controller = AutoScrollController();
+
   @override
   void initState() {
     String language = Preferences.getString('languageCode', 'en');
     String country = Preferences.getString('countryCode', '');
     Future.delayed(Duration.zero, () {
-      if (Languages.languages.indexWhere((element) =>
-              element['country'] == language &&
-              element['countryCode'] == country) !=
+      if (Languages.languages.indexWhere(
+              (element) => element['country'] == language && element['countryCode'] == country) !=
           -1) {
         setState(() {
-          currentValue = Languages.languages.indexWhere((element) =>
-              element['country'] == language &&
-              element['countryCode'] == country);
+          currentValue = Languages.languages.indexWhere(
+              (element) => element['country'] == language && element['countryCode'] == country);
         });
       }
     });
@@ -35,6 +37,9 @@ class _LanguagePageState extends State<LanguagePage> {
 
   @override
   Widget build(BuildContext context) {
+    SchedulerBinding.instance?.addPostFrameCallback((_) {
+      controller.scrollToIndex(currentValue, preferPosition: AutoScrollPosition.middle);
+    });
     return Container(
       decoration: const BoxDecoration(
           color: Colors.white,
@@ -48,10 +53,23 @@ class _LanguagePageState extends State<LanguagePage> {
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               TextButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: Text(S.of(context).cancel)),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: Row(
+                  children: [
+                    const Icon(
+                      Icons.clear,
+                      color: Colors.redAccent,
+                    ),
+                    Text(
+                      S.of(context).cancel,
+                      style: const TextStyle(color: Colors.redAccent),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 16),
               TextButton(
                 onPressed: () async {
                   await MyApp.of(context)?.setLocale(
@@ -62,20 +80,33 @@ class _LanguagePageState extends State<LanguagePage> {
                   );
                   Navigator.pop(context, true);
                 },
-                child: Text(S.of(context).confirm),
+                child: Row(
+                  children: [
+                    const Icon(Icons.check),
+                    Text(S.of(context).confirm),
+                  ],
+                ),
               ),
             ],
           ),
-          ListView.builder(
-            shrinkWrap: true,
-            itemCount: Languages.languages.length,
-            itemBuilder: (context, index) {
-              return languageTitle(
-                index,
-                image: Languages.languages[index]['image'],
-                title: Languages.languages[index]['name'],
-              );
-            },
+          Expanded(
+            child: ListView.builder(
+              shrinkWrap: true,
+              controller: controller,
+              itemCount: Languages.languages.length,
+              itemBuilder: (context, index) {
+                return AutoScrollTag(
+                  key: ValueKey(index),
+                  controller: controller,
+                  index: index,
+                  child: languageTitle(
+                    index,
+                    image: Languages.languages[index]['image'],
+                    title: Languages.languages[index]['name'],
+                  ),
+                );
+              },
+            ),
           ),
         ],
       ),
@@ -106,8 +137,7 @@ class _LanguagePageState extends State<LanguagePage> {
     );
   }
 
-  String getLanguageByContext(
-      BuildContext context, String code, String countryCode) {
+  String getLanguageByContext(BuildContext context, String code, String countryCode) {
     switch (code + countryCode) {
       case 'en':
         return 'English';

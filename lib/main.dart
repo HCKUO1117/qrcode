@@ -30,8 +30,7 @@ class MyApp extends StatefulWidget {
   @override
   _MyAppState createState() => _MyAppState();
 
-  static _MyAppState? of(BuildContext context) =>
-      context.findAncestorStateOfType<_MyAppState>();
+  static _MyAppState? of(BuildContext context) => context.findAncestorStateOfType<_MyAppState>();
 }
 
 class _MyAppState extends State<MyApp> {
@@ -61,15 +60,22 @@ class _MyAppState extends State<MyApp> {
       String countryCode = Preferences.getString('countryCode', '');
       setState(() {
         if (languageCode.isNotEmpty) {
-          _locale = Locale.fromSubtags(
-              languageCode: languageCode, countryCode: countryCode);
+          _locale = Locale(languageCode, countryCode);
         } else {
-          if (defaultLocale == 'zh_Hant_TW') {
-            _locale =
-                const Locale.fromSubtags(languageCode: 'zh', countryCode: 'TW');
-            Preferences.setString('languageCode', 'zh');
-            Preferences.setString('countryCode', 'TW');
+          if(defaultLocale.length > 1){
+            String first = defaultLocale.substring(0,2);
+            String last = defaultLocale.substring(defaultLocale.length - 2,defaultLocale.length);
+            _locale = Locale(first,last == 'TW' ? 'TW' : '');
+            Preferences.setString('languageCode', first);
+            if(last == 'TW'){
+              Preferences.setString('countryCode', last);
+            }
           }
+          // if (defaultLocale == 'zh_Hant_TW') {
+          //   _locale = const Locale('zh','TW');
+          //   Preferences.setString('languageCode', 'zh');
+          //   Preferences.setString('countryCode', 'TW');
+          // }
         }
       });
     });
@@ -105,9 +111,32 @@ class _MyAppState extends State<MyApp> {
         supportedLocales: const [
           Locale('en', ''),
           Locale('zh', 'TW'),
-          Locale('ar', 'SA'),
+          Locale('zh', ''),
+          Locale('ar', ''),
+          Locale('cs', ''),
+          Locale('de', ''),
+          Locale('el', ''),
+          Locale('es', ''),
+          Locale('fi', ''),
+          Locale('fr', ''),
+          Locale('he', ''),
+          Locale('hu', ''),
+          Locale('id', ''),
+          Locale('hi', ''),
+          Locale('it', ''),
+          Locale('ja', ''),
+          Locale('ko', ''),
+          Locale('nl', ''),
+          Locale('pl', ''),
+          Locale('pt', ''),
+          Locale('ro', ''),
+          Locale('ru', ''),
+          Locale('sk', ''),
+          Locale('tr', ''),
+          Locale('uk', ''),
+          Locale('vi', ''),
         ],
-        locale: _locale ?? const Locale('zh', 'TW'),
+        locale: _locale ?? const Locale('en', ''),
         home: const MyHomePage(),
       ),
     );
