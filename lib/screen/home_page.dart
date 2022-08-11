@@ -557,8 +557,11 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                               const Spacer(),
                               GestureDetector(
                                 onTap: () {
-                                  launchUrl(Uri.parse(
-                                      'https://play.google.com/store/apps/details?id=com.hc.qrcode'));
+                                  launchUrl(
+                                    Uri.parse(
+                                        'https://play.google.com/store/apps/details?id=com.hc.qrcode'),
+                                    mode: LaunchMode.externalApplication,
+                                  );
                                 },
                                 child: const Icon(
                                   Icons.shop,
