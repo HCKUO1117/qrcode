@@ -111,5 +111,6 @@
   "supportType": "支援的类型",
   "fromPicture": "图片扫描",
   "fromCamera": "相机扫描",
-  "generate": "生成"
+  "generate": "生成",
+  "privacy": "隐私权政策"
 }

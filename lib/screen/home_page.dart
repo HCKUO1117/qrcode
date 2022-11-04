@@ -22,6 +22,7 @@ import 'package:qrcode/screen/choose_barcode_page.dart';
 import 'package:qrcode/screen/info_page.dart';
 import 'package:qrcode/screen/scanned/scanned_page.dart';
 import 'package:qrcode/screen/setting/setting_page.dart';
+import 'package:qrcode/screen/web_view_page.dart';
 import 'package:qrcode/screen/widget/my_banner_ad.dart';
 import 'package:qrcode/sql/history_db.dart';
 import 'package:qrcode/sql/history_model.dart';
@@ -650,6 +651,18 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                       title: S.of(context).restore,
                       hint: S.of(context).restoreNote,
                       iconData: Icons.restore_outlined,
+                    ),
+                    drawerTitle(
+                      onTap: () async {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const WebViewPage(),
+                          ),
+                        );
+                      },
+                      title: S.of(context).privacy,
+                      iconData: Icons.verified_user_outlined,
                     )
                   ],
                 ),

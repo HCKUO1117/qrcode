@@ -111,5 +111,6 @@
   "supportType": " Types pris en charge",
   "fromPicture": " Numérisation d'image",
   "fromCamera": " Numérisation de caméra",
-  "generate": " Générer"
+  "generate": " Générer",
+  "privacy": "politique de confidentialité"
 }

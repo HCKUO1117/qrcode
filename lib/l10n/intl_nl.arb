@@ -111,5 +111,6 @@
   "supportType": " Ondersteunde typen",
   "fromPicture": " Beeldscan",
   "fromCamera": " Camerascan",
-  "generate": " Genereer"
+  "generate": " Genereer",
+  "privacy": "privacybeleid"
 }

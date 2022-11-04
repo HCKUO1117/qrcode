@@ -92,6 +92,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "personalInfo": MessageLookupByLibrary.simpleMessage("个人资讯"),
         "phone": MessageLookupByLibrary.simpleMessage("电话"),
         "postal": MessageLookupByLibrary.simpleMessage("邮递区号"),
+        "privacy": MessageLookupByLibrary.simpleMessage("隐私权政策"),
         "pro": MessageLookupByLibrary.simpleMessage("升级专业版"),
         "proHint": MessageLookupByLibrary.simpleMessage("移除广告、解锁功能"),
         "proUser": MessageLookupByLibrary.simpleMessage("专业版"),

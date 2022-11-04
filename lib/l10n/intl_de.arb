@@ -111,5 +111,6 @@
   "supportType": " Unterstützte Typen",
   "fromPicture": " Bild scannen",
   "fromCamera": " Kamera scannen",
-  "generate": " Generieren"
+  "generate": " Generieren",
+  "privacy": "Datenschutz-Bestimmungen"
 }

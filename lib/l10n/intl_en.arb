@@ -111,5 +111,6 @@
   "supportType": "Supported Types",
   "fromPicture": "Picture Scan",
   "fromCamera": "Camera Scan",
-  "generate": "Generate"
+  "generate": "Generate",
+  "privacy": "privacy policy"
 }

@@ -111,5 +111,6 @@
   "supportType": " Obsługiwane typy",
   "fromPicture": " Skanowanie obrazu",
   "fromCamera": " Skanowanie aparatu",
-  "generate": " Generuj"
+  "generate": " Generuj",
+  "privacy": "Polityka prywatności"
 }

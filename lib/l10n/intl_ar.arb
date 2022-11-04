@@ -111,5 +111,6 @@
   "supportType": " الأنواع المدعومة ",
   "fromPicture": " مسح الصور ",
   "fromCamera": " مسح الكاميرا ",
-  "generate": " الجيل"
+  "generate": " الجيل",
+  "privacy": "سياسة الخصوصية"
 }

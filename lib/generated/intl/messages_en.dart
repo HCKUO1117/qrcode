@@ -103,6 +103,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "personalInfo": MessageLookupByLibrary.simpleMessage("Personal Info"),
         "phone": MessageLookupByLibrary.simpleMessage("PHONE"),
         "postal": MessageLookupByLibrary.simpleMessage("Postal"),
+        "privacy": MessageLookupByLibrary.simpleMessage("privacy policy"),
         "pro": MessageLookupByLibrary.simpleMessage("Upgrade Pro"),
         "proHint":
             MessageLookupByLibrary.simpleMessage("Remove ads, unlock features"),

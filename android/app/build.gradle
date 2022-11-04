@@ -72,6 +72,13 @@ android {
             signingConfig signingConfigs.release
         }
     }
+
+    lintOptions {
+        disable 'InvalidPackage'
+        disable "Instantiatable"
+        checkReleaseBuilds false
+        abortOnError false
+    }
 }
 
 flutter {
@@ -79,6 +86,6 @@ flutter {
 }
 
 dependencies {
-    implementation("com.android.billingclient:billing:5.0.0")
+    implementation("com.android.billingclient:billing:4.0.0")
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 }

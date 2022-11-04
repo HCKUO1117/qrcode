@@ -111,5 +111,6 @@
   "supportType": " Tipos admitidos ",
   "fromPicture": " Escaneo de imagen ",
   "fromCamera": " Escaneo de cámara ",
-  "generate": " Generar"
+  "generate": " Generar",
+  "privacy": "política de privacidad"
 }

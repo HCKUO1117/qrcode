@@ -111,5 +111,6 @@
   "supportType": "支援的類型",
   "fromPicture": "圖片掃描",
   "fromCamera": "相機掃描",
-  "generate": "生成"
+  "generate": "生成",
+  "privacy": "隱私權政策"
 }

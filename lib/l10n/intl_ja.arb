@@ -111,5 +111,6 @@
   "supportType": " サポートされているタイプ",
   "fromPicture": " 画像スキャン",
   "fromCamera": " カメラスキャン",
-  "generate": " 生成"
+  "generate": " 生成",
+  "privacy": "プライバシーポリシー"
 }

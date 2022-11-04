@@ -111,5 +111,6 @@
   "supportType": " Tuetut tyypit",
   "fromPicture": " Kuvan skannaus",
   "fromCamera": " Kameran skannaus",
-  "generate": " Luo"
+  "generate": " Luo",
+  "privacy": "Tietosuojakäytäntö"
 }
